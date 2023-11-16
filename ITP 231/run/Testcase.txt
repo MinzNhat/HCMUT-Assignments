@@ -1,0 +1,30 @@
+Add [Course Intro to Programming] [Room 701-H6] [07:00|01/10/2023-12:00|3/12/2024]
+Add [Course Math Modelling] [Room 101-H1] [15:00|01/10/2023-16:50|01/10/2023]
+Add [Course Linear Programming] [Room 301-H3] [12:00|02/10/2023-13:50|02/10/2023]
+Add [Course Programming Fundamentals] [Room 701-H6] [09:00|15/10/2023-11:20|17/12/2023]
+Add [Course Data Structures] [Room 201-H2] [14:30|22/10/2023-16:50|28/01/2024]
+Add [Course Algorithms and Complexity] [Room 401-H4] [10:00|29/10/2023-12:20|04/02/2024]
+Add [Course Object-Oriented Programming] [Room 301-H3] [13:30|05/11/2023-15:50|11/02/2024]
+Add [Course Database Systems] [Room 501-H5] [16:00|12/11/2023-18:20|18/02/2024]
+Add [Course Artificial Intelligence] [Room 601-H6] [08:30|20/11/2023-10:50|26/02/2024]
+Add [Course Web Development] [Room 401-H4] [13:00|27/11/2023-15:00|04/03/2024]
+Add [Course Data Analysis] [Room 301-H3] [16:00|04/12/2023-18:00|10/03/2024]
+Add [Course Mobile App Development] [Room 201-H2] [09:30|11/12/2023-11:50|17/03/2024]
+Add [Course Software Engineering] [Room 501-H5] [14:00|18/12/2023-16:20|24/03/2024]
+Show filter status:[I]
+Show filter title:[Linear]
+Show filter description:[H6]
+Delete #2
+Show #7
+Show tail %1
+Show head %1
+Edit #5 title:[Calculus 2]
+Edit #3 description:[Room 501-H6]
+Edit #2 time:[07:00|01/11/2023-12:00|3/11/2023]
+Edit #3 status:[D]
+Show filter status:[D]
+Show filter title:[Calculus]
+Show all
+Show week time:[mon/27/11/2023]
+Quit
+Add [Course Intro to Programming] [Room 701-H6] [07:00|01/10/2023-12:00|3/11/2023]
