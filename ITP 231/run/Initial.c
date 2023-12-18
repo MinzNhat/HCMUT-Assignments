@@ -92,12 +92,12 @@ void getTimeFromAdd(char * command, char * out_time) {
     start = strchr(start + 1, '[') + 1; //Find the ptr to the second characer '[' in the command
     start = strchr(start + 1, '[') + 1; ////Find the ptr to the third characer '[' in the command
     char* end = strchr(start, ']'); //Find the ptr to the third characer ']' in the command
-    for (int i = 0; i < end - start; i++){ //Copy the string between ptr start and ptr end, which is <time>, to the string out_time
+    for (int i = 0; i< end - start; i++){ //Copy the string between ptr start and ptr end, which is <time>, to the string out_time
         out_time[i] = start[i];
     }
 }
 //End Requirement 2//
-//Requirement 3//
+//Requirement 2//
 int checkTitle(char * raw_title) {
     if (strlen(raw_title) > MAX_LENGTH_TITLE) { //If title's length > max length then return title's length
         return strlen(raw_title); //Return title's length
@@ -144,8 +144,9 @@ int isLeapYear(int year) { //Use to check if the parameter is a leap year or not
     else return 0; //If it's not a leap year then return 0
 }
 int isValidDateTime(int hh, int mm, int dd, int mo, int yyyy) {
-    if (hh < 0 || hh > 23) return abs(hh) + 1100; 
     if (mm < 0 || mm > 59) return abs(mm) + 2100;
+    if (hh < 0 || hh > 23) return abs(hh) + 1100; 
+    if (yyyy <= 0) return abs(yyyy) + 510000; 
     int maxDays;
     if (mo == 2) {
         maxDays = isLeapYear(yyyy) ? 29 : 28;
@@ -160,7 +161,6 @@ int isValidDateTime(int hh, int mm, int dd, int mo, int yyyy) {
         return abs(mo) + 4100;
     }
     if (dd < 1 || dd > maxDays) return abs(dd) + 3100;
-    if (yyyy <= 0) return abs(yyyy) + 510000; 
     return -1;
 }
 int checkTime(char* raw_time) {
@@ -172,7 +172,7 @@ int checkTime(char* raw_time) {
     if (result1 != -1) return result1;
 
     int result2 = isValidDateTime(hh2, mm2, dd2, mo2, yyyy2);
-    if (result2 != -1 && result1 < 100000) return result2 + 100;
+    if (result2 != -1 && result2 < 100000) return result2 + 100;
     else if (result2 >= 100000) return result2 + 10000;
 
     if (yyyy2 < yyyy || (yyyy2 == yyyy && (mo2 < mo || (mo2 == mo && (dd2 < dd || (dd2 == dd && (hh2 < hh || (hh2 == hh && mm2 < mm)))))))) return 0;
