@@ -1,15 +1,10 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-
-// This function can be marked `async` if using `await` inside
-export function middleware(request: NextRequest) {
-    if (request.nextUrl.pathname === '/') {
-        return NextResponse.redirect(new URL('/data', request.url));
+export async function middleware(request: any) {
+    if (request.url === '/') {
+        return new Response(null, {
+            status: 302,
+            headers: {
+                'Location': '/data'
+            }
+        });
     }
-}
-
-
-
-export const config = {
-    matcher: ['/'],
 }
