@@ -1,8 +1,12 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-export function middleware(request: NextRequest) {
-   return NextResponse.next();
-}
-export const config = {
-    matcher: ['/:path*'],
+import { NextResponse } from 'next/server';
+
+export async function middleware(request: any) {
+    const requestUrl = new URL(request.url);
+
+    if (requestUrl.pathname === '/') {
+        const redirectUrl = new URL('/data', request.url);
+        return NextResponse.redirect(redirectUrl);
+    }
+
+    return NextResponse.next();
 }
