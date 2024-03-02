@@ -1,12 +1,8 @@
-import { NextResponse } from 'next/server';
-
-export async function middleware(request:any) {
-    if (request.nextUrl.pathname === '/') {
-        // Construct the redirect URL manually
-        const redirectUrl = '/data';
-        return NextResponse.redirect(redirectUrl);
-    }
-
-    // If the path is not '/', proceed with the next middleware
-    return NextResponse.next();
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+export function middleware(request: NextRequest) {
+   return NextResponse.next();
+}
+export const config = {
+    matcher: ['/:path*'],
 }
