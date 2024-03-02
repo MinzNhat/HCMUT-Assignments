@@ -1,12 +1,9 @@
-import { NextResponse } from 'next/server';
-
-export async function middleware(request: any) {
-    const requestUrl = new URL(request.url);
-
-    if (requestUrl.pathname === '/') {
-        const redirectUrl = new URL('/data', request.url);
-        return NextResponse.redirect(redirectUrl);
-    }
-
-    return NextResponse.next();
+import { rewrite } from '@vercel/edge';
+ 
+export default function middleware(request: Request) {
+  const url = new URL(request.url);
+ 
+  if (url.pathname.startsWith('/')) {
+    return rewrite(new URL('/data', request.url));
+  }
 }
