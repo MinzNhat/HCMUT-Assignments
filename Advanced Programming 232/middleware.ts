@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export async function middleware(request) {
+export async function middleware(request:any) {
     if (request.nextUrl.pathname === '/') {
         // Construct the redirect URL manually
         const redirectUrl = '/data';
