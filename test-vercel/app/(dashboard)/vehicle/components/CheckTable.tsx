@@ -152,7 +152,7 @@ const CheckTable = (props: Props) => {
                     className={`border-b border-gray-200 pb-[10px] dark:!border-navy-700`}
                     key={index}
                   >
-                    <div className={`text-xs font-bold tracking-wide text-gray-600 lg:text-xs ${column.render("Header") == "Chi tiết" ? "text-end" : "text-start"}`}>
+                    <div className={`text-xs font-bold tracking-wide text-gray-600 lg:text-xs whitespace-nowrap ${column.render("Header") == "Chi tiết" ? "text-end" : "text-start pr-4 lg:pr-0"}`}>
                       {column.render("Header") == "Checkbox" ? <Checkbox checked={selectedRows.size === tableData.length} onChange={() => selectAllRows()} />
                         : column.render("Header")}
                     </div>
@@ -185,7 +185,7 @@ const CheckTable = (props: Props) => {
                       );
                     } else if (cell.column.Header === "Loại phương tiện") {
                       renderData = (
-                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white">
+                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
                           {cell.value === "Bus"
                             ? "Xe khách"
                             : cell.value === "Container Truck"
@@ -205,7 +205,7 @@ const CheckTable = (props: Props) => {
                               <MdOutlineError className="text-orange-500" />
                             ) : null}
                           </div>
-                          <p className="mt-0.5 text-sm font-bold text-navy-700 dark:text-white">
+                          <p className="mt-0.5 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
                             {cell.value === "Active"
                               ? "Đang hoạt động"
                               : cell.value === "Inactive"
@@ -220,13 +220,13 @@ const CheckTable = (props: Props) => {
                       );
                     } else if (cell.column.Header === "Biển số xe") {
                       renderData = (
-                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white">
+                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
                           {cell.value}
                         </p>
                       );
                     } else if (cell.column.Header === "Loại động cơ") {
                       renderData = (
-                        <p className="text-sm font-bold text-navy-700 dark:text-white">
+                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
                           {cell.value}
                         </p>
                       );
