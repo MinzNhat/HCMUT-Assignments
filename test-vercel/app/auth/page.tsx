@@ -2,12 +2,12 @@ import { FC } from 'react';
 import { FcGoogle } from "react-icons/fc";
 import InputField from '@/components/fields/InputField';
 import Checkbox from '@/components/checkbox/index2';
+import AuthLayout from './layout';
 
 type Props = {};
 
 const AuthPage: FC<Props> = () => {
     return (
-        <>
             <div className="mt-16 mb-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
                 {/* Sign in section */}
                 <div className="mt-[10vh] w-full max-w-full flex-col items-center md:pl-4 lg:pl-0 xl:max-w-[420px]">
@@ -64,7 +64,6 @@ const AuthPage: FC<Props> = () => {
                     </div>
                 </div>
             </div>
-        </>
     );
 }
 
