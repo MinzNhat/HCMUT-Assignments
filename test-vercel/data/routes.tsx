@@ -11,8 +11,8 @@ import { FaPersonBiking } from "react-icons/fa6";
 const routes = [
   {
     name: "Báo cáo thống kê",
-    layout: "/dashboard",
-    path: "data",
+    layout: "/",
+    path: "/",
     icon: <FaChartPie className="h-5 w-5 ml-0.5" />,
   },
   {

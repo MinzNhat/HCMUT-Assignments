@@ -17,17 +17,19 @@ export function SidebarLinks({ onClickRoute }: Props) {
   // Chakra color mode
   const pathname = usePathname()
 
-  // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName: string) => {
-    return pathname.includes(routeName);
+    if (routeName === "/") {
+      return pathname === "/"
+    }
+    else return pathname.includes(routeName);
   };
+
 
   const createLinks = (routes: any) => {
     return routes.map((route: any, index: number) => {
       if (
         route.layout === "/dashboard" ||
-        route.layout === "/auth" ||
-        route.layout === "/rtl"
+        route.layout === "/auth" || route.layout === "/"
       ) {
         return (
           // <Link key={index} href={route.layout + "/" + route.path}>

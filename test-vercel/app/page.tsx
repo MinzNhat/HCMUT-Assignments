@@ -1,113 +1,75 @@
-import Image from 'next/image'
+import dynamic from 'next/dynamic';
+import { FC } from 'react';
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+// import MiniCalendar from "@/components/calendar/MiniCalendar";
+import WeeklyRevenue from "./components/WeeklyRevenue";
+import TotalSpent from "./components/TotalSpent";
+import PieChartCard from "./components/PieChartCard";
+import { MdBarChart } from "react-icons/md";
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+import { columnsDataCheck, columnsDataComplex } from "./variables/columnsData";
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+import Widget from "@/components/widget/Widget";
+import ComplexTable from "./components/ComplexTable";
+import DailyTraffic from "./components/DailyTraffic";
+import TaskCard from "./components/TaskCard";
+import tableDataCheck from "./variables/tableDataCheck.json";
+import tableDataComplex from "./variables/tableDataComplex.json";
+import { FaCarSide, FaRoad } from "react-icons/fa";
+import { IoPersonCircleSharp } from "react-icons/io5";
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+const MiniCalendar = dynamic(() => import("@/components/calendar/MiniCalendar"), {
+    loading: () => <p className='mt-10'>Đang tải dữ liệu...</p>,
+    ssr: false
+})
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
+type Props = {};
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+const DashboardPage: FC<Props> = () => {
+    return (
+        <>
+            {/* Card widget */}
+            <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-6">
+                <Widget
+                    icon={<FaCarSide className="h-7 w-7" />}
+                    title={"Xe"}
+                    subtitle={"Số lượng: 350"}
+                />
+                <Widget
+                    icon={<IoPersonCircleSharp className="h-7 w-7" />}
+                    title={"Tài xế"}
+                    subtitle={"Số lượng: 240"}
+                />
+                <Widget
+                    icon={<FaRoad className="h-7 w-7" />}
+                    title={"Lộ trình"}
+                    subtitle={"Số lượng: 574"}
+                />
+            </div>
+
+            {/* Charts */}
+            <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
+                <TotalSpent />
+                <WeeklyRevenue />
+            </div>
+
+            {/* Tables & Charts */}
+            <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+                {/* Traffic chart & Pie Chart */}
+                <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
+                    <DailyTraffic />
+                    <PieChartCard />
+                </div>
+                {/* Task chart & Calendar */}
+                <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
+                    <TaskCard />
+                    <div className="grid grid-cols-1 rounded-[20px]">
+                        <MiniCalendar />
+                    </div>
+                </div>
+            </div>
+        </>
+    );
 }
+
+export default DashboardPage;
