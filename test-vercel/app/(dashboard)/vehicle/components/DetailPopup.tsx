@@ -26,14 +26,13 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
     const notificationRef = useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(true);
     const [data, setData] = useState(dataInitial);
-
     const [isEditing, setIsEditing] = useState(false);
-    const [missing, setMissing] = useState({
-        licenseplate: false,
-        height: false,
-        length: false,
-        width: false,
-        mass: false,
+    const [errors, setErrors] = useState({
+        licenseplate: "",
+        height: "",
+        length: "",
+        width: "",
+        mass: "",
     });
 
     const handleEditClick = () => {
@@ -41,56 +40,66 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
     };
 
     const handleSaveClick = () => {
-        let tempMissing = {
-            licenseplate: false,
-            height: false,
-            length: false,
-            width: false,
-            mass: false,
-        };
+        const tempErrors = { ...errors };
+        let hasError = false;
 
-        if (data.licenseplate === "") tempMissing.licenseplate = true;
-        if (data.height === "" || data.height === "0") tempMissing.height = true;
-        if (data.length === "" || data.length === "0") tempMissing.length = true;
-        if (data.width === "" || data.width === "0") tempMissing.width = true;
-        if (data.mass === "" || data.mass === "0") tempMissing.mass = true;
+        if (!data.licenseplate.match(/^\d{2}[A-Z]-\d{3}.\d{2}$/)) {
+            tempErrors.licenseplate = "Biển số xe không hợp lệ. Ví dụ: 12A-345.23";
+            hasError = true;
+        }
 
-        setMissing(tempMissing);
+        if (data.height === "" || data.height === "0") {
+            tempErrors.height = "Chiều cao không được bỏ trống.";
+            hasError = true;
+        }
+        if (data.length === "" || data.length === "0") {
+            tempErrors.length = "Chiều dài không được bỏ trống.";
+            hasError = true;
+        }
+        if (data.width === "" || data.width === "0") {
+            tempErrors.width = "Chiều rộng không được bỏ trống.";
+            hasError = true;
+        }
+        if (data.mass === "" || data.mass === "0") {
+            tempErrors.mass = "Tải trọng không được bỏ trống.";
+            hasError = true;
+        }
 
-        const anyMissing = Object.values(tempMissing).some(value => value);
-        if (anyMissing) {
-            alert("Vui lòng nhập đầy đủ các trường thông tin.");
+        if (hasError) {
+            setErrors(tempErrors);
         } else {
             setIsEditing(false);
+            setErrors({
+                licenseplate: "",
+                height: "",
+                length: "",
+                width: "",
+                mass: "",
+            });
         }
     };
 
     useEffect(() => {
-        let tempMissing: { licenseplate: boolean; height: boolean; length: boolean; width: boolean; mass: boolean } = {
-            licenseplate: false,
-            height: false,
-            length: false,
-            width: false,
-            mass: false,
-        };
-
-        if (data.licenseplate === "" || data.height === "0" || data.length === "0" || data.width === "0" || data.mass === "0") {
-            if (data.licenseplate === "") tempMissing = { ...tempMissing, licenseplate: true };
-            if (data.height === "0" || data.height === "") tempMissing = { ...tempMissing, height: true };
-            if (data.length === "0" || data.length === "") tempMissing = { ...tempMissing, length: true };
-            if (data.width === "0" || data.width === "") tempMissing = { ...tempMissing, width: true };
-            if (data.mass === "0" || data.mass === "") tempMissing = { ...tempMissing, mass: true };
+        if (data.licenseplate.match(/^\d{2}[A-Z]-\d{3}.\d{2}$/)) {
+            setErrors(prevErrors => ({ ...prevErrors, licenseplate: "" }));
         }
-
-        setMissing(tempMissing);
+        if (data.height !== "" && data.height !== "0") {
+            setErrors(prevErrors => ({ ...prevErrors, height: "" }));
+        }
+        if (data.length !== "" && data.length !== "0") {
+            setErrors(prevErrors => ({ ...prevErrors, length: "" }));
+        }
+        if (data.width !== "" && data.width !== "0") {
+            setErrors(prevErrors => ({ ...prevErrors, width: "" }));
+        }
+        if (data.mass !== "" && data.mass !== "0") {
+            setErrors(prevErrors => ({ ...prevErrors, mass: "" }));
+        }
     }, [data]);
 
-    // Hàm xử lý nhập cho các trường số
     const handleNumericInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        // Kiểm tra nếu giá trị nhập vào chỉ chứa số hoặc dấu chấm
         if (/^\d*\.?\d*$/.test(value)) {
-            // Cập nhật giá trị của trường số
             setData({ ...data, [name]: value });
         }
     };
@@ -128,7 +137,6 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
                 <div className="h-96 mt-4 relative flex flex-col lg:flex-row bg-gray-200 bg-clip-border 
                  dark:!bg-navy-800 dark:text-white w-full overflow-y-scroll p-4 rounded-sm">
                     <div className="flex flex-col gap-5 lg:w-1/2 lg:pt-2 lg:pr-5">
-                        {/* Các trường thông tin xe */}
                         <div className="flex">
                             <div className="w-1/2 font-bold text-base">
                                 Phân loại:
@@ -154,19 +162,24 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
                                 Biển số xe:
                             </div>
                             {isEditing ? (
-                                <input
-                                    className={`w-1/2 dark:text-[#000000] pl-2 rounded ${missing.licenseplate ? "border-2 border-red-500" : ""}`}
-                                    type="text"
-                                    value={data.licenseplate}
-                                    onChange={(e) =>
-                                        setData({ ...data, licenseplate: e.target.value })
-                                    }
-                                />
+                                <div className="relative w-1/2 flex flex-col gap-2">
+                                    <input
+                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.licenseplate ? "border-2 border-red-500" : ""}`}
+                                        type="text"
+                                        value={data.licenseplate}
+                                        onChange={(e) =>
+                                            setData({ ...data, licenseplate: e.target.value })
+                                        }
+                                    />
+                                    {errors.licenseplate && (
+                                        <span className=" text-red-500 text-sm">{errors.licenseplate}</span>
+                                    )}
+                                </div>
                             ) : (
                                 <div>{data.licenseplate}</div>
                             )}
                         </div>
-                        <div className="flex">
+                        <div className={`flex ${errors.licenseplate ? "-mt-3" : ""}`}>
                             <div className="w-1/2 font-bold text-base">
                                 Loại động cơ:
                             </div>
@@ -210,67 +223,87 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
                                 Tải trọng:
                             </div>
                             {isEditing ? (
-                                <input
-                                    className={`w-1/2 dark:text-[#000000] pl-2 rounded ${missing.mass ? "border-2 border-red-500" : ""}`}
-                                    type="text" // Thay đổi type từ number sang text
-                                    name="mass"
-                                    value={data.mass}
-                                    onChange={handleNumericInputChange} // Sử dụng hàm xử lý nhập mới
-                                />
+                                <div className="relative w-1/2">
+                                    <input
+                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.mass ? "border-2 border-red-500" : ""}`}
+                                        type="text"
+                                        name="mass"
+                                        value={data.mass}
+                                        onChange={handleNumericInputChange}
+                                    />
+                                    {errors.mass && (
+                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.mass}</span>
+                                    )}
+                                </div>
                             ) : (
                                 <div>{data.mass}</div>
                             )}
                         </div>
-                        <div className="flex ">
+                        <div className={`flex ${errors.mass ? "mt-1.5" : ""}`}>
                             <div className="w-1/2 font-bold text-base">
                                 Chiều dài:
                             </div>
                             {isEditing ? (
-                                <input
-                                    className={`w-1/2 dark:text-[#000000] pl-2 rounded ${missing.length ? "border-2 border-red-500" : ""}`}
-                                    type="text" // Thay đổi type từ number sang text
-                                    name="length"
-                                    value={data.length}
-                                    onChange={handleNumericInputChange} // Sử dụng hàm xử lý nhập mới
-                                />
+                                <div className="relative w-1/2">
+                                    <input
+                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.length ? "border-2 border-red-500" : ""}`}
+                                        type="text"
+                                        name="length"
+                                        value={data.length}
+                                        onChange={handleNumericInputChange}
+                                    />
+                                    {errors.length && (
+                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.length}</span>
+                                    )}
+                                </div>
                             ) : (
                                 <div>{data.length}</div>
                             )}
                         </div>
-                        <div className="flex">
+                        <div className={`flex ${errors.length ? "mt-1.5" : ""}`}>
                             <div className="w-1/2 font-bold text-base">
                                 Chiều rộng:
                             </div>
                             {isEditing ? (
-                                <input
-                                    className={`w-1/2 dark:text-[#000000] pl-2 rounded ${missing.width ? "border-2 border-red-500" : ""}`}
-                                    type="text" // Thay đổi type từ number sang text
-                                    name="width"
-                                    value={data.width}
-                                    onChange={handleNumericInputChange} // Sử dụng hàm xử lý nhập mới
-                                />
+                                <div className="relative w-1/2">
+                                    <input
+                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.width ? "border-2 border-red-500" : ""}`}
+                                        type="text"
+                                        name="width"
+                                        value={data.width}
+                                        onChange={handleNumericInputChange}
+                                    />
+                                    {errors.width && (
+                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.width}</span>
+                                    )}
+                                </div>
                             ) : (
                                 <div>{data.width}</div>
                             )}
                         </div>
-                        <div className="flex">
+                        <div className={`flex ${errors.width ? "mt-1.5" : ""}`}>
                             <div className="w-1/2 font-bold text-base">
                                 Chiều cao:
                             </div>
                             {isEditing ? (
-                                <input
-                                    className={`w-1/2 dark:text-[#000000] pl-2 rounded ${missing.height ? "border-2 border-red-500" : ""}`}
-                                    type="text" // Thay đổi type từ number sang text
-                                    name="height"
-                                    value={data.height}
-                                    onChange={handleNumericInputChange} // Sử dụng hàm xử lý nhập mới
-                                />
+                                <div className="relative w-1/2">
+                                    <input
+                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.height ? "border-2 border-red-500" : ""}`}
+                                        type="text"
+                                        name="height"
+                                        value={data.height}
+                                        onChange={handleNumericInputChange}
+                                    />
+                                    {errors.height && (
+                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.height}</span>
+                                    )}
+                                </div>
                             ) : (
                                 <div>{data.height}</div>
                             )}
                         </div>
                     </div>
-                    <div className="flex flex-col lg:w-1/2 dark:bg-navy-900 bg-white rounded-xl p-4 mt-4 lg:mt-0">
+                    <div className="flex flex-col lg:w-1/2 dark:bg-navy-900 bg-white rounded-xl p-4 mt-6 lg:mt-0">
                         <span className="w-full text-center font-bold text-base pb-2">
                             Đặt lịch bảo dưỡng định kỳ
                         </span>
