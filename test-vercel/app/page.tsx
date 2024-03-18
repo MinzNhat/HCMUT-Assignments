@@ -27,9 +27,9 @@ type Props = {};
 
 const DashboardPage: FC<Props> = () => {
     return (
-        <>
+        <div className="min-h-[calc(100vh-118px)]">
             {/* Card widget */}
-            <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-6">
+            <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3">
                 <Widget
                     icon={<FaCarSide className="h-7 w-7" />}
                     title={"Xe"}
@@ -68,7 +68,7 @@ const DashboardPage: FC<Props> = () => {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 

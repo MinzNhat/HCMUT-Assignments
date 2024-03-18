@@ -1,10 +1,4 @@
-// Icon Imports
-import {
-  MdHome,
-  MdOutlineShoppingCart,
-  MdBarChart,
-  MdPerson,
-} from "react-icons/md";
+import { FaMapLocationDot } from "react-icons/fa6";
 import { FaCar, FaRoad, FaChartPie } from "react-icons/fa";
 import { FaPersonBiking } from "react-icons/fa6";
 
@@ -16,6 +10,12 @@ const routes = [
     icon: <FaChartPie className="h-5 w-5 ml-0.5" />,
   },
   {
+    name: "Thêm lộ trình",
+    layout: "/dashboard",
+    icon: <FaMapLocationDot className="h-5 w-5 ml-0.5" />,
+    path: "plan",
+  },
+  {
     name: "Phương tiện",
     layout: "/dashboard",
     path: "vehicle",
@@ -23,17 +23,17 @@ const routes = [
     secondary: true,
   },
   {
+    name: "Tài xế",
+    layout: "/dashboard",
+    path: "driver",
+    icon: <FaPersonBiking className="h-5 w-5 ml-0.5" />,
+  },
+  {
     name: "Lộ trình",
     layout: "/dashboard",
     icon: <FaRoad className="h-5 w-5 ml-0.5" />,
     path: "route",
   },
-  {
-    name: "Tài xế",
-    layout: "/dashboard",
-    path: "driver",
-    icon: <FaPersonBiking className="h-5 w-5 ml-0.5" />,
-  }
 ];
 
 export default routes;

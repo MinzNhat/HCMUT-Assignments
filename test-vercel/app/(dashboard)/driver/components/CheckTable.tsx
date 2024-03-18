@@ -105,27 +105,11 @@ const CheckTable = (props: Props) => {
     state: { selectedRowIds },
   } = tableInstance;
 
-  const [dataRow, setDataRow] = useState({
-    type: "",
-    licenseplate: "",
-    enginefuel: "",
-    height: "",
-    length: "",
-    width: "",
-    mass: "",
-    status: ""
-  })
   return (
     <Card className={"w-full sm:overflow-auto p-4"}>
       {openAdd && (
         <AddPopup
           onClose={handleClodeAddModal}
-        />
-      )}
-      {openModal && (
-        <DetailPopup
-          onClose={handleClodeModal}
-          dataInitial={dataRow}
         />
       )}
       <div className="flex justify-between items-center flex-col sm:flex-row">
@@ -251,7 +235,6 @@ const CheckTable = (props: Props) => {
                         <div className="w-full flex justify-end">
                           <Button
                             onClick={() => {
-                              setDataRow(row.original)
                               setOpenModal(true);
                             }}
                             className={`flex items-center hover:cursor-pointer bg-lightPrimary p-2 h-8 w-8 rounded-full text-[#1488DB] border 
@@ -260,7 +243,12 @@ const CheckTable = (props: Props) => {
                           >
                             <IoAddOutline className="w-full h-full" />
                           </Button>
-
+                          {openModal && (
+                            <DetailPopup
+                              onClose={handleClodeModal}
+                              dataInitial={row.original}
+                            />
+                          )}
                         </div>
                       );
                     }
