@@ -11,9 +11,11 @@ const AddPanel = () => {
     };
 
     return (
-        <div className={`relative ${isCollapsed ? 'w-full h-8 sm:w-8' : 'h-full w-full sm:w-2/3 md:w-[550px]'} sticky z-50 transition-all duration-500 ease-in-out`}>
-            <div className={`bg-white shadow-xl shadow-shadow-500 dark:!bg-navy-800 dark:shadow-none rounded-xl h-full transition-opacity duration-500 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: isCollapsed ? '0ms' : '200ms' }}>
+        <div className={`relative ${isCollapsed ? 'w-full h-8 sm:w-8' : 'h-full w-full sm:w-2/3 md:w-[550px]'} sticky z-40 transition-all duration-500 ease-in-out`}>
+            <div className={`bg-white shadow-xl shadow-shadow-500 dark:!bg-navy-900 dark:shadow-none rounded-xl h-full transition-opacity duration-500 p-2 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: isCollapsed ? '0ms' : '200ms' }}>
+                <div className={`bg-lightPrimary dark:!bg-navy-800 h-full transition-opacity rounded-lg duration-200 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: isCollapsed ? '0ms' : '400ms' }}>
 
+                </div>
             </div>
             <Button
                 className={`absolute -bottom-2 sm:top-1/2 bg-white dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white 

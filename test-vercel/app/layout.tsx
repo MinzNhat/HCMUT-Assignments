@@ -45,7 +45,7 @@ export default function RootLayout({
                         <div className="h-full">
                           <Navbar />
 
-                          <div className="pt-5s mx-auto mb-auto p-2 md:pr-2">
+                          <div className="pt-5s mx-auto mb-auto p-2 sm:p-0 sm:pt-2 md:pr-2">
                             {children}
                           </div>
                         </div>

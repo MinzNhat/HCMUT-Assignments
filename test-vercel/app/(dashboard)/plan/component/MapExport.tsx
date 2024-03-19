@@ -5,8 +5,8 @@ import { FiZoomIn, FiZoomOut } from 'react-icons/fi';
 import { MdOutlineMyLocation } from 'react-icons/md';
 import { Button } from '@nextui-org/react';
 import { useThemeContext } from '@/providers/ThemeProvider';
-import { darkTheme } from '../MapTheme/dark';
-import { lightTheme } from '../MapTheme/light';
+import { darkTheme } from '../maptheme/dark';
+import { lightTheme } from '../maptheme/light';
 
 function MapExport() {
     const { theme, setTheme } = useThemeContext()
