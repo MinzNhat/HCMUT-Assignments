@@ -63,9 +63,6 @@ const DashboardPage: FC<Props> = () => {
                 {/* Task chart & Calendar */}
                 <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
                     <TaskCard />
-                    <div className="grid grid-cols-1 rounded-[20px]">
-                        <MiniCalendar />
-                    </div>
                 </div>
             </div>
         </div>
