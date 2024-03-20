@@ -1,15 +1,32 @@
 'use client'
-import React, { useCallback } from 'react';
-import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { DirectionsRenderer, GoogleMap, MarkerF, OverlayView, OverlayViewF, useJsApiLoader } from '@react-google-maps/api';
 import { FiZoomIn, FiZoomOut } from 'react-icons/fi';
 import { MdOutlineMyLocation } from 'react-icons/md';
 import { Button } from '@nextui-org/react';
 import { useThemeContext } from '@/providers/ThemeProvider';
 import { darkTheme } from '../maptheme/dark';
 import { lightTheme } from '../maptheme/light';
+import { CollapseContext } from '../context/CollapseContext';
+import { DestinationContext } from '../context/DestinationContext';
+import { SourceContext } from '../context/SourceContext';
+import Notification from './Notification'
+import { DistanceContext } from '../context/DistanceContext';
 
 function MapExport() {
     const { theme, setTheme } = useThemeContext()
+    const [map, setMap] = React.useState<google.maps.Map | null>(null);
+    // @ts-ignore
+    const { isCollapsed, setIsCollapsed } = useContext(CollapseContext);
+    // @ts-ignore
+    const { source, setSource } = useContext(SourceContext);
+    // @ts-ignore
+    const { distance, setDistance } = useContext(DistanceContext);
+    // @ts-ignore
+    const { destination, setDestination } = useContext(DestinationContext);
+    const [openModal, setOpenModal] = useState(false)
+    const [message, setMessage] = useState("")
+    const [directionRoutePoints, setdirectionRoutePoints] = useState<google.maps.DirectionsResult>();
     const containerStyle = {
         width: '100%',
         height: '100%',
@@ -22,16 +39,81 @@ function MapExport() {
         styles: theme == "dark" ? darkTheme : lightTheme
     };
 
-    const center = {
-        lat: -3.745,
-        lng: -38.523
-    };
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY ?? ""
+    const [center, setCenter] = useState({
+        lat: 10.816360162758764,
+        lng: 106.62860159222816,
     });
 
-    const [map, setMap] = React.useState<google.maps.Map | null>(null);
+    const directionRoute = () => {
+        if (directionRoutePoints?.routes[0]) {
+            // @ts-ignore
+            directionRoutePoints.routes[0] = null
+        }
+        if (source != null && destination != null) {
+            let DirectionsService = new google.maps.DirectionsService();
+            DirectionsService.route({
+                origin: { lat: source?.lat, lng: source?.lng },
+                destination: { lat: destination?.lat, lng: destination?.lng },
+                travelMode: google.maps.TravelMode.DRIVING,
+            }, (result: any, status) => {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    setdirectionRoutePoints(result);
+                    let totalDistance = 0;
+                    result.routes[0].legs?.forEach((leg: any) => {
+                        totalDistance += leg.distance.value;
+                    });
+                    const kmDistance = (totalDistance / 1000).toFixed(2);
+                    setDistance(kmDistance);
+                    setIsCollapsed(true)
+                } else {
+                    setMessage("Không thể tìm thấy tuyến đường, vui lòng chọn lại.")
+                    setOpenModal(true)
+                }
+            });
+        }
+    };
+
+    useEffect(() => {
+        directionRoute();
+    }, [source, destination]);
+
+    useEffect(() => {
+        if (map && source && !destination) {
+            const projection = map.getProjection();
+            if (projection) {
+                const getNewLng = (point: any, offsetX: any) => {
+                    const sourcePixel = projection.fromLatLngToPoint(point);
+                    // @ts-ignore
+                    return projection.fromPointToLatLng({ x: sourcePixel.x - offsetX * (1 / Math.pow(2, map.getZoom())), y: sourcePixel.y }).lng();
+                };
+
+                map.setZoom(12);
+                map.panTo({
+                    lat: source.lat,
+                    lng: getNewLng(source, !isCollapsed ? 250 : 0),
+                });
+            }
+        }
+    }, [source, isCollapsed]);
+
+    useEffect(() => {
+        if (map && destination && !source) {
+            const projection = map.getProjection();
+            if (projection) {
+                const getNewLng = (point: any, offsetX: any) => {
+                    const sourcePixel = projection.fromLatLngToPoint(point);
+                    // @ts-ignore
+                    return projection.fromPointToLatLng({ x: sourcePixel.x - offsetX * (1 / Math.pow(2, map.getZoom())), y: sourcePixel.y }).lng();
+                };
+
+                map.setZoom(12);
+                map.panTo({
+                    lat: destination.lat,
+                    lng: getNewLng(destination, !isCollapsed ? 250 : 0),
+                });
+            }
+        }
+    }, [destination, isCollapsed]);
 
     const zoomIn = useCallback(() => {
         if (map) {
@@ -52,6 +134,7 @@ function MapExport() {
     }, [map]);
 
     const handleMyLocation = useCallback(() => {
+        setIsCollapsed(true)
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
                 const userLocation = {
@@ -63,10 +146,12 @@ function MapExport() {
                     map.setZoom(14)
                 }
             }, error => {
-                console.error('Error getting user location:', error);
+                setMessage("Vui lòng cho phép trình duyệt quyền truy cập vị trí để sử dụng tính năng này.")
+                setOpenModal(true)
             });
         } else {
-            console.error('Geolocation is not supported by this browser.');
+            setMessage("Vui lòng cho phép trình duyệt quyền truy cập vị trí để sử dụng tính năng này.")
+            setOpenModal(true)
         }
     }, [map]);
 
@@ -78,37 +163,93 @@ function MapExport() {
         setMap(null);
     }, []);
 
-    return isLoaded ? (
-        <GoogleMap
-            mapContainerStyle={containerStyle}
-            options={mapOptions}
-            center={center}
-            zoom={10}
-            onLoad={onLoad}
-            onUnmount={onUnmount}
-        >
-            <div className="absolute bottom-5 right-1/2 translate-x-[calc(50%+25px)] sm:bottom-1/2 sm:translate-y-1/2 sm:right-5 sm:translate-x-0 flex sm:flex-col gap-1 items-center">
-                <Button
-                    className="linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 w-8 h-8 shadow-xl"
-                    onClick={zoomIn}
+    return <GoogleMap
+        mapContainerStyle={containerStyle}
+        options={mapOptions}
+        center={center}
+        zoom={10}
+        onLoad={onLoad}
+        onUnmount={onUnmount}
+    >
+        {source && (
+            <MarkerF
+                position={source}
+                icon={{
+                    url: "/img/placeholder/placeHolder2.png",
+                    // @ts-ignore
+                    scaledSize: { equals: null, width: 50, height: 50 },
+                }}
+                className="relative shadow"
+            >
+                <OverlayViewF
+                    position={source}
+                    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                 >
-                    <FiZoomIn />
-                </Button>
-                <Button
-                    className="w-12 h-12 linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 shadow-xl"
-                    onClick={handleMyLocation}
+                    <div className="absolute top-2 right-0 translate-x-1/2 p-2 bg-white dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white 
+                transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 
+                dark:hover:opacity-90 dark:active:opacity-80 shadow-xl rounded-xl font-semibold text-xs truncate max-w-10">
+                        <p>{source.label}</p>
+                    </div>
+                </OverlayViewF>
+            </MarkerF>
+        )}
+        {destination && (
+            <MarkerF
+                position={destination}
+                icon={{
+                    url: "/img/placeholder/placeHolder.png",
+                    // @ts-ignore
+                    scaledSize: { equals: null, width: 50, height: 50 },
+                }}
+                className="relative shadow"
+            >
+                <OverlayViewF
+                    position={destination}
+                    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                 >
-                    <MdOutlineMyLocation className="w-8 h-8" />
-                </Button>
-                <Button
-                    className="linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 w-8 h-8 shadow-xl"
-                    onClick={zoomOut}
-                >
-                    <FiZoomOut />
-                </Button>
-            </div>
-        </GoogleMap>
-    ) : <></>;
+                    <div className="absolute -top-16 right-0 translate-x-1/2 p-2 bg-white dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white 
+                transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 
+                dark:hover:opacity-90 dark:active:opacity-80 shadow-xl rounded-xl font-semibold text-xs truncate max-w-10">
+                        <p>{destination.label}</p>
+                        <p className="text-center underline">{distance} km</p>
+                    </div>
+                </OverlayViewF>
+            </MarkerF>
+        )}
+        {source && destination &&
+            <DirectionsRenderer
+                directions={directionRoutePoints}
+                options={{
+                    suppressMarkers: true,
+                    polylineOptions: {
+                        strokeColor: "#1488DB",
+                        strokeWeight: 5,
+                    },
+                }}
+            />
+        }
+        <div className="absolute bottom-5 right-1/2 translate-x-[calc(50%+26px)] sm:bottom-1/2 sm:translate-y-1/2 sm:right-5 sm:translate-x-0 flex sm:flex-col gap-1 items-center">
+            <Button
+                className="linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 w-8 h-8 shadow-xl"
+                onClick={zoomIn}
+            >
+                <FiZoomIn />
+            </Button>
+            <Button
+                className="w-12 h-12 linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 shadow-xl"
+                onClick={handleMyLocation}
+            >
+                <MdOutlineMyLocation className="w-8 h-8" />
+            </Button>
+            <Button
+                className="linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 w-8 h-8 shadow-xl"
+                onClick={zoomOut}
+            >
+                <FiZoomOut />
+            </Button>
+        </div>
+        {openModal && <Notification onClose={() => setOpenModal(false)} message={message} />}
+    </GoogleMap>
 }
 
 export default React.memo(MapExport);

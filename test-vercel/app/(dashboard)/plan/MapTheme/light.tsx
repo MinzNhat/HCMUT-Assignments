@@ -73,4 +73,13 @@ export const lightTheme = [
             }
         ]
     },
+    {
+        "featureType": "all",
+        "elementType": "labels.icon",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    },
 ]

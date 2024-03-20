@@ -28,6 +28,15 @@ export const darkTheme = [
     },
     {
         "featureType": "all",
+        "elementType": "labels.icon",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    },
+    {
+        "featureType": "all",
         "elementType": "labels.text.stroke",
         "stylers": [
             {

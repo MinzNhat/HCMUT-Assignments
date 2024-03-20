@@ -28,7 +28,6 @@ type Props = {};
 const DashboardPage: FC<Props> = () => {
     return (
         <div className="min-h-[calc(100vh-118px)]">
-            {/* Card widget */}
             <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3">
                 <Widget
                     icon={<FaCarSide className="h-7 w-7" />}
@@ -47,21 +46,17 @@ const DashboardPage: FC<Props> = () => {
                 />
             </div>
 
-            {/* Charts */}
             <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
-                <TotalSpent />
-                <WeeklyRevenue />
-            </div>
-
-            {/* Tables & Charts */}
-            <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
-                {/* Traffic chart & Pie Chart */}
                 <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
                     <DailyTraffic />
                     <PieChartCard />
                 </div>
-                {/* Task chart & Calendar */}
-                <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
+                <TotalSpent />
+            </div>
+
+            <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
+                <WeeklyRevenue />
+                <div className="grid grid-cols-1 gap-5 rounded-[20px]">
                     <TaskCard />
                 </div>
             </div>

@@ -50,12 +50,12 @@ const Navbar = ({ }: Props) => {
               /{" "}
             </span>
           </Link>
-          <Link className="text-sm font-bold capitalize text-navy-700 hover:underline dark:text-white dark:hover:text-white" href="#" >
+          <Link className="text-sm font-bold capitalize text-navy-700 hover:underline dark:text-white dark:hover:text-white whitespace-nowrap" href="#" >
             {currentRoute}
           </Link>
         </div>
         <p className="shrink text-[33px] capitalize text-navy-700 dark:text-white">
-          <Link href="#" className="font-bold capitalize hover:text-navy-700 dark:hover:text-white" >
+          <Link href="#" className="font-bold capitalize hover:text-navy-700 dark:hover:text-white whitespace-nowrap" >
             {currentRoute}
           </Link>
         </p>

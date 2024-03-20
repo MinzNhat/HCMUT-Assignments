@@ -1,7 +1,7 @@
 "use client"
 import { FC } from 'react'
 import { HiX } from "react-icons/hi";
-import Image from 'next/image'; // Thêm import này
+import Image from 'next/image';
 import { useSidebarContext } from '@/providers/SidebarProvider';
 import useMobileView from '@/hooks/useMobileView';
 import Links from "./components/Links";
