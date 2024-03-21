@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import AddPanel from "./component/AddPanel";
+import AddPanel from "./component/AddBox";
 export const metadata: Metadata = {
     title: 'HCMUT | Vehicle',
 }
