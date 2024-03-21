@@ -185,9 +185,8 @@ function MapExport() {
                     position={source}
                     mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                 >
-                    <div className="absolute top-2 right-0 translate-x-1/2 p-2 bg-white dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white 
-                transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 
-                dark:hover:opacity-90 dark:active:opacity-80 shadow-xl rounded-xl font-semibold text-xs truncate max-w-10">
+                    <div className="absolute top-2 right-0 translate-x-1/2 p-2 bg-white text-[#1488DB] border-2 border-[#1488DB]
+                    transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 shadow-xl rounded-xl font-semibold text-xs truncate max-w-10">
                         <p>{source.label}</p>
                     </div>
                 </OverlayViewF>
@@ -207,9 +206,8 @@ function MapExport() {
                     position={destination}
                     mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                 >
-                    <div className="absolute -top-16 right-0 translate-x-1/2 p-2 bg-white dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white 
-                transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 
-                dark:hover:opacity-90 dark:active:opacity-80 shadow-xl rounded-xl font-semibold text-xs truncate max-w-10">
+                    <div className="absolute -top-16 right-0 translate-x-1/2 p-2 bg-white text-[#1488DB] border-2 border-[#1488DB]
+                    transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 shadow-xl rounded-xl font-semibold text-xs truncate max-w-10">
                         <p>{destination.label}</p>
                         <p className="text-center underline">{distance} km</p>
                     </div>
