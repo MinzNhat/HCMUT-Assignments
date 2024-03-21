@@ -1,4 +1,4 @@
-export const lightTheme = [
+[
     {
         "stylers": [
             {
@@ -46,7 +46,8 @@ export const lightTheme = [
                 "color": "#f7f7f7"
             }
         ]
-    }, {
+    },
+    {
         "featureType": "road",
         "elementType": "labels.icon",
         "stylers": [
@@ -81,5 +82,5 @@ export const lightTheme = [
                 "visibility": "off"
             }
         ]
-    },
+    }
 ]

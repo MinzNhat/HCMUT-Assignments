@@ -5,13 +5,13 @@ import { FiZoomIn, FiZoomOut } from 'react-icons/fi';
 import { MdOutlineMyLocation } from 'react-icons/md';
 import { Button } from '@nextui-org/react';
 import { useThemeContext } from '@/providers/ThemeProvider';
-import { darkTheme } from '../maptheme/dark';
-import { lightTheme } from '../maptheme/light';
 import { CollapseContext } from '../context/CollapseContext';
 import { DestinationContext } from '../context/DestinationContext';
 import { SourceContext } from '../context/SourceContext';
 import Notification from './Notification'
 import { DistanceContext } from '../context/DistanceContext';
+import darkTheme from '../maptheme/dark.json';
+import lightTheme from '../maptheme/light.json';
 
 function MapExport() {
     const { theme, setTheme } = useThemeContext()
