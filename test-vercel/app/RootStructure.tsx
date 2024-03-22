@@ -28,7 +28,7 @@ const RootStructure = ({
     childrenProps: React.ReactNode;
 }) => {
     const pathname = usePathname()
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
     const [source, setSource] = useState(null);
     const [destination, setDestination] = useState(null);
     const [distance, setDistance] = useState(0);

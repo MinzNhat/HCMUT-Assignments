@@ -52,7 +52,7 @@ const SearchBox = () => {
     return (
         <div className="flex flex-col w-full gap-2 p-2">
             <div className="flex flex-col w-full gap-3 p-4 bg-white dark:bg-navy-900 rounded-xl shadow">
-                <h1 className="text-xl w-full text-center font-bold text-gray-400 dark:text-gray-300 text-nowrap cursor-default">
+                <h1 className="text-xl w-full text-center font-bold text-gray-700 dark:text-gray-300 text-nowrap cursor-default">
                     Nhập để tìm kiếm địa điểm cho lộ trình
                 </h1>
 

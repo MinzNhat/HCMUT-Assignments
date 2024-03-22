@@ -15,6 +15,7 @@ import routes from "@/data/routes";
 import { useSidebarContext } from "@/providers/SidebarProvider";
 import { useThemeContext } from "@/providers/ThemeProvider";
 import { Button } from "@nextui-org/react"
+import { TbBrandGithubFilled } from "react-icons/tb";
 type Props = {
 }
 
@@ -75,8 +76,10 @@ const Navbar = ({ }: Props) => {
         <span className="flex cursor-pointer text-xl text-gray-600 dark:text-white xl:hidden" onClick={() => setOpenSidebar(true)} >
           <FiAlignJustify className="h-5 w-5" />
         </span>
-
-        {/* start Notification */}
+        <Link href="https://github.com/MinzNhat" target="_blank">
+          <TbBrandGithubFilled className="h-4 w-4 text-gray-600 dark:text-white" />
+        </Link>
+        {/* start Notification
         <Dropdown
           button={
             <p className="cursor-pointer">
@@ -110,7 +113,7 @@ const Navbar = ({ }: Props) => {
               </div>
             </Button>
           </div>
-        </Dropdown>
+        </Dropdown> */}
 
         {/* DARK MODE */}
         <div className="cursor-pointer text-gray-600"

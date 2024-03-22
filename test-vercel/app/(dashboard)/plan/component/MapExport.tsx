@@ -64,7 +64,6 @@ function MapExport() {
                     });
                     const kmDistance = (totalDistance / 1000).toFixed(2);
                     setDistance(kmDistance);
-                    setIsCollapsed(true)
                 } else {
                     setMessage("Không thể tìm thấy tuyến đường, vui lòng chọn lại.")
                     setOpenModal(true)
