@@ -31,7 +31,7 @@ const AddPanel = () => {
                 </div>
             </div>
             <Button
-                className={`absolute bottom-2 h-12 text-white bg-blue-800 w-[calc(100%-16px)] mx-2 dark:bg-[#032B91]
+                className={`absolute bottom-2 h-12 text-white bg-blue-500 w-[calc(100%-16px)] mx-2 dark:bg-[#032B91]
                 hover:cursor-pointer rounded-md flex outline-8 outline-white dark:outline-navy-900 transition-transform duration-300 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}
                 // onClick={handleToggleCollapse}
                 style={{ transitionDelay: isCollapsed ? '0ms' : '300ms', outlineOffset: '-1px' }}
