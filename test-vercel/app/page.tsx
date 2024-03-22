@@ -1,22 +1,14 @@
 import dynamic from 'next/dynamic';
 import { FC } from 'react';
-
-// import MiniCalendar from "@/components/calendar/MiniCalendar";
 import WeeklyRevenue from "./components/WeeklyRevenue";
 import TotalSpent from "./components/TotalSpent";
 import PieChartCard from "./components/PieChartCard";
-import { MdBarChart } from "react-icons/md";
-
-import { columnsDataCheck, columnsDataComplex } from "./variables/columnsData";
-
 import Widget from "@/components/widget/Widget";
-import ComplexTable from "./components/ComplexTable";
 import DailyTraffic from "./components/DailyTraffic";
 import TaskCard from "./components/TaskCard";
-import tableDataCheck from "./variables/tableDataCheck.json";
-import tableDataComplex from "./variables/tableDataComplex.json";
 import { FaCarSide, FaRoad } from "react-icons/fa";
 import { IoPersonCircleSharp } from "react-icons/io5";
+import CarsData from "./(dashboard)/vehicle/variables/carsData.json"
 
 const MiniCalendar = dynamic(() => import("@/components/calendar/MiniCalendar"), {
     loading: () => <p className='mt-10'>Đang tải dữ liệu...</p>,
@@ -32,7 +24,7 @@ const DashboardPage: FC<Props> = () => {
                 <Widget
                     icon={<FaCarSide className="h-7 w-7" />}
                     title={"Xe"}
-                    subtitle={"Số lượng: 350"}
+                    subtitle={"Số lượng: " + CarsData.length}
                 />
                 <Widget
                     icon={<IoPersonCircleSharp className="h-7 w-7" />}

@@ -1,7 +1,40 @@
+import RouteData from "@/app/(dashboard)/route/variables/routeData.json";
+const generateDataForPast7Days = () => {
+  const currentDate = new Date();
+  const past7DaysData = [];
+
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(currentDate);
+    date.setDate(date.getDate() - i);
+
+    // Filter data for the current date from CarsList
+    const dataForDate = RouteData.filter(route => {
+      const carDate = new Date(route.date);
+      return carDate.getFullYear() === date.getFullYear() &&
+        carDate.getMonth() === date.getMonth() &&
+        carDate.getDate() === date.getDate();
+    });
+
+    const tripsCount = dataForDate.length;
+
+    past7DaysData.push({
+      date: date.toLocaleDateString(),
+      tripsCount: tripsCount
+    });
+  }
+  return past7DaysData;
+};
+export const past7DaysData = generateDataForPast7Days();
+const categories = past7DaysData.map(day => {
+  const firstSlashIndex = day.date.indexOf('/');
+  const secondSlashIndex = day.date.indexOf('/', firstSlashIndex + 1);
+  return day.date.substring(firstSlashIndex + 1, secondSlashIndex);
+});
+const data = past7DaysData.map(day => day.tripsCount);
 export const barChartDataDailyTraffic = [
   {
     name: "Daily Traffic",
-    data: [20, 30, 40, 20, 45, 50, 30],
+    data: data,
   },
 ];
 
@@ -26,7 +59,7 @@ export const barChartOptionsDailyTraffic = {
     theme: "dark",
   },
   xaxis: {
-    categories: ["00", "04", "08", "12", "14", "16", "18"],
+    categories: categories,
     show: false,
     labels: {
       show: true,

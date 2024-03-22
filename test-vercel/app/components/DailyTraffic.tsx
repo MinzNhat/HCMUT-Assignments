@@ -1,6 +1,7 @@
-import { barChartDataDailyTraffic } from "@/data/charts";
+
+import { barChartDataDailyTraffic, past7DaysData } from "@/data/charts";
 import { barChartOptionsDailyTraffic } from "@/data/charts";
-import { MdArrowDropUp } from "react-icons/md";
+import { MdArrowDropDown, MdArrowDropUp } from "react-icons/md";
 import Card from "@/components/card";
 import dynamic from "next/dynamic";
 
@@ -10,24 +11,33 @@ const BarChart = dynamic(() => import("@/components/charts/BarChart"), {
 })
 
 const DailyTraffic = () => {
+  const calculateTotalTrips7Days = () => {
+    let totalTrips = 0;
+    const changePercentage = ((past7DaysData[6]?.tripsCount - past7DaysData[5]?.tripsCount) / past7DaysData[5]?.tripsCount) * 100;
+    past7DaysData.forEach(dayData => {
+      totalTrips += dayData.tripsCount;
+    });
+    return totalTrips;
+  };
+  const percentage = ((past7DaysData[6]?.tripsCount - past7DaysData[5]?.tripsCount) / past7DaysData[5]?.tripsCount) * 100;
   return (
     <Card className="pb-7 p-[20px]">
       <div className="flex flex-row justify-between">
         <div className="ml-1 pt-2">
           <p className="text-sm font-medium leading-4 text-gray-600">
-            Daily Traffic
+            Lộ trình theo ngày
           </p>
           <p className="text-[34px] font-bold text-navy-700 dark:text-white">
-            2.579{" "}
+            {calculateTotalTrips7Days()}{" "}
             <span className="text-sm font-medium leading-6 text-gray-600">
-              Visitors
+              chuyến xe
             </span>
           </p>
         </div>
         <div className="mt-2 flex items-start">
-          <div className="flex items-center text-sm text-green-500">
-            <MdArrowDropUp className="h-5 w-5" />
-            <p className="font-bold"> +2.45% </p>
+          <div className={`flex items-center text-sm ${percentage > 0 ? 'text-green-500' : 'text-red-500'}`}>
+            {percentage > 0 ? <MdArrowDropUp className="h-5 w-5" /> : <MdArrowDropDown className="h-5 w-5" />}
+            <p className="font-bold"> {percentage > 0 ? `+${percentage.toFixed(2)}%` : `${percentage.toFixed(2)}%`} </p>
           </div>
         </div>
       </div>

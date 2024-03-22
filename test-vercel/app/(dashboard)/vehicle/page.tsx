@@ -4,7 +4,7 @@ import CheckTable from "./components/CheckTable";
 import {
   columnsData,
 } from "./variables/columnsData";
-import tableData from "./variables/tableData.json";
+import tableData from "./variables/carsData.json";
 
 
 export const metadata: Metadata = {
