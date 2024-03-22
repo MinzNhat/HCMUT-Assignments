@@ -5,17 +5,14 @@ import { DistanceContext } from '../context/DistanceContext';
 import cars from '../variables/CarList.json'
 import { IoMdPerson } from "react-icons/io";
 import Image from 'next/image';
-interface CarsListProps {
-    selectedType: string | null;
-    setSelectedType: React.Dispatch<React.SetStateAction<null>>;
-}
-
-const CarsList: React.FC<CarsListProps> = ({ selectedType, setSelectedType }) => {
+// @ts-ignore
+const CarsList = ({ selectedType, setSelectedType }) => {
     const { theme, setTheme } = useThemeContext()
     // @ts-ignore
     const { distance, setDistance } = useContext(DistanceContext);
 
     const handleSelectType = (type: any) => {
+        console.log(type)
         setSelectedType(type === selectedType ? null : type);
     };
 
@@ -27,7 +24,7 @@ const CarsList: React.FC<CarsListProps> = ({ selectedType, setSelectedType }) =>
                 </h1>
                 <div className="flex flex-wrap justify-center gap-4">
                     {cars.map(car => (
-                        <div key={car.type} className={`cursor-pointer flex gap-1 sm:gap-2 w-full border border-gray-200 dark:border-gray-300 rounded-lg p-4 ${selectedType === car.type ? 'border-blue-500 dark:border-blue-500' : ''}`} onClick={() => handleSelectType(car.type)}>
+                        <div key={car.type} className={`cursor-pointer flex gap-1 sm:gap-2 w-full border rounded-lg p-4 ${selectedType === car.type ? 'border-blue-500 dark:border-blue-500' : 'border-gray-200 dark:border-gray-300'}`} onClick={() => handleSelectType(car.type)}>
                             <div className='grow flex flex-col justify-between p-1'>
                                 <div>
                                     <div className='flex flex-col md:flex-row md:gap-2 md:place-items-center mb-2 md:mb-0'>
