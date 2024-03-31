@@ -5,10 +5,17 @@ import { FaAngleDoubleLeft } from "react-icons/fa";
 import { CollapseContext } from '../context/CollapseContext';
 import SearchBox from './SearchBox';
 import CarList from './CarList';
+import { SourceContext } from '../context/SourceContext';
+import { DistanceContext } from '../context/DistanceContext';
+import { DestinationContext } from '../context/DestinationContext';
 
 const AddPanel = () => {
     //@ts-ignore
     const { isCollapsed, setIsCollapsed } = useContext(CollapseContext);
+    //@ts-ignore
+    const { source, setSource } = useContext(SourceContext);
+    //@ts-ignore
+    const { destination, setDestination } = useContext(DestinationContext);
     const [selectedType, setSelectedType] = useState(null);
 
     const handleToggleCollapse = () => {
@@ -19,12 +26,14 @@ const AddPanel = () => {
         setIsCollapsed(false);
         return () => {
             setIsCollapsed(true);
+            setDestination(null);
+            setSource(null)
         };
     }, []);
 
     return (
         <div className={`relative ${isCollapsed ? 'w-full h-8 sm:w-8 sm:h-full' : ' w-full h-[calc(100vh-208px)] md:h-[calc(100vh-126px)] sm:w-2/3 md:w-[550px]'} sticky z-40 transition-all duration-500 ease-in-out`}>
-            <div className={`border-8 border-white dark:border-navy-900 shadow-xl shadow-shadow-500 dark:shadow-none rounded-xl sm:rounded-tr-none sm:rounded-l-xl h-[calc(100vh-208px)] md:h-[calc(100vh-126px)] transition-opacity duration-500 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: isCollapsed ? '0ms' : '200ms' }}>
+            <div className={`border-8 border-white dark:border-navy-900 shadow-xl shadow-shadow-500 dark:shadow-none rounded-xl sm:rounded-tr-none sm:rounded-l-xl transition-all duration-500 ${isCollapsed ? 'opacity-0 h-8' : 'opacity-100 h-[calc(100vh-208px)] md:h-[calc(100vh-126px)]'}`} style={{ transitionDelay: isCollapsed ? '0ms' : '200ms' }}>
                 <div className={`bg-white/10 backdrop-blur-sm dark:bg-[#0b14374d] h-full transition-opacity rounded-[4px] sm:rounded-tr-none sm:rounded-l-[4px] duration-200 border-b-2 dark:border-b border-white/10 dark:border-white/30 flex flex-col overflow-y-scroll no-scrollbar ${isCollapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: isCollapsed ? '0ms' : '400ms' }}>
                     <SearchBox />
                     <CarList selectedType={selectedType} setSelectedType={setSelectedType} />
@@ -32,16 +41,16 @@ const AddPanel = () => {
             </div>
             <Button
                 className={`absolute bottom-2 h-12 text-white bg-blue-500 w-[calc(100%-16px)] mx-2 dark:bg-[#032B91]
-                hover:cursor-pointer rounded-md flex outline-8 outline-white dark:outline-navy-900 transition-transform duration-300 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}
+                hover:cursor-pointer rounded-md flex outline-8 outline-white dark:outline-navy-900 transition-all duration-400 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}
                 // onClick={handleToggleCollapse}
-                style={{ transitionDelay: isCollapsed ? '0ms' : '300ms', outlineOffset: '-1px' }}
+                style={{ transitionDelay: isCollapsed ? '0ms' : '400ms', outlineOffset: '-1px' }}
             >
                 Xác nhận tạo lộ trình
             </Button>
             <Button
-                className={`absolute -bottom-3 sm:top-[21px] dark:text-white text-gray-400
+                className={`absolute -bottom-3 sm:top-[20.3px] dark:text-white text-gray-400
                 hover:cursor-pointer rounded-full flex focus:outline-none transition-all duration-500
-                ${isCollapsed ? 'transform -translate-y-1/2 right-1/2 translate-x-1/2 sm:translate-x-0 sm:right-0 shadow h-8 w-8 bg-white dark:bg-navy-800' :
+                ${isCollapsed ? 'transform -translate-y-1/2 right-1/2 translate-x-1/2 sm:translate-x-0 sm:right-0 shadow h-8 w-8 bg-white dark:bg-navy-900' :
                         'transform right-1/2 translate-x-1/2 sm:-translate-y-[calc(50%+0.5px)] sm:translate-x-0 bottom-12 sm:border-none h-8 w-8 sm:-right-5 sm:w-14 sm:h-10 sm:justify-end'}`}
                 onClick={handleToggleCollapse}
             >

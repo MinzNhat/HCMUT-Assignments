@@ -19,7 +19,7 @@ const DailyTraffic = () => {
     });
     return totalTrips;
   };
-  const percentage = ((past7DaysData[6]?.tripsCount - past7DaysData[5]?.tripsCount) / past7DaysData[5]?.tripsCount) * 100;
+  const percentage = past7DaysData[5]?.tripsCount != 0 ? ((past7DaysData[6]?.tripsCount - past7DaysData[5]?.tripsCount) / past7DaysData[5]?.tripsCount) * 100 : 0;
   return (
     <Card className="pb-7 p-[20px]">
       <div className="flex flex-row justify-between">

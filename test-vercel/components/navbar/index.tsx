@@ -151,7 +151,7 @@ const Navbar = ({ }: Props) => {
             <div className="h-px w-full bg-gray-200 dark:bg-white/20 " />
 
             <div className="flex flex-col pb-3 px-3">
-              <Link href="/auth" className="mt-3 text-sm font-medium text-red-500 hover:text-red-500" >
+              <Link href="/" className="mt-3 text-sm font-medium text-red-500 hover:text-red-500" >
                 Đăng xuất
               </Link>
             </div>

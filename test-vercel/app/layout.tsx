@@ -1,8 +1,9 @@
+import { type Metadata } from 'next'
 import './globals.css'
 // import "react-calendar/dist/Calendar.css";
 import "@/components/calendar/MiniCalendar.css";
-import RootStructure from './RootStructure';
-import { Metadata } from "next";
+import ThemeProvider from '@/providers/ThemeProvider';
+import LayoutStructure from './layoutStructure';
 
 export const metadata: Metadata = {
   title: 'HCMUT Assignment',
@@ -11,8 +12,7 @@ export const metadata: Metadata = {
   keywords: ["react", "server components", 'nextjs', 'tailwind', 'admin', 'dashboard'],
   themeColor: '#422AFB',
   icons: [
-    { rel: "favicon", type: 'image/ico', url: "/favicon.ico" },
-    { rel: "thumbnail", type: 'image/png', url: "/img/auth/auth.png" }
+    { rel: "favicon", type: 'image/ico', url: "/favicon.ico" }
   ],
   generator: 'nhatdev',
   authors: [{ name: 'nhatdev' }],
@@ -21,10 +21,15 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-
   return (
-    <RootStructure childrenProps={children} />
-  );
+    <html lang="en">
+      <body>
+        <ThemeProvider>
+          <LayoutStructure childrenProps={children} />
+        </ThemeProvider>
+      </body>
+    </html>
+  )
 }
