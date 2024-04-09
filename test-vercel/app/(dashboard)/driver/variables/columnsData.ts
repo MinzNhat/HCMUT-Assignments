@@ -3,16 +3,16 @@ export const columnsData = [
     Header: "Checkbox",
   },
   {
-    Header: "Loại phương tiện",
-    accessor: "type",
+    Header: "Tên tài xế",
+    accessor: "driver_name",
   },
   {
-    Header: "Biển số xe",
-    accessor: "licenseplate",
+    Header: "Số điện thoại",
+    accessor: "phone_num",
   },
   {
-    Header: "Loại động cơ",
-    accessor: "enginefuel",
+    Header: "Địa chỉ",
+    accessor: "address",
   },
   {
     Header: "Trạng thái",

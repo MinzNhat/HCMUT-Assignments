@@ -15,6 +15,7 @@ import {
   MdAddCircleOutline,
   MdNavigateNext,
   MdNavigateBefore,
+  MdOutlineRemoveCircleOutline,
 } from "react-icons/md";
 import Progress from "@/components/progress";
 import { Button, useDisclosure } from "@nextui-org/react";
@@ -141,7 +142,7 @@ const CheckTable = (props: Props) => {
             <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
             border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-700 dark:hover:bg-white/20 dark:active:bg-white/10
               linear justify-center rounded-lg font-bold transition duration-200`}>
-              <MdAddCircleOutline className="mr-1" />Xoá đã chọn
+              <MdOutlineRemoveCircleOutline className="mr-1" />Xoá đã chọn
             </Button>}
         </div>
         <div className="flex gap-2 h-full">

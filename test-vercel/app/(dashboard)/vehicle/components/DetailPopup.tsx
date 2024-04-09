@@ -39,6 +39,30 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
         setIsEditing(true);
     };
 
+    const handleAnimationComplete = () => {
+        if (!isVisible) {
+            onClose();
+        }
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+                handleClose();
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [onClose]);
+
+    const handleClose = () => {
+        setIsVisible(false);
+    };
+
     const handleSaveClick = () => {
         const tempErrors = { ...errors };
         let hasError = false;
@@ -114,6 +138,7 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
             style={{
                 backdropFilter: "blur(6px)",
             }}
+            onAnimationComplete={handleAnimationComplete}
         >
             <motion.div
                 ref={notificationRef}
@@ -129,7 +154,7 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
                     </div>
                     <Button
                         className="absolute right-0 w-8 h-8 top-0 rounded-full mb-2 hover:bg-gray-200 dark:hover:text-navy-900"
-                        onClick={() => onClose()}
+                        onClick={handleClose}
                     >
                         <IoMdClose className="w-5/6 h-5/6" />
                     </Button>

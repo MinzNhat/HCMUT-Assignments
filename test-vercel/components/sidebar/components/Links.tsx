@@ -1,4 +1,4 @@
-import React, { MouseEvent, useState } from "react";
+import React, { MouseEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { motion, Variants } from "framer-motion";
@@ -18,17 +18,22 @@ export function SidebarLinks({ onClickRoute }: Props) {
   const pathname = usePathname();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  const activeRoute = (routeName: string) => {
-    if (routeName === "/") {
-      return pathname === "/";
-    } else {
-      return pathname.includes(routeName);
-    }
-  };
+  useEffect(() => {
+    const findActiveRouteIndex = () => {
+      for (let i = 0; i < routes.length; i++) {
+        const route = routes[i];
+        if (route.layout && route.path && pathname.includes(route.path)) {
+          return i;
+        }
+      }
+      return null;
+    };
+
+    setActiveIndex(findActiveRouteIndex());
+  }, [pathname]);
 
   const handleRouteClick = (index: number, e: React.MouseEvent<HTMLElement, globalThis.MouseEvent>) => {
     setActiveIndex(index);
-    console.log(index)
     if (onClickRoute) {
       onClickRoute(e);
     }
@@ -56,7 +61,7 @@ export function SidebarLinks({ onClickRoute }: Props) {
                   key={index}
                 >
                   <span
-                    className={`${activeRoute(route.path) === true
+                    className={`${activeIndex === index
                       ? "font-bold text-brand-500 dark:text-white"
                       : "font-medium text-gray-600"
                       }`}
@@ -64,7 +69,7 @@ export function SidebarLinks({ onClickRoute }: Props) {
                     {route.icon ? route.icon : <DashIcon />}{" "}
                   </span>
                   <p
-                    className={`leading-1 ml-4 flex ${activeRoute(route.path) === true
+                    className={`leading-1 ml-4 flex ${activeIndex === index
                       ? "font-bold text-navy-700 dark:text-white"
                       : "font-medium text-gray-600"
                       }`}
@@ -101,7 +106,7 @@ export function SidebarLinks({ onClickRoute }: Props) {
                   key={index + 2}
                 >
                   <span
-                    className={`${activeRoute(route.path) === true
+                    className={`${activeIndex === index + 2
                       ? "font-bold text-brand-500 dark:text-white"
                       : "font-medium text-gray-600"
                       }`}
@@ -109,7 +114,7 @@ export function SidebarLinks({ onClickRoute }: Props) {
                     {route.icon ? route.icon : <DashIcon />}{" "}
                   </span>
                   <p
-                    className={`leading-1 ml-4 flex ${activeRoute(route.path) === true
+                    className={`leading-1 ml-4 flex ${activeIndex === index + 2
                       ? "font-bold text-navy-700 dark:text-white"
                       : "font-medium text-gray-600"
                       }`}

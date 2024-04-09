@@ -15,27 +15,25 @@ import {
   MdAddCircleOutline,
   MdNavigateNext,
   MdNavigateBefore,
+  MdOutlineRemoveCircleOutline,
 } from "react-icons/md";
 import Progress from "@/components/progress";
 import { Button, useDisclosure } from "@nextui-org/react";
-import DetailPopup from "./DetailPopup";
+// import DetailPopup from "./DetailPopup";
 import { IoAddOutline } from "react-icons/io5";
 import AddPopup from "./AddPopup";
 
-interface VehicleData {
-  type: string;
-  licenseplate: string;
-  enginefuel: string;
-  height: string;
-  length: string;
-  width: string;
-  mass: string;
-  status: string;
+interface DriverData {
+  driver_name: string;
+  phone_num: string;
+  address: string;
+  status: number;
+  license: string[];
 }
 
 type Props = {
   columnsData: any[];
-  tableData: VehicleData[];
+  tableData: DriverData[];
 };
 
 const CheckTable = (props: Props) => {
@@ -119,13 +117,13 @@ const CheckTable = (props: Props) => {
               linear justify-center rounded-lg font-bold transition duration-200`}
             onClick={() => setOpenAdd(true)}>
             <MdAddCircleOutline className="mr-1" />Thêm
-            <p className={`sm:block ${selectedRows.size != 0 ? "hidden" : "block"}`}>&nbsp;phương tiện</p>
+            <p className={`sm:block ${selectedRows.size != 0 ? "hidden" : "block"}`}>&nbsp;tài xế</p>
           </Button>
           {selectedRows.size != 0 &&
             <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
             border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-700 dark:hover:bg-white/20 dark:active:bg-white/10
               linear justify-center rounded-lg font-bold transition duration-200`}>
-              <MdAddCircleOutline className="mr-1" />Xoá đã chọn
+              <MdOutlineRemoveCircleOutline className="mr-1" />Xoá đã chọn
             </Button>}
         </div>
         <div className="flex gap-2 h-full">
@@ -183,51 +181,32 @@ const CheckTable = (props: Props) => {
                           onChange={() => toggleRowSelection(rowIndex)}
                         />
                       );
-                    } else if (cell.column.Header === "Loại phương tiện") {
+                    } else if (cell.column.Header === "Tên tài xế") {
                       renderData = (
                         <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
-                          {cell.value === "Bus"
-                            ? "Xe khách"
-                            : cell.value === "Container Truck"
-                              ? "Xe Container"
-                              : "Xe tải"}
+                          {cell.value}
                         </p>
                       );
-                    } else if (cell.column.Header === "Trạng thái") {
+                    } else if (cell.column.Header === "Số điện thoại") {
                       renderData = (
-                        <div className="flex items-center gap-2">
-                          <div className={`rounded-full text-xl`}>
-                            {cell.value === "Active" ? (
-                              <MdCheckCircle className="text-green-500" />
-                            ) : cell.value === "Inactive" ? (
-                              <MdCancel className="text-red-500" />
-                            ) : cell.value === "Maintenance" ? (
-                              <MdOutlineError className="text-orange-500" />
-                            ) : null}
-                          </div>
-                          <p className="mt-0.5 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
-                            {cell.value === "Active"
-                              ? "Đang hoạt động"
-                              : cell.value === "Inactive"
-                                ? "Không hoạt động"
-                                : "Đang bảo trì"}
-                          </p>
-                        </div>
+                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
+                          {cell.value}
+                        </p>
                       );
                     } else if (cell.column.Header === "PROGRESS") {
                       renderData = (
                         <Progress width="w-[68px]" value={cell.value} />
                       );
-                    } else if (cell.column.Header === "Biển số xe") {
+                    } else if (cell.column.Header === "Địa chỉ") {
                       renderData = (
                         <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
                           {cell.value}
                         </p>
                       );
-                    } else if (cell.column.Header === "Loại động cơ") {
+                    } else if (cell.column.Header === "Trạng thái") {
                       renderData = (
-                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
-                          {cell.value}
+                        <p className={`mt-1 text-sm font-bold pr-4 whitespace-nowrap ${cell.value == 0 ? "text-green-400" : "text-yellow-500"}`}>
+                          {cell.value == 0 ? "Sẵn sàng" : "Đã nhận đơn"}
                         </p>
                       );
                     } else if (cell.column.Header === "Chi tiết") {
@@ -243,12 +222,12 @@ const CheckTable = (props: Props) => {
                           >
                             <IoAddOutline className="w-full h-full" />
                           </Button>
-                          {openModal && (
+                          {/* {openModal && (
                             <DetailPopup
                               onClose={handleClodeModal}
                               dataInitial={row.original}
                             />
-                          )}
+                          )} */}
                         </div>
                       );
                     }
