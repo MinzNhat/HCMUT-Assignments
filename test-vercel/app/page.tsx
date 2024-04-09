@@ -1,3 +1,4 @@
+"use client"
 import { FC } from 'react';
 import { FcGoogle } from "react-icons/fc";
 import InputField from '@/components/fields/InputField';
@@ -5,6 +6,10 @@ import Checkbox from '@/components/checkbox/index2';
 import AuthLayout from './layout';
 import Link from 'next/link';
 import FixedPlugin from '@/components/fixedPlugin/FixedPlugin';
+import Carousel from "react-multi-carousel";
+import Image from 'next/image'
+import { TbChevronsRight, TbChevronsLeft } from "react-icons/tb";
+import "react-multi-carousel/lib/styles.css";
 
 type Props = {};
 
@@ -76,9 +81,44 @@ const AuthPage: FC<Props> = () => {
                                 </div>
                             </div>
                             <div className="absolute right-0 hidden h-screen lg:block lg:w-[49vw] 2xl:w-[55vw]">
-                                <div
-                                    className={`flex h-full w-full items-end justify-center bg-cover bg-left lg:rounded-bl-[120px] xl:rounded-bl-[200px] bg-[url('/img/auth/auth.png')]`}
-                                />
+
+                                <Carousel
+                                    additionalTransfrom={0}
+                                    draggable
+                                    keyBoardControl
+                                    autoPlay
+                                    showDots={false}
+                                    autoPlaySpeed={3000}
+                                    shouldResetAutoplay={true}
+                                    swipeable
+                                    minimumTouchDrag={80}
+                                    responsive={{
+                                        res1: { breakpoint: { max: 40000, min: 0 }, items: 1, partialVisibilityGutter: 0 },
+                                    }}
+                                    containerClass="flex h-full w-full lg:rounded-bl-[120px] xl:rounded-bl-[200px]"
+                                    rewind={true}
+                                    pauseOnHover={false}
+                                    rewindWithAnimation={true}
+                                    arrows={false}
+                                    transitionDuration={1000}
+                                >
+                                    <div className="h-screen bg-green-500">
+                                        <Image
+                                            src={"/img/auth/auth.png"}
+                                            alt={`Image`}
+                                            layout="fill"
+                                            objectFit="cover"
+                                        />
+                                    </div>
+                                    <div className="h-screen bg-green-500">
+                                        <Image
+                                            src={"/img/auth/hcmut.jpg"}
+                                            alt={`Image`}
+                                            layout="fill"
+                                            objectFit="cover"
+                                        />
+                                    </div>
+                                </Carousel>
                             </div>
                         </div>
                     </div>
