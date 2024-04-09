@@ -13,6 +13,8 @@
     "@chakra-ui/react": "^2.8.2",
     "@nextui-org/react": "^2.2.9",
     "@react-google-maps/api": "^2.19.3",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.3.0",
     "@types/node": "20.2.5",
     "@types/react": "18.2.8",
     "@types/react-dom": "18.2.4",

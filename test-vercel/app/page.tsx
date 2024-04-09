@@ -10,6 +10,7 @@ import Carousel from "react-multi-carousel";
 import Image from 'next/image'
 import { TbChevronsRight, TbChevronsLeft } from "react-icons/tb";
 import "react-multi-carousel/lib/styles.css";
+import ParticlesBackground from '@/components/Particle';
 
 type Props = {};
 
@@ -17,6 +18,7 @@ const AuthPage: FC<Props> = () => {
     return (
         <div>
             <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">
+                <ParticlesBackground />
                 <main className={`mx-auto min-h-screen`}>
                     <div className="relative flex h-screen">
                         <div className="mx-auto flex min-h-full h-full w-full flex-col justify-start">
@@ -95,7 +97,7 @@ const AuthPage: FC<Props> = () => {
                                     responsive={{
                                         res1: { breakpoint: { max: 40000, min: 0 }, items: 1, partialVisibilityGutter: 0 },
                                     }}
-                                    containerClass="flex h-full w-full lg:rounded-bl-[120px] xl:rounded-bl-[200px]"
+                                    containerClass="flex h-full w-full"
                                     rewind={true}
                                     pauseOnHover={false}
                                     rewindWithAnimation={true}
