@@ -3,33 +3,66 @@ import { FC, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import InputField from "@/components/fields/InputField";
 import Checkbox from "@/components/checkbox/index2";
-import AuthLayout from "./layout";
-import Link from "next/link";
 import FixedPlugin from "@/components/fixedPlugin/FixedPlugin";
 import Carousel from "react-multi-carousel";
 import Image from "next/image";
-import { TbChevronsRight, TbChevronsLeft } from "react-icons/tb";
 import "react-multi-carousel/lib/styles.css";
 import ParticlesBackground from "@/components/Particle";
 import { handleAuth, handleSignUp, handleSignIn } from "@/library/account";
+import NotiPopup from "@/components/notification";
+import { useRouter } from "next/navigation";
 
 type Props = {};
 
 const AuthPage: FC<Props> = () => {
+  const [modal, setModal] = useState(false)
+  const [message, setMessage] = useState("")
+  const [error, setError] = useState(false)
+  const [form, setForm] = useState("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const route = useRouter()
   const handleSignUpButton = async (): Promise<void> => {
     const response = await handleSignUp(email, password);
-    console.log(response);
+    if (response.errors) {
+      setMessage("Đã có lỗi xảy ra!")
+      setError(true)
+      setModal(true)
+    } else {
+      setMessage("Đăng ký thành công")
+      setModal(true)
+    }
   };
+
   const handleSignInButton = async (): Promise<void> => {
     const response = await handleSignIn(email, password);
-    console.log(response);
+    if (response.errors) {
+      setMessage("Đã có lỗi xảy ra!")
+      setError(true)
+      setModal(true)
+    } else {
+      setMessage("Đăng nhập thành công")
+      setModal(true)
+    }
   };
+
+  const handleForgotPw = async (): Promise<void> => {
+  };
+
+  const handleNotificationClose = () => {
+    setModal(false)
+    if (!error) {
+      if (form == "signin") {
+        route.push("/data")
+      }
+    }
+    else setError(false)
+  }
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">
         <ParticlesBackground />
+        {modal && <NotiPopup message={message} onClose={handleNotificationClose} />}
         <main className={`mx-auto min-h-screen`}>
           <div className="relative flex h-screen">
             <div className="mx-auto flex min-h-full h-full w-full flex-col justify-start">
@@ -38,13 +71,13 @@ const AuthPage: FC<Props> = () => {
                 <div className="w-full flex-col items-center md:pl-4 lg:pl-0">
                   <div className="flex justify-between">
                     <h4 className="mb-2.5 text-4xl font-bold text-navy-700 dark:text-white">
-                      Đăng nhập
+                      {form == "signin" ? <>Đăng nhập</> : (form == "signup" ? <>Đăng ký</> : <>Quên mật khẩu</>)}
                     </h4>
                     <FixedPlugin />
                   </div>
 
                   <p className="mb-9 ml-1 text-base text-gray-600">
-                    Nhập email và mật khẩu để đăng nhập!
+                    {form == "signin" ? <>Nhập email và mật khẩu để đăng nhập!</> : (form == "signup" ? <>Nhập email và mật khẩu để đăng ký!</> : <>Nhập email để lấy lại mật khẩu.</>)}
                   </p>
                   <div className="mb-6 flex h-[50px] w-full items-center justify-center gap-2 rounded-xl bg-lightPrimary hover:cursor-pointer dark:bg-navy-800">
                     <button
@@ -76,10 +109,11 @@ const AuthPage: FC<Props> = () => {
                     type="text"
                     value={email}
                     setValue={setEmail}
+                    className="bg-white dark:!bg-navy-900"
                   />
 
                   {/* Password */}
-                  <InputField
+                  {form != "forgotPw" && <InputField
                     variant="auth"
                     extra="mb-3"
                     label="Mật khẩu*"
@@ -88,11 +122,12 @@ const AuthPage: FC<Props> = () => {
                     type="password"
                     value={password}
                     setValue={setPassword}
-                  />
+                    className="bg-white dark:!bg-navy-900"
+                  />}
 
                   {/* Checkbox */}
                   <div className="mb-4 flex items-center justify-between px-2">
-                    <div className="flex items-center">
+                    <div className={`flex items-center ${form != "forgotPw" ? "visible" : "invisible"}`}>
                       <Checkbox id="remember-me" />
                       <label
                         htmlFor="remember-me"
@@ -101,30 +136,30 @@ const AuthPage: FC<Props> = () => {
                         Lưu đăng nhập
                       </label>
                     </div>
-                    <a
-                      className="text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
-                      href=""
+                    <button
+                      className={`text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white ${form != "forgotPw" ? "visible" : "invisible"}`}
+                      onClick={() => setForm("forgotPw")}
                     >
                       Quên mật khẩu?
-                    </a>
+                    </button>
                   </div>
 
                   <button
-                    onClick={handleSignInButton}
+                    onClick={form == "signin" ? handleSignInButton : (form == "signup" ? handleSignUpButton : handleForgotPw)}
                     className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
                   >
-                    Đăng nhập
+                    {form == "signin" ? <>Đăng nhập</> : (form == "signup" ? <>Đăng ký tài khoản</> : <>Lấy lại mật khẩu</>)}
                   </button>
 
                   <div className="mt-4">
                     <span className=" text-sm font-medium text-navy-700 dark:text-gray-600">
-                      Chưa đăng ký?
+                      {form == "signin" ? <>Chưa đăng ký?</> : (form == "signup" ? <>Đã có tài khoản?</> : <>Chưa đăng ký?</>)}
                     </span>
                     <button
-                      onClick={handleSignUpButton}
+                      onClick={() => { setForm(form == "signin" ? "signup" : (form == "signup" ? "signin" : "signup")) }}
                       className="ml-1 text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
                     >
-                      Tạo tài khoản
+                      {form == "signin" ? <>Tạo tài khoản</> : (form == "signup" ? <>Đăng nhập</> : <>Tạo tài khoản</>)}
                     </button>
                   </div>
                 </div>
@@ -154,7 +189,7 @@ const AuthPage: FC<Props> = () => {
                   arrows={false}
                   transitionDuration={1000}
                 >
-                  <div className="h-screen bg-green-500">
+                  <div className="h-screen">
                     <Image
                       src={"/img/auth/auth.png"}
                       alt={`Image`}
@@ -162,7 +197,7 @@ const AuthPage: FC<Props> = () => {
                       objectFit="cover"
                     />
                   </div>
-                  <div className="h-screen bg-green-500">
+                  <div className="h-screen">
                     <Image
                       src={"/img/auth/hcmut.jpg"}
                       alt={`Image`}
