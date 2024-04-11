@@ -8,61 +8,88 @@ import Carousel from "react-multi-carousel";
 import Image from "next/image";
 import "react-multi-carousel/lib/styles.css";
 import ParticlesBackground from "@/components/Particle";
-import { handleAuth, handleSignUp, handleSignIn } from "@/library/account";
+import {
+  handleAuth,
+  handleSignUp,
+  handleSignIn,
+  checkUserLoggedIn,
+  handleForgotPass,
+} from "@/library/account";
 import NotiPopup from "@/components/notification";
 import { useRouter } from "next/navigation";
 
 type Props = {};
 
 const AuthPage: FC<Props> = () => {
-  const [modal, setModal] = useState(false)
-  const [message, setMessage] = useState("")
-  const [error, setError] = useState(false)
+  const [modal, setModal] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
   const [form, setForm] = useState("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const route = useRouter()
+  const route = useRouter();
   const handleSignUpButton = async (): Promise<void> => {
     const response = await handleSignUp(email, password);
     if (response.errors) {
-      setMessage("Đã có lỗi xảy ra!")
-      setError(true)
-      setModal(true)
+      setMessage("Đã có lỗi xảy ra!");
+      setError(true);
+      setModal(true);
     } else {
-      setMessage("Đăng ký thành công")
-      setModal(true)
+      setMessage("Đăng ký thành công");
+      setModal(true);
     }
   };
 
   const handleSignInButton = async (): Promise<void> => {
     const response = await handleSignIn(email, password);
     if (response.errors) {
-      setMessage("Đã có lỗi xảy ra!")
-      setError(true)
-      setModal(true)
+      setMessage("Đã có lỗi xảy ra!");
+      setError(true);
+      setModal(true);
     } else {
-      setMessage("Đăng nhập thành công")
-      setModal(true)
+      setMessage("Đăng nhập thành công");
+      setModal(true);
     }
   };
 
   const handleForgotPw = async (): Promise<void> => {
-  };
-
-  const handleNotificationClose = () => {
-    setModal(false)
-    if (!error) {
-      if (form == "signin") {
-        route.push("/data")
-      }
+    const response = handleForgotPass(email);
+    if (response.errors) {
+      setMessage("Đã có lỗi xảy ra!");
+      setError(true);
+      setModal(true);
+    } else {
+      setMessage("Reset password verification đã gửi vô mail của bạn!");
+      setModal(true);
     }
-    else setError(false)
-  }
+  };
+  const handleSignInByGoogle = async (): Promise<void> => {
+    const response = await handleAuth();
+    if (response.errors) {
+      setMessage("Vui lòng chọn tài khoản!");
+      setError(true);
+      setModal(true);
+    } else {
+      setMessage("Đăng nhập thành công");
+      setModal(true);
+    }
+  };
+  const handleNotificationClose = async () => {
+    setModal(false);
+    const checkUserExists = await checkUserLoggedIn();
+    console.log(checkUserExists);
+
+    if (!error) {
+      route.push("/data");
+    } else setError(false);
+  };
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">
         <ParticlesBackground />
-        {modal && <NotiPopup message={message} onClose={handleNotificationClose} />}
+        {modal && (
+          <NotiPopup message={message} onClose={handleNotificationClose} />
+        )}
         <main className={`mx-auto min-h-screen`}>
           <div className="relative flex h-screen">
             <div className="mx-auto flex min-h-full h-full w-full flex-col justify-start">
@@ -71,17 +98,29 @@ const AuthPage: FC<Props> = () => {
                 <div className="w-full flex-col items-center md:pl-4 lg:pl-0">
                   <div className="flex justify-between">
                     <h4 className="mb-2.5 text-4xl font-bold text-navy-700 dark:text-white">
-                      {form == "signin" ? <>Đăng nhập</> : (form == "signup" ? <>Đăng ký</> : <>Quên mật khẩu</>)}
+                      {form == "signin" ? (
+                        <>Đăng nhập</>
+                      ) : form == "signup" ? (
+                        <>Đăng ký</>
+                      ) : (
+                        <>Quên mật khẩu</>
+                      )}
                     </h4>
                     <FixedPlugin />
                   </div>
 
                   <p className="mb-9 ml-1 text-base text-gray-600">
-                    {form == "signin" ? <>Nhập email và mật khẩu để đăng nhập!</> : (form == "signup" ? <>Nhập email và mật khẩu để đăng ký!</> : <>Nhập email để lấy lại mật khẩu.</>)}
+                    {form == "signin" ? (
+                      <>Nhập email và mật khẩu để đăng nhập!</>
+                    ) : form == "signup" ? (
+                      <>Nhập email và mật khẩu để đăng ký!</>
+                    ) : (
+                      <>Nhập email để lấy lại mật khẩu.</>
+                    )}
                   </p>
                   <div className="mb-6 flex h-[50px] w-full items-center justify-center gap-2 rounded-xl bg-lightPrimary hover:cursor-pointer dark:bg-navy-800">
                     <button
-                      onClick={handleAuth}
+                      onClick={handleSignInByGoogle}
                       className="flex items-center gap-2"
                     >
                       <FcGoogle />
@@ -113,21 +152,27 @@ const AuthPage: FC<Props> = () => {
                   />
 
                   {/* Password */}
-                  {form != "forgotPw" && <InputField
-                    variant="auth"
-                    extra="mb-3"
-                    label="Mật khẩu*"
-                    placeholder="Tối thiểu 8 ký tự"
-                    id="password"
-                    type="password"
-                    value={password}
-                    setValue={setPassword}
-                    className="bg-white dark:!bg-navy-900"
-                  />}
+                  {form != "forgotPw" && (
+                    <InputField
+                      variant="auth"
+                      extra="mb-3"
+                      label="Mật khẩu*"
+                      placeholder="Tối thiểu 8 ký tự"
+                      id="password"
+                      type="password"
+                      value={password}
+                      setValue={setPassword}
+                      className="bg-white dark:!bg-navy-900"
+                    />
+                  )}
 
                   {/* Checkbox */}
                   <div className="mb-4 flex items-center justify-between px-2">
-                    <div className={`flex items-center ${form != "forgotPw" ? "visible" : "invisible"}`}>
+                    <div
+                      className={`flex items-center ${
+                        form != "forgotPw" ? "visible" : "invisible"
+                      }`}
+                    >
                       <Checkbox id="remember-me" />
                       <label
                         htmlFor="remember-me"
@@ -137,7 +182,9 @@ const AuthPage: FC<Props> = () => {
                       </label>
                     </div>
                     <button
-                      className={`text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white ${form != "forgotPw" ? "visible" : "invisible"}`}
+                      className={`text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white ${
+                        form != "forgotPw" ? "visible" : "invisible"
+                      }`}
                       onClick={() => setForm("forgotPw")}
                     >
                       Quên mật khẩu?
@@ -145,21 +192,53 @@ const AuthPage: FC<Props> = () => {
                   </div>
 
                   <button
-                    onClick={form == "signin" ? handleSignInButton : (form == "signup" ? handleSignUpButton : handleForgotPw)}
+                    onClick={
+                      form == "signin"
+                        ? handleSignInButton
+                        : form == "signup"
+                        ? handleSignUpButton
+                        : handleForgotPw
+                    }
                     className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
                   >
-                    {form == "signin" ? <>Đăng nhập</> : (form == "signup" ? <>Đăng ký tài khoản</> : <>Lấy lại mật khẩu</>)}
+                    {form == "signin" ? (
+                      <>Đăng nhập</>
+                    ) : form == "signup" ? (
+                      <>Đăng ký tài khoản</>
+                    ) : (
+                      <>Lấy lại mật khẩu</>
+                    )}
                   </button>
 
                   <div className="mt-4">
                     <span className=" text-sm font-medium text-navy-700 dark:text-gray-600">
-                      {form == "signin" ? <>Chưa đăng ký?</> : (form == "signup" ? <>Đã có tài khoản?</> : <>Chưa đăng ký?</>)}
+                      {form == "signin" ? (
+                        <>Chưa đăng ký?</>
+                      ) : form == "signup" ? (
+                        <>Đã có tài khoản?</>
+                      ) : (
+                        <>Chưa đăng ký?</>
+                      )}
                     </span>
                     <button
-                      onClick={() => { setForm(form == "signin" ? "signup" : (form == "signup" ? "signin" : "signup")) }}
+                      onClick={() => {
+                        setForm(
+                          form == "signin"
+                            ? "signup"
+                            : form == "signup"
+                            ? "signin"
+                            : "signup"
+                        );
+                      }}
                       className="ml-1 text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
                     >
-                      {form == "signin" ? <>Tạo tài khoản</> : (form == "signup" ? <>Đăng nhập</> : <>Tạo tài khoản</>)}
+                      {form == "signin" ? (
+                        <>Tạo tài khoản</>
+                      ) : form == "signup" ? (
+                        <>Đăng nhập</>
+                      ) : (
+                        <>Tạo tài khoản</>
+                      )}
                     </button>
                   </div>
                 </div>
