@@ -7,7 +7,7 @@ import { LoadScript } from "@react-google-maps/api";
 import { Suspense } from "react";
 export const CustomLoadingElement = () => {
   return (
-    <div className="w-full h-screen flex flex-col gap-4 justify-center place-items-center">
+    <div className="w-full h-screen flex flex-col gap-4 justify-center place-items-center bg-white dark:bg-navy-800">
       <Image src="/logo.ico" alt="Your image" width={50} height={50} />
       <span className="text-xl">Đang tải dữ liệu...</span>
     </div>

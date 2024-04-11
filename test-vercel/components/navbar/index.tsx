@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FiAlignJustify, FiSearch } from "react-icons/fi";
 import { MdTipsAndUpdates } from "react-icons/md";
 import { RiMoonFill, RiSunFill } from "react-icons/ri";
@@ -16,12 +16,13 @@ import { useSidebarContext } from "@/providers/SidebarProvider";
 import { useThemeContext } from "@/providers/ThemeProvider";
 import { Button } from "@nextui-org/react"
 import { TbBrandGithubFilled } from "react-icons/tb";
+import { onClickLogOut } from "@/library/account";
 type Props = {
 }
 
 const Navbar = ({ }: Props) => {
   const [currentRoute, setCurrentRoute] = useState("Đang tải...");
-
+  const route = useRouter();
   const pathname = usePathname()
   const { setOpenSidebar } = useSidebarContext()
   const { theme, setTheme } = useThemeContext()
@@ -40,6 +41,10 @@ const Navbar = ({ }: Props) => {
     return activeRoute;
   };
 
+  const handleLogout = async () => {
+    const response = await onClickLogOut()
+    route.push("/")
+  }
   return (
     <nav className="sticky top-4 z-40 flex flex-col md:flex-row md:justify-between h-full justify-start gap-4 flex-wrap items-center rounded-xl bg-white/10 p-2 backdrop-blur-xl dark:bg-[#0b14374d]">
       <div className="ml-[6px] w-full md:w-[224px]">
@@ -151,9 +156,9 @@ const Navbar = ({ }: Props) => {
             <div className="h-px w-full bg-gray-200 dark:bg-white/20 " />
 
             <div className="flex flex-col pb-3 px-3">
-              <Link href="/" className="mt-3 text-sm font-medium text-red-500 hover:text-red-500" >
+              <button onClick={handleLogout} className="mt-3 text-sm font-medium text-red-500 hover:text-red-500" >
                 Đăng xuất
-              </Link>
+              </button>
             </div>
           </div>
         </Dropdown>

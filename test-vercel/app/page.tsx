@@ -1,5 +1,5 @@
 "use client";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import InputField from "@/components/fields/InputField";
 import Checkbox from "@/components/checkbox/index2";
@@ -17,7 +17,6 @@ import {
 } from "@/library/account";
 import NotiPopup from "@/components/notification";
 import { useRouter } from "next/navigation";
-
 type Props = {};
 
 const AuthPage: FC<Props> = () => {
@@ -28,10 +27,31 @@ const AuthPage: FC<Props> = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const route = useRouter();
+  const handleCheckField = () => {
+    if (form == "signin" || form == "signup") {
+      if (email == "" || password == "") {
+        setError(true);
+        setMessage("Vui lòng nhập đầy đủ email và mật khẩu!")
+        setModal(true)
+        return true;
+      }
+      return false
+    }
+    else {
+      if (email == "") {
+        setError(true);
+        setMessage("Vui lòng nhập đầy đủ email để lấy lại mật khẩu!");
+        setModal(true);
+        return true;
+      }
+      return false
+    };
+  }
   const handleSignUpButton = async (): Promise<void> => {
+    if (handleCheckField()) return;
     const response = await handleSignUp(email, password);
     if (response.errors) {
-      setMessage("Đã có lỗi xảy ra!");
+      setMessage("Đã có lỗi xảy ra! Vui lòng kiểm tra tài khoản/mật khẩu.");
       setError(true);
       setModal(true);
     } else {
@@ -41,9 +61,10 @@ const AuthPage: FC<Props> = () => {
   };
 
   const handleSignInButton = async (): Promise<void> => {
+    if (handleCheckField()) return;
     const response = await handleSignIn(email, password);
     if (response.errors) {
-      setMessage("Đã có lỗi xảy ra!");
+      setMessage("Đã có lỗi xảy ra! Vui lòng kiểm tra tài khoản/mật khẩu.");
       setError(true);
       setModal(true);
     } else {
@@ -53,36 +74,48 @@ const AuthPage: FC<Props> = () => {
   };
 
   const handleForgotPw = async (): Promise<void> => {
-    const response = handleForgotPass(email);
+    if (handleCheckField()) return;
+    const response = await handleForgotPass(email);
     if (response.errors) {
-      setMessage("Đã có lỗi xảy ra!");
+      setMessage("Đã có lỗi xảy ra! Vui lòng kiểm tra lại email hoặc tạo tài khoản mới.");
       setError(true);
       setModal(true);
     } else {
-      setMessage("Reset password verification đã gửi vô mail của bạn!");
+      setMessage("Mật khẩu đã được gửi vô mail của bạn!");
       setModal(true);
     }
   };
   const handleSignInByGoogle = async (): Promise<void> => {
     const response = await handleAuth();
-    if (response.errors) {
-      setMessage("Vui lòng chọn tài khoản!");
-      setError(true);
+    if (response && !response.errors) {
+      setMessage("Đăng nhập thành công");
       setModal(true);
     } else {
-      setMessage("Đăng nhập thành công");
+      setMessage("Đã có lỗi xảy ra! Vui lòng chọn tài khoản để đăng nhập hoặc tải lại trang rồi thử lại.");
+      setError(true);
       setModal(true);
     }
   };
   const handleNotificationClose = async () => {
     setModal(false);
-    const checkUserExists = await checkUserLoggedIn();
-    console.log(checkUserExists);
-
     if (!error) {
       route.push("/data");
     } else setError(false);
   };
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        if (form === "signin") handleSignInButton();
+        else if (form === "signup") handleSignUpButton();
+        else if (form === "forgotPw") handleForgotPw();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [form]);
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">
@@ -169,9 +202,8 @@ const AuthPage: FC<Props> = () => {
                   {/* Checkbox */}
                   <div className="mb-4 flex items-center justify-between px-2">
                     <div
-                      className={`flex items-center ${
-                        form != "forgotPw" ? "visible" : "invisible"
-                      }`}
+                      className={`flex items-center ${form != "forgotPw" ? "visible" : "invisible"
+                        }`}
                     >
                       <Checkbox id="remember-me" />
                       <label
@@ -182,9 +214,8 @@ const AuthPage: FC<Props> = () => {
                       </label>
                     </div>
                     <button
-                      className={`text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white ${
-                        form != "forgotPw" ? "visible" : "invisible"
-                      }`}
+                      className={`text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white ${form != "forgotPw" ? "visible" : "invisible"
+                        }`}
                       onClick={() => setForm("forgotPw")}
                     >
                       Quên mật khẩu?
@@ -192,13 +223,11 @@ const AuthPage: FC<Props> = () => {
                   </div>
 
                   <button
-                    onClick={
-                      form == "signin"
-                        ? handleSignInButton
-                        : form == "signup"
-                        ? handleSignUpButton
-                        : handleForgotPw
-                    }
+                    onClick={() => {
+                      if (form === "signin") handleSignInButton();
+                      else if (form === "signup") handleSignUpButton();
+                      else if (form === "forgotPw") handleForgotPw();
+                    }}
                     className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
                   >
                     {form == "signin" ? (
@@ -226,8 +255,8 @@ const AuthPage: FC<Props> = () => {
                           form == "signin"
                             ? "signup"
                             : form == "signup"
-                            ? "signin"
-                            : "signup"
+                              ? "signin"
+                              : "signup"
                         );
                       }}
                       className="ml-1 text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"

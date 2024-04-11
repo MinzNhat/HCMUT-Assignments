@@ -1,7 +1,7 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import {
   getFirestore,
   doc,
@@ -9,21 +9,14 @@ import {
   serverTimestamp,
   getDoc,
 } from "firebase/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollectionData } from "react-firebase-hooks/firestore";
 import {
   getAuth,
   signInWithPopup,
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import React from "react";
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/router";
-import { Route } from "react-router-dom";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDZ4OnCgIJmfbD5e68xLndPzDMk9lEsd3s",
@@ -36,12 +29,10 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const firestore = firebase.firestore();
 
-// Modify handleAuth to set isGoogleUser to true on successful sign in
 export const handleAuth = async () => {
   let result: SignInResult = { errors: true, data: undefined };
 
@@ -51,8 +42,7 @@ export const handleAuth = async () => {
     const result2 = await signInWithPopup(auth, provider);
     const user = result2.user;
     if (result2) {
-      const docRef = doc(db, "users", user.uid); // replace 'users' with your collection name
-
+      const docRef = doc(db, "users", user.uid);
       await setDoc(
         docRef,
         {
@@ -71,12 +61,11 @@ export const handleAuth = async () => {
   }
 };
 
-//this handle button onClick event to sign up // sign in web with Google authentication
-
 interface SignUpResult {
   errors: boolean;
   data?: any;
 }
+
 export const handleSignUp = async (
   email: string,
   password: string
@@ -97,37 +86,31 @@ export const handleSignUp = async (
     if (response) {
       result.errors = false;
       result.data = response;
-      if (response) {
-        const user = response.user;
-        const docRef = doc(db, "users", user.uid); // replace 'users' with your collection name
+      const user = response.user;
+      const docRef = doc(db, "users", user.uid);
 
-        await setDoc(
-          docRef,
-          {
-            email: user.email,
-            timestamp: serverTimestamp(),
-            profilePicture: user.photoURL, //URL to user profile picture
-          },
-          { merge: true }
-        );
-      }
+      await setDoc(
+        docRef,
+        {
+          email: user.email,
+          timestamp: serverTimestamp(),
+          profilePicture: user.photoURL,
+        },
+        { merge: true }
+      );
     }
     return result;
   } catch (error) {
-    console.error("Error during sign up:", error);
     return result;
   }
 };
-//Handle button sign up
 
 interface SignInResult {
   errors: boolean;
   data?: any;
 }
-export const handleSignIn = async (
-  email: string,
-  password: string
-): Promise<SignInResult> => {
+
+export const handleSignIn = async (email: string, password: string): Promise<SignInResult> => {
   let result: SignInResult = { errors: true, data: undefined };
 
   try {
@@ -139,15 +122,11 @@ export const handleSignIn = async (
     }
     return result;
   } catch (error) {
-    console.error("Error during sign in:", error);
     return result;
   }
 };
-//handle Sign in button
 
-export const getUserProfilePicture = async (
-  userId: string
-): Promise<string | null> => {
+export const getUserProfilePicture = async (userId: string): Promise<string | null> => {
   try {
     const docRef = doc(db, "users", userId);
     const docSnap = await getDoc(docRef);
@@ -159,11 +138,9 @@ export const getUserProfilePicture = async (
     }
     return null;
   } catch (error) {
-    console.error("Error getting user profile picture:", error);
     return null;
   }
 };
-// this function return user profile picture by URL string
 
 export const getUserEmail = async (userId: string): Promise<string | null> => {
   try {
@@ -177,24 +154,20 @@ export const getUserEmail = async (userId: string): Promise<string | null> => {
     }
     return null;
   } catch (error) {
-    console.error("Error getting user email:", error);
     return null;
   }
 };
-//this function return user email by string
 
 export const onClickLogOut = () => {
   const auth = getAuth();
   auth.signOut();
 };
-// handle Logout button
 
 export const checkUserLoggedIn = (): boolean => {
   const auth = getAuth();
   const user = auth.currentUser;
   return !!user;
 };
-// this function return user status if user is logged in or not if user logged in then logged in true if checking status is true page loading
 
 interface ForgotPw {
   errors: boolean;
@@ -210,20 +183,17 @@ export const handleForgotPass = async (email: string): Promise<ForgotPw> => {
     result.data = response;
     return result;
   } catch (error) {
-    console.error("Error during password reset:", error);
     return result;
   }
 };
-//handle forgot password reset
 
 export const checkUserExist = async (userId: string): Promise<boolean> => {
   try {
+    các
     const docRef = doc(db, "users", userId);
     const docSnap = await getDoc(docRef);
     return docSnap.exists();
   } catch (error) {
-    console.error("Error checking user existence:", error);
     return false;
   }
 };
-//function check user existence

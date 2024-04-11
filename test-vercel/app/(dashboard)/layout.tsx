@@ -1,20 +1,17 @@
 "use client";
 import "@/app/globals.css";
 import "@/components/calendar/MiniCalendar.css";
-import ThemeProvider from "@/providers/ThemeProvider";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import SidebarProvider from "@/providers/SidebarProvider";
 import { usePathname } from "next/navigation";
-import { LoadScript } from "@react-google-maps/api";
-import Image from "next/image";
 import { Suspense, useState } from "react";
 import MapExport from "./plan/component/MapExport";
 import { CollapseContext } from "./plan/context/CollapseContext";
 import { DestinationContext } from "./plan/context/DestinationContext";
 import { DistanceContext } from "./plan/context/DistanceContext";
 import { SourceContext } from "./plan/context/SourceContext";
-import CustomLoadingElement from "../loading";
+import CustomLoadingElement from "./loading";
 const RootStructure = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -30,9 +27,7 @@ const RootStructure = ({ children }: { children: React.ReactNode }) => {
           {/* @ts-ignore */}
           <SourceContext.Provider value={{ source, setSource }}>
             {/* @ts-ignore */}
-            <DestinationContext.Provider
-              value={{ destination, setDestination }}
-            >
+            <DestinationContext.Provider value={{ destination, setDestination }} >
               <SidebarProvider>
                 <section className="flex h-full w-full">
                   <Sidebar />
@@ -45,9 +40,10 @@ const RootStructure = ({ children }: { children: React.ReactNode }) => {
                         {/* Routes */}
                         <div className="h-full">
                           <Navbar />
-
                           <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
-                            {children}
+                            <Suspense fallback={<CustomLoadingElement />}>
+                              {children}
+                            </Suspense>
                           </div>
                         </div>
                       </main>
@@ -58,7 +54,9 @@ const RootStructure = ({ children }: { children: React.ReactNode }) => {
                           <Navbar />
 
                           <div className="pt-5s mx-auto mb-auto pt-2 md:pr-2">
-                            {children}
+                            <Suspense fallback={<CustomLoadingElement />}>
+                              {children}
+                            </Suspense>
                           </div>
                         </div>
                         <div className="absolute h-screen w-[calc(100%+75px)] top-0 -left-[63px]">
