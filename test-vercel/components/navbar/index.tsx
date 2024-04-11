@@ -4,19 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FiAlignJustify, FiSearch } from "react-icons/fi";
-import { MdTipsAndUpdates } from "react-icons/md";
 import { RiMoonFill, RiSunFill } from "react-icons/ri";
-import {
-  IoMdNotificationsOutline,
-} from "react-icons/io";
 import Dropdown from "@/components/dropdown";
 
 import routes from "@/data/routes";
 import { useSidebarContext } from "@/providers/SidebarProvider";
 import { useThemeContext } from "@/providers/ThemeProvider";
-import { Button } from "@nextui-org/react"
 import { TbBrandGithubFilled } from "react-icons/tb";
-import { onClickLogOut } from "@/library/account";
+import { checkUserLoggedIn, onClickLogOut } from "@/library/account";
 type Props = {
 }
 
@@ -147,7 +142,7 @@ const Navbar = ({ }: Props) => {
           <div className="flex w-56 flex-col justify-start rounded-[20px] bg-white bg-cover bg-no-repeat shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none">
             <div className="p-3.5">
               <div className="flex items-center flex-col gap-.5">
-                <p className="text-sm font-normal text-navy-700 dark:text-white w-full text-left">Log in as</p>
+                <p className="text-sm font-normal text-navy-700 dark:text-white w-full text-left">Đang đăng nhập với</p>
                 <p className="text-sm font-bold text-navy-700 dark:text-white">
                   nhat.dang2004.cv@gmail.com
                 </p>{" "}
