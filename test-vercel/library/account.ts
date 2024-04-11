@@ -189,7 +189,6 @@ export const handleForgotPass = async (email: string): Promise<ForgotPw> => {
 
 export const checkUserExist = async (userId: string): Promise<boolean> => {
   try {
-    các
     const docRef = doc(db, "users", userId);
     const docSnap = await getDoc(docRef);
     return docSnap.exists();
