@@ -10,12 +10,12 @@ import {
 } from "react-table";
 import {
   MdCheckCircle,
-  MdCancel,
-  MdOutlineError,
   MdAddCircleOutline,
   MdNavigateNext,
   MdNavigateBefore,
   MdOutlineRemoveCircleOutline,
+  MdPending,
+  MdPendingActions,
 } from "react-icons/md";
 import Progress from "@/components/progress";
 import { Button, useDisclosure } from "@nextui-org/react";
@@ -205,9 +205,20 @@ const CheckTable = (props: Props) => {
                       );
                     } else if (cell.column.Header === "Trạng thái") {
                       renderData = (
-                        <p className={`mt-1 text-sm font-bold pr-4 whitespace-nowrap ${cell.value == 0 ? "text-green-400" : "text-yellow-500"}`}>
-                          {cell.value == 0 ? "Sẵn sàng" : "Đã nhận đơn"}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <div className={`rounded-full text-xl`}>
+                            {cell.value === 0 ? (
+                              <MdCheckCircle className="text-green-500" />
+                            ) : cell.value === 1 ? (
+                              <MdPendingActions className="text-orange-500" />
+                            ) : null}
+                          </div>
+                          <p className="mt-0.5 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
+                            {cell.value === 0
+                              ? "Sẵn sàng" : "Đã nhận đơn"
+                            }
+                          </p>
+                        </div>
                       );
                     } else if (cell.column.Header === "Chi tiết") {
                       renderData = (

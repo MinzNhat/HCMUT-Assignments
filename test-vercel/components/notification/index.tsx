@@ -48,7 +48,7 @@ const NotiPopup: React.FC<NotiPopupProps> = ({ onClose, message, ref }) => {
 
     return (
         <motion.div
-            className="fixed top-0 left-0 right-0 bottom-0 flex backdrop-blur items-center justify-center bg-[#000000] dark:bg-white/30 bg-opacity-50 z-[100] inset-0 px-2"
+            className="fixed top-0 left-0 right-0 bottom-0 flex backdrop-blur-sm items-center justify-center bg-[#000000] dark:bg-white/30 bg-opacity-50 z-[100] inset-0 px-4"
 
             initial={{ opacity: 0 }}
             animate={{ opacity: isVisible ? 1 : 0 }}
@@ -58,7 +58,7 @@ const NotiPopup: React.FC<NotiPopupProps> = ({ onClose, message, ref }) => {
         >
             <motion.div
                 ref={ref ? ref : notificationRef}
-                className="relative max-w-full sm:min-w-[300px] sm:max-w-screen max-h-[80vh] xs:max-h-64 bg-white dark:bg-navy-800 rounded-xl p-4 flex flex-col"
+                className="relative min-w-full sm:min-w-[300px] sm:max-w-screen max-h-[80vh] xs:max-h-64 bg-white dark:bg-navy-800 rounded-xl p-4 flex flex-col shadow"
                 initial={{ scale: 0 }}
                 animate={{ scale: isVisible ? 1 : 0 }}
                 exit={{ scale: 0 }}

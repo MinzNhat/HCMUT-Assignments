@@ -17,6 +17,7 @@ import {
 } from "@/library/account";
 import NotiPopup from "@/components/notification";
 import { useRouter } from "next/navigation";
+import { useUserContext } from "@/providers/UserInfoProvider";
 type Props = {};
 
 const AuthPage: FC<Props> = () => {
@@ -27,26 +28,43 @@ const AuthPage: FC<Props> = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const route = useRouter();
+  const { user, setUser } = useUserContext()
+
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
   const handleCheckField = () => {
-    if (form == "signin" || form == "signup") {
-      if (email == "" || password == "") {
+    if (form === "signin" || form === "signup") {
+      if (!email || !password) {
         setError(true);
-        setMessage("Vui lòng nhập đầy đủ email và mật khẩu!")
-        setModal(true)
+        setMessage("Vui lòng nhập đầy đủ email và mật khẩu!");
+        setModal(true);
+        return true;
+      } else if (!validateEmail(email)) {
+        setError(true);
+        setMessage("Vui lòng nhập đúng định dạng email!");
+        setModal(true);
         return true;
       }
-      return false
-    }
-    else {
-      if (email == "") {
+      return false;
+    } else {
+      if (!email) {
         setError(true);
         setMessage("Vui lòng nhập đầy đủ email để lấy lại mật khẩu!");
         setModal(true);
         return true;
+      } else if (!validateEmail(email)) {
+        setError(true);
+        setMessage("Vui lòng nhập đúng định dạng email!");
+        setModal(true);
+        return true;
       }
-      return false
-    };
-  }
+      return false;
+    }
+  };
+
   const handleSignUpButton = async (): Promise<void> => {
     if (handleCheckField()) return;
     const response = await handleSignUp(email, password);
@@ -68,6 +86,7 @@ const AuthPage: FC<Props> = () => {
       setError(true);
       setModal(true);
     } else {
+      setUser(response.data.user)
       setMessage("Đăng nhập thành công");
       setModal(true);
     }
@@ -88,6 +107,7 @@ const AuthPage: FC<Props> = () => {
   const handleSignInByGoogle = async (): Promise<void> => {
     const response = await handleAuth();
     if (response && !response.errors) {
+      setUser(response.data)
       setMessage("Đăng nhập thành công");
       setModal(true);
     } else {
@@ -105,6 +125,7 @@ const AuthPage: FC<Props> = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter") {
+        e.preventDefault();
         if (form === "signin") handleSignInButton();
         else if (form === "signup") handleSignUpButton();
         else if (form === "forgotPw") handleForgotPw();
@@ -115,7 +136,8 @@ const AuthPage: FC<Props> = () => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [form]);
+  }, [form, email, password]);
+
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">

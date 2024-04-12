@@ -5,9 +5,10 @@ import "@/components/calendar/MiniCalendar.css";
 import Image from "next/image";
 import { LoadScript } from "@react-google-maps/api";
 import { Suspense } from "react";
+import UserProvider from "@/providers/UserInfoProvider";
 export const CustomLoadingElement = () => {
   return (
-    <div className="w-full h-screen flex flex-col gap-4 justify-center place-items-center bg-white dark:bg-navy-800">
+    <div className="w-full h-screen flex flex-col gap-4 justify-center place-items-center dark:text-white bg-white dark:bg-navy-800">
       <Image src="/logo.ico" alt="Your image" width={50} height={50} />
       <span className="text-xl">Đang tải dữ liệu...</span>
     </div>
@@ -24,7 +25,9 @@ export default function layoutStructure({
       libraries={["places"]}
       loadingElement={<CustomLoadingElement />}
     >
-      <Suspense fallback={<CustomLoadingElement />}>{childrenProps}</Suspense>
+      <UserProvider>
+        <Suspense fallback={<CustomLoadingElement />}>{childrenProps}</Suspense>
+      </UserProvider>
     </LoadScript>
   );
 }

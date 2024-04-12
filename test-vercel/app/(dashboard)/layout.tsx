@@ -32,60 +32,61 @@ const RootStructure = ({ children }: { children: React.ReactNode }) => {
   }, []);
   return (
     <>
-      {loggedIn ?
-        <>{/* @ts-ignore */}
-          <DistanceContext.Provider value={{ distance, setDistance }}>
+      {/* {loggedIn ? */}
+      <>{/* @ts-ignore */}
+        <DistanceContext.Provider value={{ distance, setDistance }}>
+          {/* @ts-ignore */}
+          <CollapseContext.Provider value={{ isCollapsed, setIsCollapsed }}>
             {/* @ts-ignore */}
-            <CollapseContext.Provider value={{ isCollapsed, setIsCollapsed }}>
+            <SourceContext.Provider value={{ source, setSource }}>
               {/* @ts-ignore */}
-              <SourceContext.Provider value={{ source, setSource }}>
-                {/* @ts-ignore */}
-                <DestinationContext.Provider value={{ destination, setDestination }} >
-                  <SidebarProvider>
-                    <section className="flex h-full w-full">
-                      <Sidebar />
+              <DestinationContext.Provider value={{ destination, setDestination }} >
+                <SidebarProvider>
+                  <section className="flex h-full w-full">
+                    <Sidebar />
 
-                      {/* Navbar & Main Content */}
-                      <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
-                        {/* Main Content */}
-                        {pathname != "/plan" ? (
-                          <main className="mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]">
-                            {/* Routes */}
-                            <div className="h-full">
-                              <Navbar />
-                              <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
-                                <Suspense fallback={<CustomLoadingElement />}>
-                                  {children}
-                                </Suspense>
-                              </div>
+                    {/* Navbar & Main Content */}
+                    <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
+                      {/* Main Content */}
+                      {pathname != "/plan" ? (
+                        <main className="mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]">
+                          {/* Routes */}
+                          <div className="h-full">
+                            <Navbar />
+                            <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
+                              <Suspense fallback={<CustomLoadingElement />}>
+                                {children}
+                              </Suspense>
                             </div>
-                          </main>
-                        ) : (
-                          <main className="relative mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]">
-                            {/* Routes */}
-                            <div className="h-full">
-                              <Navbar />
+                          </div>
+                        </main>
+                      ) : (
+                        <main className="relative mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]">
+                          {/* Routes */}
+                          <div className="h-full">
+                            <Navbar />
 
-                              <div className="pt-5s mx-auto mb-auto pt-2 md:pr-2">
-                                <Suspense fallback={<CustomLoadingElement />}>
-                                  {children}
-                                </Suspense>
-                              </div>
+                            <div className="pt-5s mx-auto mb-auto pt-2 md:pr-2">
+                              <Suspense fallback={<CustomLoadingElement />}>
+                                {children}
+                              </Suspense>
                             </div>
-                            <div className="absolute h-screen w-[calc(100%+75px)] top-0 -left-[63px]">
-                              <MapExport />
-                            </div>
-                          </main>
-                        )}
-                      </div>
-                    </section>
-                  </SidebarProvider>
-                </DestinationContext.Provider>
-              </SourceContext.Provider>
-            </CollapseContext.Provider>
-          </DistanceContext.Provider>
-        </> : <CustomLoadingElement2 />
-      }
+                          </div>
+                          <div className="absolute h-screen w-[calc(100%+75px)] top-0 -left-[63px]">
+                            <MapExport />
+                          </div>
+                        </main>
+                      )}
+                    </div>
+                  </section>
+                </SidebarProvider>
+              </DestinationContext.Provider>
+            </SourceContext.Provider>
+          </CollapseContext.Provider>
+        </DistanceContext.Provider>
+      </>
+      {/* : <CustomLoadingElement2 />
+      } */}
     </>
   );
 };

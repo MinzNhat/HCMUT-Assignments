@@ -3,9 +3,8 @@ import React, { useRef, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IoMdClose } from "react-icons/io";
 import { Button } from "@nextui-org/react";
-import { FaTrash, FaPen } from "react-icons/fa";
-import MiniCalendar from "@/components/calendar/MiniCalendar";
 import Dropzone from "./Dropzone";
+import axios from "axios";
 
 interface DriverData {
     driver_name: string;
@@ -13,6 +12,23 @@ interface DriverData {
     address: string;
     status: number;
     license: File[];
+}
+
+interface City {
+    Id: string;
+    Name: string;
+    Districts: District[];
+}
+
+interface District {
+    Id: string;
+    Name: string;
+    Wards: Ward[];
+}
+
+interface Ward {
+    Id: string;
+    Name: string;
 }
 
 interface AddPopupProps {
@@ -38,6 +54,40 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
         status: "",
         license: "",
     });
+
+    const [cities, setCities] = useState<City[]>([]);
+    const [selectedCity, setSelectedCity] = useState("");
+    const [selectedDistrict, setSelectedDistrict] = useState("");
+
+    useEffect(() => {
+        const fetchCities = async () => {
+            const response = await axios.get(
+                "https://raw.githubusercontent.com/kenzouno1/DiaGioiHanhChinhVN/master/data.json"
+            );
+            setCities(response.data);
+        };
+
+        fetchCities();
+    }, []);
+
+    const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedCity(event.target.value);
+        setSelectedDistrict("");
+    };
+
+    const handleDistrictChange = (
+        event: React.ChangeEvent<HTMLSelectElement>
+    ) => {
+        setSelectedDistrict(event.target.value);
+    };
+
+    const selectedCityObj = cities.find((city) => city.Id === selectedCity);
+    const districts = selectedCityObj ? selectedCityObj.Districts : [];
+
+    const selectedDistrictObj = districts.find(
+        (district) => district.Id === selectedDistrict
+    );
+    const wards = selectedDistrictObj ? selectedDistrictObj.Wards : [];
 
     const handleAnimationComplete = () => {
         if (!isVisible) {
@@ -125,7 +175,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                         </div>
                         <div className="flex">
                             <div className="w-1/2 font-bold text-base">
-                                Địa chỉ:
+                                Địa chỉ cụ thể:
                             </div>
                             <input
                                 className="w-1/2 dark:text-[#000000] px-2 rounded"
@@ -133,6 +183,61 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                                 value={data.address}
                                 onChange={(e) => setData({ ...data, address: e.target.value })}
                             />
+                        </div>
+                        <div className="flex">
+                            <div className="w-1/2 font-bold text-base">
+                                Tỉnh thành:
+                            </div>
+                            <select
+                                className="w-1/2 dark:text-[#000000] px-2 rounded"
+                                id="city"
+                                aria-label=".form-select-sm"
+                                value={selectedCity}
+                                onChange={handleCityChange}
+                            >
+                                <option value="">Chọn tỉnh thành</option>
+                                {cities.map((city) => (
+                                    <option key={city.Id} value={city.Id}>
+                                        {city.Name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex">
+                            <div className="w-1/2 font-bold text-base">
+                                Quận/Huyện:
+                            </div>
+                            <select
+                                className="w-1/2 dark:text-[#000000] px-2 rounded"
+                                id="district"
+                                aria-label=".form-select-sm"
+                                value={selectedDistrict}
+                                onChange={handleDistrictChange}
+                            >
+                                <option value="">Chọn quận huyện</option>
+                                {districts.map((district) => (
+                                    <option key={district.Id} value={district.Id}>
+                                        {district.Name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex">
+                            <div className="w-1/2 font-bold text-base">
+                                Phường/Xã:
+                            </div>
+                            <select
+                                className="w-1/2 dark:text-[#000000] px-2 rounded"
+                                aria-label=".form-select-sm"
+                                id="ward"
+                            >
+                                <option value="">Chọn phường xã</option>
+                                {wards.map((ward) => (
+                                    <option key={ward.Id} value={ward.Id}>
+                                        {ward.Name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div className="flex">
                             <div className="w-1/2 font-bold text-base">

@@ -14,9 +14,9 @@ const useMobileView = () => {
         }
     }, []);
 
-    return { 
-        isMobile: width <= 768, 
-        windowWidth: width 
+    return {
+        isMobile: width <= 768,
+        windowWidth: width
     };
 }
 

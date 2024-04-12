@@ -71,3 +71,8 @@ input:checked.defaultCheckbox::before {
 }
 
 /* END SCROLLBAR */
+
+.highlight {
+	background-color: #FFC107;
+	/* Màu highlight */
+}
