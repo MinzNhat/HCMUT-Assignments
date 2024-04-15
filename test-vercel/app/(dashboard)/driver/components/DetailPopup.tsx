@@ -3,41 +3,109 @@ import React, { useRef, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IoMdClose } from "react-icons/io";
 import { Button } from "@nextui-org/react";
-import { FaTrash, FaPen } from "react-icons/fa";
-import MiniCalendar from "@/components/calendar/MiniCalendar";
+import Dropzone from "./Dropzone";
+import axios from "axios";
+import InputWithError from "./Input";
+import { FaPen } from "react-icons/fa6";
+import { CarouselSlider } from "@/components/slider";
 
-interface VehicleData {
-    type: string;
-    licenseplate: string;
-    enginefuel: string;
-    height: string;
-    length: string;
-    width: string;
-    mass: string;
-    status: string;
+interface DriverData {
+    driver_name: string;
+    phone_num: string;
+    address: string;
+    status: number;
+    license: string[];
 }
 
-interface DetailPopupProps {
+interface AddPopupProps {
     onClose: () => void;
-    dataInitial: VehicleData;
+    dataInitial: DriverData;
 }
 
-const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
+const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial }) => {
     const notificationRef = useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(true);
-    const [data, setData] = useState(dataInitial);
     const [isEditing, setIsEditing] = useState(false);
+
+    const [files, setFiles] = useState<File[]>([]);
+    const [data, setData] = useState<DriverData>(dataInitial);
+
     const [errors, setErrors] = useState({
-        licenseplate: "",
-        height: "",
-        length: "",
-        width: "",
-        mass: "",
+        driver_name: "",
+        phone_num: "",
+        address: "",
+        status: "",
+        license: "",
     });
 
     const handleEditClick = () => {
         setIsEditing(true);
     };
+
+    const validatePhoneNumber = (phone: string) => {
+        const phoneRegex = /^\d{10}$/;
+        return phoneRegex.test(phone);
+    };
+
+    const handleSaveClick = () => {
+        const tempErrors = { ...errors };
+        let hasError = false;
+
+        if (data.driver_name.trim() === "") {
+            tempErrors.driver_name = "Tên tài xế không được bỏ trống.";
+            hasError = true;
+        } else {
+            tempErrors.driver_name = "";
+        }
+
+        if (data.phone_num.trim() === "" || !validatePhoneNumber(data.phone_num)) {
+            tempErrors.phone_num = "Số điện thoại không hợp lệ.";
+            hasError = true;
+        } else {
+            tempErrors.phone_num = "";
+        }
+
+        if (data.address.trim() === "") {
+            tempErrors.address = "Địa chỉ không được bỏ trống.";
+            hasError = true;
+        } else {
+            tempErrors.address = "";
+        }
+
+        if (data.license.length === 0) {
+            tempErrors.license = "Giấy phép lái xe không được bỏ trống.";
+            hasError = true;
+        } else {
+            tempErrors.license = "";
+        }
+        if (hasError) {
+            setErrors(tempErrors);
+        } else {
+            setErrors({
+                driver_name: "",
+                phone_num: "",
+                address: "",
+                status: "",
+                license: "",
+            });
+            setIsEditing(false)
+        }
+    };
+
+    useEffect(() => {
+        if (data.phone_num.match(/^\d{10}$/)) {
+            setErrors(prevErrors => ({ ...prevErrors, phone_num: "" }));
+        }
+        if (data.driver_name !== "") {
+            setErrors(prevErrors => ({ ...prevErrors, driver_name: "" }));
+        }
+        if (data.address !== "") {
+            setErrors(prevErrors => ({ ...prevErrors, address: "" }));
+        }
+        if (data.license.length !== 0) {
+            setErrors(prevErrors => ({ ...prevErrors, license: "" }));
+        }
+    }, [data]);
 
     const handleAnimationComplete = () => {
         if (!isVisible) {
@@ -63,71 +131,6 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
         setIsVisible(false);
     };
 
-    const handleSaveClick = () => {
-        const tempErrors = { ...errors };
-        let hasError = false;
-
-        if (!data.licenseplate.match(/^\d{2}[A-Z]-\d{3}.\d{2}$/)) {
-            tempErrors.licenseplate = "Biển số xe không hợp lệ. Ví dụ: 12A-345.23";
-            hasError = true;
-        }
-
-        if (data.height === "" || data.height === "0") {
-            tempErrors.height = "Chiều cao không được bỏ trống.";
-            hasError = true;
-        }
-        if (data.length === "" || data.length === "0") {
-            tempErrors.length = "Chiều dài không được bỏ trống.";
-            hasError = true;
-        }
-        if (data.width === "" || data.width === "0") {
-            tempErrors.width = "Chiều rộng không được bỏ trống.";
-            hasError = true;
-        }
-        if (data.mass === "" || data.mass === "0") {
-            tempErrors.mass = "Tải trọng không được bỏ trống.";
-            hasError = true;
-        }
-
-        if (hasError) {
-            setErrors(tempErrors);
-        } else {
-            setIsEditing(false);
-            setErrors({
-                licenseplate: "",
-                height: "",
-                length: "",
-                width: "",
-                mass: "",
-            });
-        }
-    };
-
-    useEffect(() => {
-        if (data.licenseplate.match(/^\d{2}[A-Z]-\d{3}.\d{2}$/)) {
-            setErrors(prevErrors => ({ ...prevErrors, licenseplate: "" }));
-        }
-        if (data.height !== "" && data.height !== "0") {
-            setErrors(prevErrors => ({ ...prevErrors, height: "" }));
-        }
-        if (data.length !== "" && data.length !== "0") {
-            setErrors(prevErrors => ({ ...prevErrors, length: "" }));
-        }
-        if (data.width !== "" && data.width !== "0") {
-            setErrors(prevErrors => ({ ...prevErrors, width: "" }));
-        }
-        if (data.mass !== "" && data.mass !== "0") {
-            setErrors(prevErrors => ({ ...prevErrors, mass: "" }));
-        }
-    }, [data]);
-
-    const handleNumericInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        if (/^\d*\.?\d*$/.test(value)) {
-            setData({ ...data, [name]: value });
-        }
-    };
-
     return (
         <motion.div
             className={`fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-[#000000] bg-opacity-10 dark:bg-white dark:bg-opacity-5 z-50`}
@@ -142,15 +145,15 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
         >
             <motion.div
                 ref={notificationRef}
-                className={`relative w-[98%] sm:w-9/12 dark:bg-navy-900 bg-white rounded-xl p-4`}
+                className={`relative w-[98%] sm:w-9/12 dark:bg-navy-900 bg-white rounded-xl p-4 overflow-y-auto`}
                 initial={{ scale: 0 }}
                 animate={{ scale: isVisible ? 1 : 0 }}
                 exit={{ scale: 0 }}
                 transition={{ duration: 0.5 }}
             >
                 <div className="relative items-center justify-center flex-col flex h-10 w-full border-b-2 border-gray-200 dark:!border-navy-700 overflow-hidden">
-                    <div className="font-bold text-lg sm:text-2xl pb-2 w-full text-center">
-                        Thông tin xe
+                    <div className="font-bold text-lg lg:text-2xl pb-2 w-full text-center">
+                        Thông tin tài xế
                     </div>
                     <Button
                         className="absolute right-0 w-8 h-8 top-0 rounded-full mb-2 hover:bg-gray-200 dark:hover:text-navy-900"
@@ -162,177 +165,74 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
                 <div className="h-96 mt-4 relative flex flex-col lg:flex-row bg-gray-200 bg-clip-border 
                  dark:!bg-navy-800 dark:text-white w-full overflow-y-scroll p-4 rounded-sm">
                     <div className="flex flex-col gap-5 lg:w-1/2 lg:pt-2 lg:pr-5">
-                        <div className="flex">
-                            <div className="w-1/2 font-bold text-base">
-                                Phân loại:
-                            </div>
-                            {isEditing ? (
-                                <select
-                                    className="w-1/2 dark:text-[#000000] pl-2 rounded"
-                                    value={data.type}
-                                    onChange={(e) =>
-                                        setData({ ...data, type: e.target.value })
-                                    }
-                                >
-                                    <option value="Bus">Xe khách</option>
-                                    <option value="Container Truck">Xe Container</option>
-                                    <option value="Truck">Xe tải</option>
-                                </select>
-                            ) : (
-                                <div>{data.type === "Bus" ? "Xe khách" : (data.type === "Container Truck" ? "Xe Container" : "Xe tải")}</div>
-                            )}
-                        </div>
-                        <div className="flex">
-                            <div className="w-1/2 font-bold text-base">
-                                Biển số xe:
-                            </div>
-                            {isEditing ? (
-                                <div className="relative w-1/2 flex flex-col gap-2">
-                                    <input
-                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.licenseplate ? "border-2 border-red-500" : ""}`}
-                                        type="text"
-                                        value={data.licenseplate}
-                                        onChange={(e) =>
-                                            setData({ ...data, licenseplate: e.target.value })
-                                        }
-                                    />
-                                    {errors.licenseplate && (
-                                        <span className=" text-red-500 text-sm">{errors.licenseplate}</span>
-                                    )}
+                        {!isEditing ?
+                            <div className="flex">
+                                <div className="w-1/2 font-bold text-base">
+                                    Tên tài xế:
                                 </div>
-                            ) : (
-                                <div>{data.licenseplate}</div>
-                            )}
-                        </div>
-                        <div className={`flex ${errors.licenseplate ? "-mt-3" : ""}`}>
-                            <div className="w-1/2 font-bold text-base">
-                                Loại động cơ:
+                                <div>{data.driver_name}</div>
                             </div>
-                            {isEditing ? (
-                                <select
-                                    className="w-1/2 dark:text-[#000000] pl-2 rounded"
-                                    value={data.enginefuel}
-                                    onChange={(e) =>
-                                        setData({ ...data, enginefuel: e.target.value })
-                                    }
-                                >
-                                    <option value="Gasoline">Gasoline</option>
-                                    <option value="Diesel">Diesel</option>
-                                </select>
-                            ) : (
-                                <div>{data.enginefuel}</div>
-                            )}
-                        </div>
-                        <div className="flex">
+                            :
+                            <InputWithError
+                                label="Tên tài xế"
+                                value={data.driver_name}
+                                onChange={(e) => setData({ ...data, driver_name: e.target.value })}
+                                error={errors.driver_name}
+                            />
+                        }
+                        {!isEditing ?
+                            <div className="flex">
+                                <div className="w-1/2 font-bold text-base">
+                                    Số điện thoại:
+                                </div>
+                                <div>{data.phone_num}</div>
+                            </div>
+                            :
+                            <InputWithError
+                                label="Số điện thoại"
+                                value={data.phone_num}
+                                onChange={(e) => setData({ ...data, phone_num: e.target.value })}
+                                error={errors.phone_num}
+                            />
+                        }
+                        {!isEditing ?
+                            <div className="flex">
+                                <div className="w-1/2 font-bold text-base">
+                                    Địa chỉ cụ thể:
+                                </div>
+                                <div>{data.address}</div>
+                            </div>
+                            :
+                            <InputWithError
+                                label="Địa chỉ cụ thể"
+                                value={data.address}
+                                onChange={(e) => setData({ ...data, address: e.target.value })}
+                                error={errors.address}
+                            />
+                        }
+                        <div className="flex lg:pb-4">
                             <div className="w-1/2 font-bold text-base">
                                 Trạng thái:
                             </div>
-                            {isEditing ? (
-                                <select
-                                    className="w-1/2 dark:text-[#000000] pl-2 rounded"
-                                    value={data.status}
-                                    onChange={(e) =>
-                                        setData({ ...data, status: e.target.value })
-                                    }
-                                >
-                                    <option value="Active">Đang hoạt động</option>
-                                    <option value="Inactive">Không hoạt động</option>
-                                    <option value="Maintenance">Đang bảo trì</option>
-                                </select>
-                            ) : (
-                                <div>{data.status === "Active" ? "Đang hoạt động" : (data.status === "Inactive" ? "Không hoạt động" : "Đang bảo trì")}</div>
-                            )}
-                        </div>
-                        <div className="flex">
-                            <div className="w-1/2 font-bold text-base">
-                                Tải trọng:
-                            </div>
-                            {isEditing ? (
-                                <div className="relative w-1/2">
-                                    <input
-                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.mass ? "border-2 border-red-500" : ""}`}
-                                        type="text"
-                                        name="mass"
-                                        value={data.mass}
-                                        onChange={handleNumericInputChange}
-                                    />
-                                    {errors.mass && (
-                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.mass}</span>
-                                    )}
-                                </div>
-                            ) : (
-                                <div>{data.mass}</div>
-                            )}
-                        </div>
-                        <div className={`flex ${errors.mass ? "mt-1.5" : ""}`}>
-                            <div className="w-1/2 font-bold text-base">
-                                Chiều dài:
-                            </div>
-                            {isEditing ? (
-                                <div className="relative w-1/2">
-                                    <input
-                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.length ? "border-2 border-red-500" : ""}`}
-                                        type="text"
-                                        name="length"
-                                        value={data.length}
-                                        onChange={handleNumericInputChange}
-                                    />
-                                    {errors.length && (
-                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.length}</span>
-                                    )}
-                                </div>
-                            ) : (
-                                <div>{data.length}</div>
-                            )}
-                        </div>
-                        <div className={`flex ${errors.length ? "mt-1.5" : ""}`}>
-                            <div className="w-1/2 font-bold text-base">
-                                Chiều rộng:
-                            </div>
-                            {isEditing ? (
-                                <div className="relative w-1/2">
-                                    <input
-                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.width ? "border-2 border-red-500" : ""}`}
-                                        type="text"
-                                        name="width"
-                                        value={data.width}
-                                        onChange={handleNumericInputChange}
-                                    />
-                                    {errors.width && (
-                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.width}</span>
-                                    )}
-                                </div>
-                            ) : (
-                                <div>{data.width}</div>
-                            )}
-                        </div>
-                        <div className={`flex ${errors.width ? "mt-1.5" : ""}`}>
-                            <div className="w-1/2 font-bold text-base">
-                                Chiều cao:
-                            </div>
-                            {isEditing ? (
-                                <div className="relative w-1/2">
-                                    <input
-                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.height ? "border-2 border-red-500" : ""}`}
-                                        type="text"
-                                        name="height"
-                                        value={data.height}
-                                        onChange={handleNumericInputChange}
-                                    />
-                                    {errors.height && (
-                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.height}</span>
-                                    )}
-                                </div>
-                            ) : (
-                                <div>{data.height}</div>
-                            )}
+                            <div>{data.status == 0 ? "Sẵn sàng" : "Đang nhận đơn"}</div>
                         </div>
                     </div>
-                    <div className="flex flex-col lg:w-1/2 dark:bg-navy-900 bg-white rounded-xl p-4 mt-6 lg:mt-0">
-                        <span className="w-full text-center font-bold text-base pb-2">
-                            Đặt lịch bảo dưỡng định kỳ
+
+                    <div className="flex flex-col lg:w-1/2 relative dark:bg-navy-900 bg-white rounded-xl p-4 pt-2 mt-6 lg:mt-0 h-full">
+                        <span className="w-full text-center font-bold text-lg pb-2">
+                            Ảnh giấy phép lái xe
                         </span>
-                        <MiniCalendar />
+                        {isEditing ?
+                            <>
+                                {errors.license && <div className="text-red-500 absolute w-full text-center mt-12 -ml-4">{errors.license}</div>}
+                                <Dropzone files={files} setFiles={setFiles} className={`${files.length == 0 ? "h-full" : "h-28 px-3"}  flex justify-center place-items-center mt-1`} />
+                            </>
+                            :
+                            <div className="relative grow">
+                                <CarouselSlider urls={data.license} />
+                            </div>
+                        }
+
                     </div>
                 </div>
 
@@ -368,4 +268,4 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
     );
 };
 
-export default DetailPopup;
+export default AddPopup;

@@ -30,7 +30,6 @@ const Dropzone: React.FC<DropzoneProps> = ({ className, files, setFiles }) => {
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         //@ts-ignore
         accept: 'image/*',
-        maxSize: 1024 * 1000,
         maxFiles: 2,
         //@ts-ignore
         onDrop
@@ -61,7 +60,7 @@ const Dropzone: React.FC<DropzoneProps> = ({ className, files, setFiles }) => {
                 })}
             >
                 <input {...getInputProps({ name: 'files' })} />
-                <div className='flex flex-col items-center justify-center gap-4 w-full h-full outline-dashed rounded-xl'>
+                <div className='flex flex-col items-center justify-center gap-4 w-full min-h-[100px] text-center h-full outline-dashed rounded-xl px-2'>
                     {isDragActive ? (
                         <p>Thả ảnh ở đây</p>
                     ) : (
@@ -75,7 +74,7 @@ const Dropzone: React.FC<DropzoneProps> = ({ className, files, setFiles }) => {
                     {files.map((file, index) => (
                         <li key={index} className='relative h-32 w-full rounded-md px-2 border border-gray-300'>
                             <Image
-                                src={URL.createObjectURL(file)}
+                                src={typeof file == "string" ? file : URL.createObjectURL(file)}
                                 alt={file.name}
                                 width={100}
                                 height={100}

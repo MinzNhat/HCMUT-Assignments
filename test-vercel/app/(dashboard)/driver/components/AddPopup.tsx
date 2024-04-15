@@ -5,6 +5,7 @@ import { IoMdClose } from "react-icons/io";
 import { Button } from "@nextui-org/react";
 import Dropzone from "./Dropzone";
 import axios from "axios";
+import InputWithError from "./Input";
 
 interface DriverData {
     driver_name: string;
@@ -53,11 +54,96 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
         address: "",
         status: "",
         license: "",
+        district: "",
+        city: "",
+        ward: ""
     });
 
     const [cities, setCities] = useState<City[]>([]);
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
+    const [selectedWard, setSelectedWard] = useState("");
+
+    const validatePhoneNumber = (phone: string) => {
+        const phoneRegex = /^\d{10}$/;
+        return phoneRegex.test(phone);
+    };
+
+    const handleSubmitClick = () => {
+        const tempErrors = { ...errors };
+        let hasError = false;
+
+        if (data.driver_name.trim() === "") {
+            tempErrors.driver_name = "Tên tài xế không được bỏ trống.";
+            hasError = true;
+        } else {
+            tempErrors.driver_name = "";
+        }
+
+        if (data.phone_num.trim() === "" || !validatePhoneNumber(data.phone_num)) {
+            tempErrors.phone_num = "Số điện thoại không hợp lệ.";
+            hasError = true;
+        } else {
+            tempErrors.phone_num = "";
+        }
+
+        if (data.address.trim() === "") {
+            tempErrors.address = "Địa chỉ không được bỏ trống.";
+            hasError = true;
+        } else {
+            tempErrors.address = "";
+        }
+
+        if (data.status === 0) {
+            tempErrors.status = "Trạng thái không được bỏ trống.";
+            hasError = true;
+        } else {
+            tempErrors.status = "";
+        }
+
+        if (data.license.length === 0) {
+            tempErrors.license = "Giấy phép lái xe không được bỏ trống.";
+            hasError = true;
+        } else {
+            tempErrors.license = "";
+        }
+
+        if (selectedCity === "") {
+            tempErrors.city = "Vui lòng chọn tỉnh thành.";
+            hasError = true;
+        } else {
+            tempErrors.city = "";
+        }
+
+        if (selectedDistrict === "") {
+            tempErrors.district = "Vui lòng chọn quận/huyện.";
+            hasError = true;
+        } else {
+            tempErrors.district = "";
+        }
+
+        if (selectedWard === "") {
+            tempErrors.ward = "Vui lòng chọn phường/xã.";
+            hasError = true;
+        } else {
+            tempErrors.ward = "";
+        }
+
+        if (hasError) {
+            setErrors(tempErrors);
+        } else {
+            setErrors({
+                driver_name: "",
+                phone_num: "",
+                address: "",
+                status: "",
+                license: "",
+                city: "",
+                district: "",
+                ward: ""
+            });
+        }
+    };
 
     useEffect(() => {
         const fetchCities = async () => {
@@ -79,6 +165,13 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
         event: React.ChangeEvent<HTMLSelectElement>
     ) => {
         setSelectedDistrict(event.target.value);
+        setSelectedWard("");
+    };
+
+    const handleWardChange = (
+        event: React.ChangeEvent<HTMLSelectElement>
+    ) => {
+        setSelectedWard(event.target.value);
     };
 
     const selectedCityObj = cities.find((city) => city.Id === selectedCity);
@@ -111,10 +204,6 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
 
     const handleClose = () => {
         setIsVisible(false);
-    };
-
-    const handleSubmitClick = () => {
-
     };
 
     return (
@@ -151,95 +240,92 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                 <div className="h-96 mt-4 relative flex flex-col lg:flex-row bg-gray-200 bg-clip-border 
                  dark:!bg-navy-800 dark:text-white w-full overflow-y-scroll p-4 rounded-sm">
                     <div className="flex flex-col gap-5 lg:w-1/2 lg:pt-2 lg:pr-5">
-                        <div className="flex">
-                            <div className="w-1/2 font-bold text-base">
-                                Tên tài xế:
-                            </div>
-                            <input
-                                className="w-1/2 dark:text-[#000000] px-2 rounded"
-                                type="text"
-                                value={data.driver_name}
-                                onChange={(e) => setData({ ...data, driver_name: e.target.value })}
-                            />
-                        </div>
-                        <div className="flex">
-                            <div className="w-1/2 font-bold text-base">
-                                Số điện thoại:
-                            </div>
-                            <input
-                                className="w-1/2 dark:text-[#000000] px-2 rounded"
-                                type="text"
-                                value={data.phone_num}
-                                onChange={(e) => setData({ ...data, phone_num: e.target.value })}
-                            />
-                        </div>
-                        <div className="flex">
-                            <div className="w-1/2 font-bold text-base">
-                                Địa chỉ cụ thể:
-                            </div>
-                            <input
-                                className="w-1/2 dark:text-[#000000] px-2 rounded"
-                                type="text"
-                                value={data.address}
-                                onChange={(e) => setData({ ...data, address: e.target.value })}
-                            />
-                        </div>
-                        <div className="flex">
+                        <InputWithError
+                            label="Tên tài xế"
+                            value={data.driver_name}
+                            onChange={(e) => setData({ ...data, driver_name: e.target.value })}
+                            error={errors.driver_name}
+                        />
+                        <InputWithError
+                            label="Số điện thoại"
+                            value={data.phone_num}
+                            onChange={(e) => setData({ ...data, phone_num: e.target.value })}
+                            error={errors.phone_num}
+                        />
+                        <InputWithError
+                            label="Địa chỉ cụ thể"
+                            value={data.address}
+                            onChange={(e) => setData({ ...data, address: e.target.value })}
+                            error={errors.address}
+                        />
+                        <div className={`flex ${errors.city ? "-mb-3" : ""}`}>
                             <div className="w-1/2 font-bold text-base">
                                 Tỉnh thành:
                             </div>
-                            <select
-                                className="w-1/2 dark:text-[#000000] px-2 rounded"
-                                id="city"
-                                aria-label=".form-select-sm"
-                                value={selectedCity}
-                                onChange={handleCityChange}
-                            >
-                                <option value="">Chọn tỉnh thành</option>
-                                {cities.map((city) => (
-                                    <option key={city.Id} value={city.Id}>
-                                        {city.Name}
-                                    </option>
-                                ))}
-                            </select>
+                            <div className="relative w-1/2 flex flex-col gap-2">
+                                <select
+                                    className={`w-full dark:text-[#000000] pl-2 rounded ${errors.city ? "border-2 border-red-500" : ""}`}
+                                    id="city"
+                                    aria-label=".form-select-sm"
+                                    value={selectedCity}
+                                    onChange={handleCityChange}
+                                >
+                                    <option value="">Chọn tỉnh thành</option>
+                                    {cities.map((city) => (
+                                        <option key={city.Id} value={city.Id}>
+                                            {city.Name}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.city && <div className="text-red-500">{errors.city}</div>}
+                            </div>
                         </div>
-                        <div className="flex">
+                        <div className={`flex ${errors.district ? "-mb-3" : ""}`}>
                             <div className="w-1/2 font-bold text-base">
                                 Quận/Huyện:
                             </div>
-                            <select
-                                className="w-1/2 dark:text-[#000000] px-2 rounded"
-                                id="district"
-                                aria-label=".form-select-sm"
-                                value={selectedDistrict}
-                                onChange={handleDistrictChange}
-                            >
-                                <option value="">Chọn quận huyện</option>
-                                {districts.map((district) => (
-                                    <option key={district.Id} value={district.Id}>
-                                        {district.Name}
-                                    </option>
-                                ))}
-                            </select>
+                            <div className="relative w-1/2 flex flex-col gap-2">
+                                <select
+                                    className={`w-full dark:text-[#000000] pl-2 rounded ${errors.district ? "border-2 border-red-500" : ""}`}
+                                    id="district"
+                                    aria-label=".form-select-sm"
+                                    value={selectedDistrict}
+                                    onChange={handleDistrictChange}
+                                >
+                                    <option value="">Chọn quận huyện</option>
+                                    {districts.map((district) => (
+                                        <option key={district.Id} value={district.Id}>
+                                            {district.Name}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.district && <div className="text-red-500">{errors.district}</div>}
+                            </div>
                         </div>
-                        <div className="flex">
+                        <div className={`flex ${errors.ward ? "-mb-3" : ""}`}>
                             <div className="w-1/2 font-bold text-base">
                                 Phường/Xã:
                             </div>
-                            <select
-                                className="w-1/2 dark:text-[#000000] px-2 rounded"
-                                aria-label=".form-select-sm"
-                                id="ward"
-                            >
-                                <option value="">Chọn phường xã</option>
-                                {wards.map((ward) => (
-                                    <option key={ward.Id} value={ward.Id}>
-                                        {ward.Name}
-                                    </option>
-                                ))}
-                            </select>
+                            <div className="relative w-1/2 flex flex-col gap-2">
+                                <select
+                                    className={`w-full dark:text-[#000000] pl-2 rounded ${errors.ward ? "border-2 border-red-500" : ""}`}
+                                    aria-label=".form-select-sm"
+                                    id="ward"
+                                    value={selectedWard}
+                                    onChange={handleWardChange}
+                                >
+                                    <option value="">Chọn phường xã</option>
+                                    {wards.map((ward) => (
+                                        <option key={ward.Id} value={ward.Id}>
+                                            {ward.Name}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.ward && <div className="text-red-500">{errors.ward}</div>}
+
+                            </div>
                         </div>
-                        <div className="flex">
+                        <div className="flex lg:pb-4">
                             <div className="w-1/2 font-bold text-base">
                                 Trạng thái:
                             </div>
@@ -252,10 +338,13 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                             </select>
                         </div>
                     </div>
-                    <div className="flex flex-col lg:w-1/2 dark:bg-navy-900 bg-white rounded-xl p-4 pt-2 mt-6 lg:mt-0 h-full">
+
+                    <div className="flex flex-col lg:w-1/2 relative dark:bg-navy-900 bg-white rounded-xl p-4 pt-2 mt-6 lg:mt-0 h-full">
                         <span className="w-full text-center font-bold text-lg pb-2">
                             Thêm giấy phép lái xe
                         </span>
+                        {errors.license && <div className="text-red-500 absolute w-full text-center mt-12 -ml-4">{errors.license}</div>}
+
                         <Dropzone files={files} setFiles={setFiles} className={`${files.length == 0 ? "h-full" : "h-28 px-3"}  flex justify-center place-items-center mt-1`} />
                     </div>
                 </div>
