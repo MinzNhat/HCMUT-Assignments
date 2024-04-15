@@ -175,10 +175,16 @@ export const onClickLogOut = () => {
   auth.signOut();
 };
 
-export const checkUserLoggedIn = (): boolean => {
-  const auth = getAuth();
-  const user = auth.currentUser;
-  return !!user;
+export const checkUserLoggedIn = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        resolve(true); // User is signed in.
+      } else {
+        resolve(false); // No user is signed in.
+      }
+    });
+  });
 };
 
 interface ForgotPw {

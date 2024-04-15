@@ -25,7 +25,7 @@ const Navbar = ({}: Props) => {
   const { theme, setTheme } = useThemeContext();
   const [email, setEmail] = useState<undefined | string>(undefined);
   const [profilePicture, setProfilePicture] = useState(
-    "/images/avatar/avatar4.jpg"
+    "/img/avatars/avatar4.png"
   );
   const { user } = useUserContext();
   const [search, setSearch] = useState("");
