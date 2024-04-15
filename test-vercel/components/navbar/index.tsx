@@ -17,7 +17,7 @@ import { motion } from "framer-motion";
 
 type Props = {};
 
-const Navbar = ({}: Props) => {
+const Navbar = ({ }: Props) => {
   const [currentRoute, setCurrentRoute] = useState("Đang tải...");
   const route = useRouter();
   const pathname = usePathname();
@@ -25,7 +25,7 @@ const Navbar = ({}: Props) => {
   const { theme, setTheme } = useThemeContext();
   const [email, setEmail] = useState<undefined | string>(undefined);
   const [profilePicture, setProfilePicture] = useState(
-    "/images/avatar/avatar4.jpg"
+    "/img/avatars/avatar4.png"
   );
   const { user } = useUserContext();
   const [search, setSearch] = useState("");
@@ -128,18 +128,16 @@ const Navbar = ({}: Props) => {
         >
           <motion.button
             onClick={handleSearch}
-            className={`absolute text-xl h-8 w-8 px-2 flex justify-center rounded-full place-items-center transition-all duration-500  ${
-              isSearchFocused ? "bg-blue-500 shadow-sm" : ""
-            } transform`}
+            className={`absolute text-xl h-8 w-8 px-2 flex justify-center rounded-full place-items-center transition-all duration-500  ${isSearchFocused ? "bg-blue-500 shadow-sm" : ""
+              } transform`}
             initial={{ left: 2 }}
             animate={{
               left: isSearchFocused ? "calc(100% - 2rem - 6px)" : "4px",
             }}
           >
             <FiSearch
-              className={`h-4 w-4 dark:text-white ${
-                isSearchFocused ? "text-white" : "text-gray-400"
-              }`}
+              className={`h-4 w-4 dark:text-white ${isSearchFocused ? "text-white" : "text-gray-400"
+                }`}
             />
           </motion.button>
           <input
@@ -147,9 +145,8 @@ const Navbar = ({}: Props) => {
             onChange={(e) => setSearch(e.target.value)}
             type="text"
             placeholder="Tìm kiếm..."
-            className={`block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white transition-all duration-500 ${
-              isSearchFocused ? "pl-4" : "pl-10"
-            }`}
+            className={`block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white transition-all duration-500 ${isSearchFocused ? "pl-4" : "pl-10"
+              }`}
           />
         </div>
         <span

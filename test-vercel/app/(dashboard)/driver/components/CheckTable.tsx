@@ -22,6 +22,7 @@ import { Button, useDisclosure } from "@nextui-org/react";
 // import DetailPopup from "./DetailPopup";
 import { IoAddOutline } from "react-icons/io5";
 import AddPopup from "./AddPopup";
+import DetailPopup from "./DetailPopup";
 
 interface DriverData {
   driver_name: string;
@@ -41,7 +42,13 @@ const CheckTable = (props: Props) => {
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [openModal, setOpenModal] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
-
+  const [dataRow, setDataRow] = useState<DriverData>({
+    driver_name: "",
+    phone_num: "",
+    address: "",
+    status: 0,
+    license: []
+  })
   const handleClodeModal = () => {
     setOpenModal(false);
   };
@@ -108,6 +115,12 @@ const CheckTable = (props: Props) => {
       {openAdd && (
         <AddPopup
           onClose={handleClodeAddModal}
+        />
+      )}
+      {openModal && (
+        <DetailPopup
+          onClose={handleClodeModal}
+          dataInitial={dataRow}
         />
       )}
       <div className="flex justify-between items-center flex-col sm:flex-row">
@@ -225,6 +238,7 @@ const CheckTable = (props: Props) => {
                         <div className="w-full flex justify-end">
                           <Button
                             onClick={() => {
+                              setDataRow(row.original)
                               setOpenModal(true);
                             }}
                             className={`flex items-center hover:cursor-pointer bg-lightPrimary p-2 h-8 w-8 rounded-full text-[#1488DB] border 
@@ -233,12 +247,6 @@ const CheckTable = (props: Props) => {
                           >
                             <IoAddOutline className="w-full h-full" />
                           </Button>
-                          {/* {openModal && (
-                            <DetailPopup
-                              onClose={handleClodeModal}
-                              dataInitial={row.original}
-                            />
-                          )} */}
                         </div>
                       );
                     }
