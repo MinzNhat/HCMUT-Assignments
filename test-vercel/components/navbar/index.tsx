@@ -10,10 +10,15 @@ import Dropdown from "@/components/dropdown";
 import routes from "@/data/routes";
 import { useSidebarContext } from "@/providers/SidebarProvider";
 import { useThemeContext } from "@/providers/ThemeProvider";
-import { onClickLogOut, getUserProfilePicture } from "@/library/account";
+import {
+  onClickLogOut,
+  getUserProfilePicture,
+  getUserEmail,
+} from "@/library/account";
 import { useUserContext } from "@/providers/UserInfoProvider";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { EmailAuthCredential } from "firebase/auth";
 
 type Props = {};
 
@@ -23,7 +28,7 @@ const Navbar = ({}: Props) => {
   const pathname = usePathname();
   const { setOpenSidebar } = useSidebarContext();
   const { theme, setTheme } = useThemeContext();
-  const [email, setEmail] = useState<undefined | string>(undefined);
+  const [email, setEmail] = useState<string | null>(null);
   const [profilePicture, setProfilePicture] = useState(
     "/img/avatars/avatar4.png"
   );
@@ -55,7 +60,14 @@ const Navbar = ({}: Props) => {
   }, [pathname]);
 
   useEffect(() => {
-    setEmail(user?.email);
+    const fetchEmail = async () => {
+      if (user) {
+        const userEmail = await getUserEmail();
+        setEmail(userEmail);
+      }
+    };
+
+    fetchEmail();
   }, [user]);
 
   useEffect(() => {
@@ -196,7 +208,7 @@ const Navbar = ({}: Props) => {
                   Đang đăng nhập với
                 </p>
                 <p className="text-sm font-bold text-navy-700 dark:text-white w-full overflow-hidden">
-                  {email ? <>{email}</> : <>nhat.dang2004.cv@gmail.com</>}
+                  {email}
                 </p>{" "}
               </div>
             </div>

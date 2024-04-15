@@ -154,20 +154,28 @@ export const getUserProfilePicture = async (): Promise<string | null> => {
   });
 };
 
-export const getUserEmail = async (userId: string): Promise<string | null> => {
-  try {
-    const docRef = doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      if (data && data.email) {
-        return data.email;
+export const getUserEmail = async (): Promise<string | null> => {
+  const auth = getAuth();
+  return new Promise((resolve) => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data && data.email) {
+              resolve(data.email);
+            }
+          }
+        } catch (error) {
+          resolve(null);
+        }
+      } else {
+        resolve(null);
       }
-    }
-    return null;
-  } catch (error) {
-    return null;
-  }
+    });
+  });
 };
 
 export const onClickLogOut = () => {
