@@ -16,6 +16,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  onAuthStateChanged,
 } from "firebase/auth";
 
 const firebaseConfig = {
@@ -110,7 +111,10 @@ interface SignInResult {
   data?: any;
 }
 
-export const handleSignIn = async (email: string, password: string): Promise<SignInResult> => {
+export const handleSignIn = async (
+  email: string,
+  password: string
+): Promise<SignInResult> => {
   let result: SignInResult = { errors: true, data: undefined };
 
   try {
@@ -126,20 +130,28 @@ export const handleSignIn = async (email: string, password: string): Promise<Sig
   }
 };
 
-export const getUserProfilePicture = async (userId: string): Promise<string | null> => {
-  try {
-    const docRef = doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      if (data && data.profilePicture) {
-        return data.profilePicture;
+export const getUserProfilePicture = async (): Promise<string | null> => {
+  const auth = getAuth();
+  return new Promise((resolve) => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data && data.profilePicture) {
+              resolve(data.profilePicture);
+            }
+          }
+        } catch (error) {
+          resolve(null);
+        }
+      } else {
+        resolve(null);
       }
-    }
-    return null;
-  } catch (error) {
-    return null;
-  }
+    });
+  });
 };
 
 export const getUserEmail = async (userId: string): Promise<string | null> => {

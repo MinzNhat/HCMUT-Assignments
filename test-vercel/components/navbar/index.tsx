@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
@@ -10,20 +10,23 @@ import Dropdown from "@/components/dropdown";
 import routes from "@/data/routes";
 import { useSidebarContext } from "@/providers/SidebarProvider";
 import { useThemeContext } from "@/providers/ThemeProvider";
-import { onClickLogOut } from "@/library/account";
+import { onClickLogOut, getUserProfilePicture } from "@/library/account";
 import { useUserContext } from "@/providers/UserInfoProvider";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
 type Props = {};
 
-const Navbar = ({ }: Props) => {
+const Navbar = ({}: Props) => {
   const [currentRoute, setCurrentRoute] = useState("Đang tải...");
   const route = useRouter();
   const pathname = usePathname();
   const { setOpenSidebar } = useSidebarContext();
   const { theme, setTheme } = useThemeContext();
   const [email, setEmail] = useState<undefined | string>(undefined);
+  const [profilePicture, setProfilePicture] = useState(
+    "/images/avatar/avatar4.jpg"
+  );
   const { user } = useUserContext();
   const [search, setSearch] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -32,10 +35,12 @@ const Navbar = ({ }: Props) => {
 
   useEffect(() => {
     const handleDocumentClick = (event: any) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
         setIsSearchFocused(false);
-      }
-      else setIsSearchFocused(true);
+      } else setIsSearchFocused(true);
     };
 
     document.addEventListener("mousedown", handleDocumentClick);
@@ -52,6 +57,17 @@ const Navbar = ({ }: Props) => {
   useEffect(() => {
     setEmail(user?.email);
   }, [user]);
+
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      const picture = await getUserProfilePicture();
+      if (picture) {
+        setProfilePicture(picture);
+      }
+    };
+
+    fetchProfilePicture();
+  }, []);
 
   const getActiveRoute = (routes: any) => {
     let activeRoute = "Báo cáo thống kê";
@@ -71,26 +87,35 @@ const Navbar = ({ }: Props) => {
   const handleSearch = () => {
     if (search == "") return;
     //@ts-ignore
-    window.find(search)
+    window.find(search);
   };
 
   return (
     <nav className="sticky top-4 z-40 flex flex-col md:flex-row md:justify-between h-full justify-start gap-4 flex-wrap items-center rounded-xl bg-white/10 p-2 backdrop-blur-xl dark:bg-[#0b14374d]">
       <div className="ml-[6px] w-full md:w-[224px]">
         <div className="h-6 w-full pt-1 text-left">
-          <Link className="text-sm font-normal text-navy-700 hover:underline dark:text-white dark:hover:text-white" href=" " >
+          <Link
+            className="text-sm font-normal text-navy-700 hover:underline dark:text-white dark:hover:text-white"
+            href=" "
+          >
             Trang chủ
             <span className="mx-1 text-sm text-navy-700 hover:text-navy-700 dark:text-white">
               {" "}
               /{" "}
             </span>
           </Link>
-          <Link className="text-sm font-bold capitalize text-navy-700 hover:underline dark:text-white dark:hover:text-white whitespace-nowrap" href="#" >
+          <Link
+            className="text-sm font-bold capitalize text-navy-700 hover:underline dark:text-white dark:hover:text-white whitespace-nowrap"
+            href="#"
+          >
             {currentRoute}
           </Link>
         </div>
         <p className="shrink text-[33px] capitalize text-navy-700 dark:text-white">
-          <Link href="#" className="font-bold capitalize hover:text-navy-700 dark:hover:text-white whitespace-nowrap" >
+          <Link
+            href="#"
+            className="font-bold capitalize hover:text-navy-700 dark:hover:text-white whitespace-nowrap"
+          >
             {currentRoute}
           </Link>
         </p>
@@ -103,33 +128,47 @@ const Navbar = ({ }: Props) => {
         >
           <motion.button
             onClick={handleSearch}
-            className={`absolute text-xl h-8 w-8 px-2 flex justify-center rounded-full place-items-center transition-all duration-500  ${isSearchFocused ? "bg-blue-500 shadow-sm" : ""} transform`}
+            className={`absolute text-xl h-8 w-8 px-2 flex justify-center rounded-full place-items-center transition-all duration-500  ${
+              isSearchFocused ? "bg-blue-500 shadow-sm" : ""
+            } transform`}
             initial={{ left: 2 }}
-            animate={{ left: isSearchFocused ? 'calc(100% - 2rem - 6px)' : '4px' }}
+            animate={{
+              left: isSearchFocused ? "calc(100% - 2rem - 6px)" : "4px",
+            }}
           >
-            <FiSearch className={`h-4 w-4 dark:text-white ${isSearchFocused ? "text-white" : "text-gray-400"}`} />
+            <FiSearch
+              className={`h-4 w-4 dark:text-white ${
+                isSearchFocused ? "text-white" : "text-gray-400"
+              }`}
+            />
           </motion.button>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             type="text"
             placeholder="Tìm kiếm..."
-            className={`block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white transition-all duration-500 ${isSearchFocused ? "pl-4" : "pl-10"}`}
+            className={`block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white transition-all duration-500 ${
+              isSearchFocused ? "pl-4" : "pl-10"
+            }`}
           />
         </div>
-        <span className="flex cursor-pointer text-xl text-gray-600 dark:text-white xl:hidden" onClick={() => setOpenSidebar(true)} >
+        <span
+          className="flex cursor-pointer text-xl text-gray-600 dark:text-white xl:hidden"
+          onClick={() => setOpenSidebar(true)}
+        >
           <FiAlignJustify className="h-5 w-5" />
         </span>
         <Link href="https://github.com/MinzNhat" target="_blank">
           <TbBrandGithubFilled className="h-4 w-4 text-gray-600 dark:text-white" />
         </Link>
 
-        <div className="cursor-pointer text-gray-600"
+        <div
+          className="cursor-pointer text-gray-600"
           onClick={() => {
-            theme === 'dark' ? setTheme('light') : setTheme('dark')
+            theme === "dark" ? setTheme("light") : setTheme("dark");
           }}
         >
-          {theme === 'dark' ? (
+          {theme === "dark" ? (
             <RiSunFill className="h-4 w-4 text-gray-600 dark:text-white" />
           ) : (
             <RiMoonFill className="h-4 w-4 text-gray-600 dark:text-white" />
@@ -140,8 +179,8 @@ const Navbar = ({ }: Props) => {
           button={
             <div className="avatar w-10 h-10 rounded-full">
               <Image
-                src='/img/avatars/avatar4.png'
-                alt='avatar'
+                src={profilePicture}
+                alt="avatar"
                 width={19200}
                 height={10800}
                 className="w-full h-full object-cover rounded-full  "
@@ -153,7 +192,9 @@ const Navbar = ({ }: Props) => {
           <div className="flex w-56 flex-col justify-start rounded-[20px] bg-white bg-cover bg-no-repeat shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none">
             <div className="p-3.5">
               <div className="flex items-center flex-col gap-.5">
-                <p className="text-sm font-normal text-navy-700 dark:text-white w-full text-left">Đang đăng nhập với</p>
+                <p className="text-sm font-normal text-navy-700 dark:text-white w-full text-left">
+                  Đang đăng nhập với
+                </p>
                 <p className="text-sm font-bold text-navy-700 dark:text-white w-full overflow-hidden">
                   {email ? <>{email}</> : <>nhat.dang2004.cv@gmail.com</>}
                 </p>{" "}
@@ -162,18 +203,18 @@ const Navbar = ({ }: Props) => {
             <div className="h-px w-full bg-gray-200 dark:bg-white/20 " />
 
             <div className="flex flex-col pb-3 px-3">
-              <button onClick={handleLogout} className="mt-3 text-sm font-medium text-red-500 hover:text-red-500" >
+              <button
+                onClick={handleLogout}
+                className="mt-3 text-sm font-medium text-red-500 hover:text-red-500"
+              >
                 Đăng xuất
               </button>
             </div>
           </div>
         </Dropdown>
-
       </div>
-
     </nav>
   );
 };
 
 export default Navbar;
-
