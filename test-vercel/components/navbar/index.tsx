@@ -28,7 +28,7 @@ const Navbar = ({ }: Props) => {
   const pathname = usePathname();
   const { setOpenSidebar } = useSidebarContext();
   const { theme, setTheme } = useThemeContext();
-  const [email, setEmail] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
   const [profilePicture, setProfilePicture] = useState(
     "/img/avatars/avatar4.png"
   );
@@ -61,14 +61,14 @@ const Navbar = ({ }: Props) => {
 
   useEffect(() => {
     const fetchEmail = async () => {
-      if (user) {
-        const userEmail = await getUserEmail();
-        setEmail(userEmail);
+      const email = await getUserEmail();
+      if (email) {
+        setEmail(email);
       }
     };
 
     fetchEmail();
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     const fetchProfilePicture = async () => {
