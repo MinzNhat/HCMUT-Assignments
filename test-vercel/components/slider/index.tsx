@@ -56,7 +56,7 @@ export function CarouselSlider(ObjUrls: any) {
             responsive={{
                 res1: { breakpoint: { max: 40000, min: 0 }, items: 1, partialVisibilityGutter: 0 },
             }}
-            containerClass="w-full h-60 rounded-2xl mt-2 outline outline-[1px] outline-gray-300 bg-white"
+            containerClass="w-full h-60 rounded-2xl mt-2 outline outline-[1px] outline-gray-300 bg-white dark:bg-navy-800"
             rewind={true}
             rewindWithAnimation={true}
             arrows={false}
