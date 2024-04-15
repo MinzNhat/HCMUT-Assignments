@@ -57,7 +57,7 @@ const ImageView: React.FC<ImageViewProps> = ({ onClose, url }) => {
                 transition={{ duration: 0.5 }}
             >
                 <Button
-                    className="absolute dark:text-black right-4 top-4 sm:-right-3 w-8 h-8 sm:-top-3 rounded-full mb-2 z-30 bg-white shadow"
+                    className="absolute dark:text-[#000000] text-gray-500 right-6 top-6 w-8 h-8 rounded-full mb-2 z-30 bg-white shadow"
                     onClick={handleClose}
                 >
                     <IoMdClose className="w-5/6 h-5/6" />
