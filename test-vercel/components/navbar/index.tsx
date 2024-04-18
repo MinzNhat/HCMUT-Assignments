@@ -10,11 +10,7 @@ import Dropdown from "@/components/dropdown";
 import routes from "@/data/routes";
 import { useSidebarContext } from "@/providers/SidebarProvider";
 import { useThemeContext } from "@/providers/ThemeProvider";
-import {
-  onClickLogOut,
-  getUserProfilePicture,
-  getUserEmail,
-} from "@/library/account";
+import { UsersOperation } from "@/library/account";
 import { useUserContext } from "@/providers/UserInfoProvider";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -32,12 +28,11 @@ const Navbar = ({ }: Props) => {
   const [profilePicture, setProfilePicture] = useState(
     "/img/avatars/avatar4.png"
   );
-  const { user } = useUserContext();
   const [search, setSearch] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-
+  const user = new UsersOperation()
   useEffect(() => {
     const handleDocumentClick = (event: any) => {
       if (
@@ -61,9 +56,9 @@ const Navbar = ({ }: Props) => {
 
   useEffect(() => {
     const fetchEmail = async () => {
-      const email = await getUserEmail();
-      if (email) {
-        setEmail(email);
+      const response = await user.getUserEmail();
+      if (!response.error) {
+        setEmail(response.data);
       }
     };
 
@@ -72,9 +67,9 @@ const Navbar = ({ }: Props) => {
 
   useEffect(() => {
     const fetchProfilePicture = async () => {
-      const picture = await getUserProfilePicture();
-      if (picture) {
-        setProfilePicture(picture);
+      const response = await user.handleGetUserProfilePicture();
+      if (!response.error) {
+        setProfilePicture(response.data);
       }
     };
 
@@ -92,7 +87,7 @@ const Navbar = ({ }: Props) => {
   };
 
   const handleLogout = async () => {
-    await onClickLogOut();
+    await user.onClickLogOut();
     route.push("/");
   };
 

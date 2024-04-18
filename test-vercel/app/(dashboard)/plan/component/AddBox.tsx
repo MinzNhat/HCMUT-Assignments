@@ -51,7 +51,7 @@ const AddPanel = () => {
                 className={`absolute -bottom-3 sm:top-[20.3px] dark:text-white text-gray-400
                 hover:cursor-pointer rounded-full flex focus:outline-none transition-all duration-500
                 ${isCollapsed ? 'transform -translate-y-1/2 right-1/2 translate-x-1/2 sm:translate-x-0 sm:right-0 shadow h-8 w-8 bg-white dark:bg-navy-900' :
-                        'transform right-1/2 translate-x-1/2 sm:-translate-y-[calc(50%+0.5px)] sm:translate-x-0 bottom-12 sm:border-none h-8 w-8 sm:-right-5 sm:w-14 sm:h-10 sm:justify-end'}`}
+                        'transform right-1/2 translate-x-1/2 sm:-translate-y-[calc(50%)] sm:translate-x-0 bottom-12 sm:border-none h-8 w-8 sm:-right-5 sm:w-14 sm:h-10 sm:justify-end'}`}
                 onClick={handleToggleCollapse}
             >
                 <div className='absolute w-full top-0 h-1/3 bg-white dark:bg-navy-900 sm:hidden'></div>

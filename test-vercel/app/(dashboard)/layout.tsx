@@ -13,20 +13,19 @@ import { DistanceContext } from "./plan/context/DistanceContext";
 import { SourceContext } from "./plan/context/SourceContext";
 import CustomLoadingElement from "./loading";
 import CustomLoadingElement2 from "../loading";
-import { checkUserLoggedIn } from "@/library/account";
+import { UsersOperation } from "@/library/account";
 const RootStructure = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [source, setSource] = useState(null);
   const [destination, setDestination] = useState(null);
   const [distance, setDistance] = useState(0);
-  const [loggedIn, setLoggedIn] = useState(false);
   const route = useRouter()
+  const user = new UsersOperation()
   useEffect(() => {
     const fetchData = async () => {
-      const loggedIn2 = await checkUserLoggedIn();
-      if (!loggedIn2) route.push("/")
-      else setLoggedIn(true)
+      const loggedIn2 = await user.checkUserLoggedIn();
+      if (!loggedIn2.data) route.push("/")
     };
     fetchData();
   }, []);

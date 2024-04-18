@@ -18,6 +18,7 @@ import {
   sendPasswordResetEmail,
   onAuthStateChanged,
 } from "firebase/auth";
+import { ForgotPass, Response, SignUp } from "./libraryType/type";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDZ4OnCgIJmfbD5e68xLndPzDMk9lEsd3s",
@@ -34,191 +35,156 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const firestore = firebase.firestore();
 
-export const handleAuth = async () => {
-  let result: SignInResult = { errors: true, data: undefined };
+export class UsersOperation {
+  constructor() { }
 
-  try {
-    const auth = getAuth();
-    const provider = new GoogleAuthProvider();
-    const result2 = await signInWithPopup(auth, provider);
-    const user = result2.user;
-    if (result2) {
-      const docRef = doc(db, "users", user.uid);
-      await setDoc(
-        docRef,
-        {
-          email: user.email,
-          timestamp: serverTimestamp(),
-          profilePicture: user.photoURL,
-        },
-        { merge: true }
-      );
-      result.errors = false;
-      result.data = user;
+  async handleAuth() {
+    let result: Response = { error: true, data: null };
+
+    try {
+      const auth = getAuth();
+      const provider = new GoogleAuthProvider();
+      const result2 = await signInWithPopup(auth, provider);
+      const user = result2.user;
+
+      if (result2) {
+        const docRef = doc(db, "users", user.uid);
+        await setDoc(docRef, { email: user.email, timestamp: serverTimestamp(), profilePicture: user.photoURL, }, { merge: true });
+
+        result.error = false;
+        result.data = user;
+
+      }
+      return result;
+    } catch (error) {
       return result;
     }
-  } catch (error) {
-    return result;
-  }
-};
+  };
 
-interface SignUpResult {
-  errors: boolean;
-  data?: any;
-}
+  async handleSignUp(userAccount: SignUp) {
+    let result: Response = { error: true, data: undefined };
 
-export const handleSignUp = async (
-  email: string,
-  password: string
-): Promise<SignUpResult> => {
-  let result: SignUpResult = { errors: true, data: undefined };
-  if (password.length < 8) {
-    console.error("Error: Password should be at least 8 characters long.");
-    return result;
-  }
-
-  try {
-    const auth = getAuth();
-    const response = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    if (response) {
-      result.errors = false;
-      result.data = response;
-      const user = response.user;
-      const docRef = doc(db, "users", user.uid);
-
-      await setDoc(
-        docRef,
-        {
-          email: user.email,
-          timestamp: serverTimestamp(),
-          profilePicture: user.photoURL,
-        },
-        { merge: true }
-      );
+    if (userAccount.password.length < 8) {
+      return result;
     }
-    return result;
-  } catch (error) {
-    return result;
-  }
-};
 
-interface SignInResult {
-  errors: boolean;
-  data?: any;
-}
+    try {
+      const auth = getAuth();
+      const response = await createUserWithEmailAndPassword(auth, userAccount.email, userAccount.password);
 
-export const handleSignIn = async (
-  email: string,
-  password: string
-): Promise<SignInResult> => {
-  let result: SignInResult = { errors: true, data: undefined };
-
-  try {
-    const auth = getAuth();
-    const response = await signInWithEmailAndPassword(auth, email, password);
-    if (response) {
-      result.errors = false;
-      result.data = response;
+      if (response) {
+        result.error = false;
+        result.data = response;
+        const user = response.user;
+        const docRef = doc(db, "users", user.uid);
+        await setDoc(docRef, { email: user.email, timestamp: serverTimestamp(), profilePicture: user.photoURL, }, { merge: true });
+      }
+      return result;
+    } catch (error) {
+      return result;
     }
-    return result;
-  } catch (error) {
-    return result;
-  }
-};
+  };
 
-export const getUserProfilePicture = async (): Promise<string | null> => {
-  const auth = getAuth();
-  return new Promise((resolve) => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            if (data && data.profilePicture) {
-              resolve(data.profilePicture);
-            }
-          }
-        } catch (error) {
-          resolve(null);
-        }
-      } else {
-        resolve(null);
+  async handleSignIn(userAccount: SignUp) {
+    let result: Response = { error: true, data: null };
+
+    try {
+      const auth = getAuth();
+      const response = await signInWithEmailAndPassword(auth, userAccount.email, userAccount.password);
+
+      if (response) {
+        result.error = false;
+        result.data = response;
       }
-    });
-  });
-};
+      return result;
+    } catch (error) {
+      return result;
+    }
+  };
 
-export const getUserEmail = async (): Promise<string | null> => {
-  const auth = getAuth();
-  return new Promise((resolve) => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            if (data && data.email) {
-              resolve(data.email);
-            }
-          }
-        } catch (error) {
-          resolve(null);
-        }
-      } else {
-        resolve(null);
-      }
-    });
-  });
-};
+  async handleGetUserProfilePicture() {
+    let result: Response = { error: true, data: null };
 
-export const onClickLogOut = () => {
-  const auth = getAuth();
-  auth.signOut();
-};
-
-export const checkUserLoggedIn = (): Promise<boolean> => {
-  return new Promise((resolve) => {
-    firebase.auth().onAuthStateChanged(function (user) {
-      if (user) {
-        resolve(true); // User is signed in.
-      } else {
-        resolve(false); // No user is signed in.
-      }
-    });
-  });
-};
-
-interface ForgotPw {
-  errors: boolean;
-  data?: any;
-}
-export const handleForgotPass = async (email: string): Promise<ForgotPw> => {
-  let result: ForgotPw = { errors: true, data: undefined };
-
-  try {
     const auth = getAuth();
-    const response = await sendPasswordResetEmail(auth, email);
-    result.errors = false;
-    result.data = response;
-    return result;
-  } catch (error) {
-    return result;
-  }
-};
+    const user = auth.currentUser;
 
-export const checkUserExist = async (userId: string): Promise<boolean> => {
-  try {
-    const docRef = doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
-    return docSnap.exists();
-  } catch (error) {
-    return false;
-  }
+    if (user) {
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data && data.profilePicture) {
+            result.error = false;
+            result.data = data.profilePicture;
+          }
+        }
+      } catch (error) {
+        return result
+      }
+    }
+
+    return result;
+  };
+
+  async getUserEmail() {
+    let result: Response = { error: true, data: null };
+
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (user) {
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data && data.email) {
+            result.error = false;
+            result.data = data.email;
+          }
+        }
+      } catch (error) {
+        return result;
+      }
+    }
+
+    return result;
+  };
+
+  async onClickLogOut() {
+    const auth = getAuth();
+    auth.signOut();
+  };
+
+  async checkUserLoggedIn() {
+    let result: Response = { error: true, data: null };
+
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (user) {
+      result.error = false;
+      result.data = true;
+    } else {
+      result.error = false;
+      result.data = false;
+    }
+
+    return result;
+  };
+
+  async handleForgotPass(userAccount: ForgotPass) {
+    let result: Response = { error: true, data: undefined };
+
+    try {
+      const auth = getAuth();
+      const response = await sendPasswordResetEmail(auth, userAccount.email);
+      result.error = false;
+      result.data = response;
+      return result;
+    } catch (error) {
+      return result;
+    }
+  };
 };
