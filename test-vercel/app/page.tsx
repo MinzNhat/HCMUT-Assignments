@@ -8,13 +8,7 @@ import Carousel from "react-multi-carousel";
 import Image from "next/image";
 import "react-multi-carousel/lib/styles.css";
 import ParticlesBackground from "@/components/Particle";
-import {
-  handleAuth,
-  handleSignUp,
-  handleSignIn,
-  checkUserLoggedIn,
-  handleForgotPass,
-} from "@/library/account";
+import { UsersOperation } from "@/library/account";
 import NotiPopup from "@/components/notification";
 import { useRouter } from "next/navigation";
 import { useUserContext } from "@/providers/UserInfoProvider";
@@ -28,8 +22,7 @@ const AuthPage: FC<Props> = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const route = useRouter();
-  const { user, setUser } = useUserContext()
-
+  const user = new UsersOperation();
   const validateEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -65,11 +58,11 @@ const AuthPage: FC<Props> = () => {
     }
   };
 
-  const handleSignUpButton = async (): Promise<void> => {
+  const handleSignUpButton = async () => {
     if (handleCheckField()) return;
-    const response = await handleSignUp(email, password);
-    if (response.errors) {
-      setMessage("Đã có lỗi xảy ra! Vui lòng kiểm tra tài khoản/mật khẩu.");
+    const response = await user.handleSignUp({ email, password });
+    if (response.error) {
+      setMessage("Đã có lỗi xảy ra! Vui lòng kiểm tra tài khoản/mật khẩu hoặc đăng ký để tạo tài khoản.");
       setError(true);
       setModal(true);
     } else {
@@ -78,24 +71,23 @@ const AuthPage: FC<Props> = () => {
     }
   };
 
-  const handleSignInButton = async (): Promise<void> => {
+  const handleSignInButton = async () => {
     if (handleCheckField()) return;
-    const response = await handleSignIn(email, password);
-    if (response.errors) {
-      setMessage("Đã có lỗi xảy ra! Vui lòng kiểm tra tài khoản/mật khẩu.");
+    const response = await user.handleSignIn({ email, password });
+    if (response.error) {
+      setMessage("Đã có lỗi xảy ra! Vui lòng kiểm tra tài khoản/mật khẩu. Nếu bạn đã đăng ký, vui lòng nhấp vào đăng nhập.");
       setError(true);
       setModal(true);
     } else {
-      setUser(response.data.user)
       setMessage("Đăng nhập thành công");
       setModal(true);
     }
   };
 
-  const handleForgotPw = async (): Promise<void> => {
+  const handleForgotPw = async () => {
     if (handleCheckField()) return;
-    const response = await handleForgotPass(email);
-    if (response.errors) {
+    const response = await user.handleForgotPass({ email });
+    if (response.error) {
       setMessage("Đã có lỗi xảy ra! Vui lòng kiểm tra lại email hoặc tạo tài khoản mới.");
       setError(true);
       setModal(true);
@@ -105,9 +97,8 @@ const AuthPage: FC<Props> = () => {
     }
   };
   const handleSignInByGoogle = async (): Promise<void> => {
-    const response = await handleAuth();
-    if (response && !response.errors) {
-      setUser(response.data)
+    const response = await user.handleAuth();
+    if (response && !response.error) {
       setMessage("Đăng nhập thành công");
       setModal(true);
     } else {

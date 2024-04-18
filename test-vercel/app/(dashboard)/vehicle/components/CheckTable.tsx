@@ -22,6 +22,8 @@ import { Button, useDisclosure } from "@nextui-org/react";
 import DetailPopup from "./DetailPopup";
 import { IoAddOutline } from "react-icons/io5";
 import AddPopup from "./AddPopup";
+import { motion } from "framer-motion";
+import { FiSearch } from "react-icons/fi";
 
 interface VehicleData {
   type: string;
@@ -75,6 +77,7 @@ const CheckTable = (props: Props) => {
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
+  const [searchValue, setSearchValue] = useState("");
 
   const tableInstance = useTable(
     {
@@ -102,8 +105,8 @@ const CheckTable = (props: Props) => {
     canNextPage,
     nextPage,
     previousPage,
-    pageIndex,
-    state: { selectedRowIds },
+    state: { pageIndex },
+    setGlobalFilter,
   } = tableInstance;
 
   const [dataRow, setDataRow] = useState({
@@ -129,30 +132,55 @@ const CheckTable = (props: Props) => {
           dataInitial={dataRow}
         />
       )}
-      <div className="flex justify-between items-center flex-col sm:flex-row">
-        <div className="flex gap-2 h-full mb-2 sm:mb-0">
-          <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
-            border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-700 dark:hover:bg-white/20 dark:active:bg-white/10
-              linear justify-center rounded-lg font-bold transition duration-200`}
-            onClick={() => setOpenAdd(true)}>
-            <MdAddCircleOutline className="mr-1" />Thêm
-            <p className={`sm:block ${selectedRows.size != 0 ? "hidden" : "block"}`}>&nbsp;phương tiện</p>
-          </Button>
-          {selectedRows.size != 0 &&
+      <div className="flex justify-between items-center flex-col lg:flex-row">
+        <div className="flex flex-col lg:flex-row gap-3 h-full mb-2 lg:mb-0 w-full place-items-center">
+          <div
+            className={`relative flex items-center bg-lightPrimary rounded-full text-navy-700 dark:bg-navy-900 dark:text-white lg:w-[300px] w-full`}
+          >
+            <motion.button
+              className={`text-xl h-10 w-8 px-2 ml-2 flex justify-center rounded-full place-items-center`}
+              initial={{ left: 2 }}
+            >
+              <FiSearch
+                className={`h-4 w-4 text-[#1488DB]`}
+              />
+            </motion.button>
+            <input
+              value={searchValue}
+              onChange={(e) => {
+                setSearchValue(e.target.value);
+                setGlobalFilter(e.target.value)
+              }}
+              type="text"
+              placeholder="Tìm kiếm theo biển số  ..."
+              className={`block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-[#1488DB] placeholder:text-[#1488DB]
+            outline-none dark:bg-navy-900 dark:text-[#1488DB]`}
+            />
+          </div>
+          <div className="flex gap-2">
             <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
-            border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-700 dark:hover:bg-white/20 dark:active:bg-white/10
+            border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-900 dark:hover:bg-white/20 dark:active:bg-white/10
+              linear justify-center rounded-lg font-bold transition duration-200`}
+              onClick={() => setOpenAdd(true)}>
+              <MdAddCircleOutline className="mr-1" />Thêm
+              <p className={`sm:block ${selectedRows.size != 0 ? "hidden" : "block"}`}>&nbsp;phương tiện</p>
+            </Button>
+            {selectedRows.size != 0 &&
+              <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
+            border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-900 dark:hover:bg-white/20 dark:active:bg-white/10
               linear justify-center rounded-lg font-bold transition duration-200`}>
-              <MdOutlineRemoveCircleOutline className="mr-1" />Xoá đã chọn
-            </Button>}
+                <MdOutlineRemoveCircleOutline className="mr-1" />Xoá đã chọn
+              </Button>}
+          </div>
         </div>
         <div className="flex gap-2 h-full">
           <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
-            border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-700 dark:hover:bg-white/20 dark:active:bg-white/10
+            border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-900 dark:hover:bg-white/20 dark:active:bg-white/10
               linear justify-center rounded-full font-bold transition duration-200`} onClick={() => previousPage()} disabled={!canPreviousPage}>
             <MdNavigateBefore className="w-6 h-6" />
           </Button>
           <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
-            border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-700 dark:hover:bg-white/20 dark:active:bg-white/10
+            border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-900 dark:hover:bg-white/20 dark:active:bg-white/10
               linear justify-center rounded-full font-bold transition duration-200`} onClick={() => nextPage()} disabled={!canNextPage}>
             <MdNavigateNext className="w-6 h-6" />
           </Button>

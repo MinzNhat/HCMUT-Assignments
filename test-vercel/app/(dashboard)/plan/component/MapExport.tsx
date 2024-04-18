@@ -8,7 +8,7 @@ import { useThemeContext } from '@/providers/ThemeProvider';
 import { CollapseContext } from '../context/CollapseContext';
 import { DestinationContext } from '../context/DestinationContext';
 import { SourceContext } from '../context/SourceContext';
-import Notification from './Notification'
+import Notification from '@/components/notification'
 import { DistanceContext } from '../context/DistanceContext';
 import darkTheme from '../maptheme/dark.json';
 import lightTheme from '../maptheme/light.json';
