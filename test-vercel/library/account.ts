@@ -36,7 +36,7 @@ const db = getFirestore(app);
 const firestore = firebase.firestore();
 
 export class UsersOperation {
-  constructor() {}
+  constructor() { }
 
   async handleAuth() {
     let result: Response = { error: true, data: null };
@@ -125,52 +125,54 @@ export class UsersOperation {
     }
   }
 
-  async handleGetUserProfilePicture() :  Promise<string | null>{
+  async handleGetUserProfilePicture(): Promise<string | null> {
     const auth = getAuth();
-  return new Promise((resolve) => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            if (data && data.profilePicture) {
-              resolve(data.profilePicture);
+
+    return new Promise((resolve) => {
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          try {
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              if (data && data.profilePicture) {
+                resolve(data.profilePicture);
+              }
             }
+          } catch (error) {
+            resolve(null);
           }
-        } catch (error) {
+        } else {
           resolve(null);
         }
-      } else {
-        resolve(null);
-      }
-       });
-  });
+      });
+    });
   }
 
-  async getUserEmail() :  Promise<string | null> {
+  async getUserEmail(): Promise<string | null> {
     const auth = getAuth();
-  return new Promise((resolve) => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            if (data && data.email) {
-              resolve(data.email);
+
+    return new Promise((resolve) => {
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          try {
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              if (data && data.email) {
+                resolve(data.email);
+              }
             }
+          } catch (error) {
+            resolve(null);
           }
-        } catch (error) {
+        } else {
           resolve(null);
         }
-      } else {
-        resolve(null);
-      }
       });
-  });
+    });
   }
 
   async onClickLogOut() {
@@ -180,15 +182,14 @@ export class UsersOperation {
 
   async checkUserLoggedIn() {
     return new Promise((resolve) => {
-    firebase.auth().onAuthStateChanged(function (user) {
-      if (user) {
-        resolve(true); // User is signed in.
-      } else {
-        resolve(false); // No user is signed in.
-      }
+      firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
     });
-  });
-    
   }
 
   async handleForgotPass(userAccount: ForgotPass) {
