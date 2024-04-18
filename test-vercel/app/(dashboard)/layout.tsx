@@ -20,19 +20,20 @@ const RootStructure = ({ children }: { children: React.ReactNode }) => {
   const [source, setSource] = useState(null);
   const [destination, setDestination] = useState(null);
   const [distance, setDistance] = useState(0);
-  const route = useRouter()
-  const user = new UsersOperation()
+  const route = useRouter();
+  const user = new UsersOperation();
   useEffect(() => {
     const fetchData = async () => {
       const loggedIn2 = await user.checkUserLoggedIn();
-      if (!loggedIn2.data) route.push("/")
+      if (!loggedIn2) route.push("/");
     };
     fetchData();
   }, []);
   return (
     <>
       {/* {loggedIn ? */}
-      <>{/* @ts-ignore */}
+      <>
+        {/* @ts-ignore */}
         <DistanceContext.Provider value={{ distance, setDistance }}>
           {/* @ts-ignore */}
           <CollapseContext.Provider value={{ isCollapsed, setIsCollapsed }}>

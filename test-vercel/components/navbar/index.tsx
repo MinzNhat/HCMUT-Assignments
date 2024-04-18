@@ -24,8 +24,8 @@ const Navbar = ({ }: Props) => {
   const pathname = usePathname();
   const { setOpenSidebar } = useSidebarContext();
   const { theme, setTheme } = useThemeContext();
-  const [email, setEmail] = useState("");
-  const [profilePicture, setProfilePicture] = useState(
+  const [email, setEmail] = useState<string>("");
+  const [profilePicture, setProfilePicture] = useState<string>(
     "/img/avatars/avatar4.png"
   );
   const [search, setSearch] = useState("");
@@ -57,8 +57,9 @@ const Navbar = ({ }: Props) => {
   useEffect(() => {
     const fetchEmail = async () => {
       const response = await user.getUserEmail();
-      if (!response.error) {
-        setEmail(response.data);
+      console.log(response);
+      if (response != null) {
+        setEmail(response);
       }
     };
 
@@ -68,8 +69,9 @@ const Navbar = ({ }: Props) => {
   useEffect(() => {
     const fetchProfilePicture = async () => {
       const response = await user.handleGetUserProfilePicture();
-      if (!response.error) {
-        setProfilePicture(response.data);
+      console.log(response);
+      if (response != null) {
+        setProfilePicture(response);
       }
     };
 
@@ -182,13 +184,13 @@ const Navbar = ({ }: Props) => {
         <Dropdown
           button={
             <div className="avatar w-10 h-10 rounded-full">
-              <Image
+              {profilePicture && <Image
                 src={profilePicture}
                 alt="avatar"
                 width={19200}
                 height={10800}
                 className="w-full h-full object-cover rounded-full  "
-              />
+              />}
             </div>
           }
           className={"py-2 top-8 -left-[180px] w-max"}

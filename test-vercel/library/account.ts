@@ -36,7 +36,7 @@ const db = getFirestore(app);
 const firestore = firebase.firestore();
 
 export class UsersOperation {
-  constructor() { }
+  constructor() {}
 
   async handleAuth() {
     let result: Response = { error: true, data: null };
@@ -49,17 +49,24 @@ export class UsersOperation {
 
       if (result2) {
         const docRef = doc(db, "users", user.uid);
-        await setDoc(docRef, { email: user.email, timestamp: serverTimestamp(), profilePicture: user.photoURL, }, { merge: true });
+        await setDoc(
+          docRef,
+          {
+            email: user.email,
+            timestamp: serverTimestamp(),
+            profilePicture: user.photoURL,
+          },
+          { merge: true }
+        );
 
         result.error = false;
         result.data = user;
-
       }
       return result;
     } catch (error) {
       return result;
     }
-  };
+  }
 
   async handleSignUp(userAccount: SignUp) {
     let result: Response = { error: true, data: undefined };
@@ -70,27 +77,43 @@ export class UsersOperation {
 
     try {
       const auth = getAuth();
-      const response = await createUserWithEmailAndPassword(auth, userAccount.email, userAccount.password);
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        userAccount.email,
+        userAccount.password
+      );
 
       if (response) {
         result.error = false;
         result.data = response;
         const user = response.user;
         const docRef = doc(db, "users", user.uid);
-        await setDoc(docRef, { email: user.email, timestamp: serverTimestamp(), profilePicture: user.photoURL, }, { merge: true });
+        await setDoc(
+          docRef,
+          {
+            email: user.email,
+            timestamp: serverTimestamp(),
+            profilePicture: user.photoURL,
+          },
+          { merge: true }
+        );
       }
       return result;
     } catch (error) {
       return result;
     }
-  };
+  }
 
   async handleSignIn(userAccount: SignUp) {
     let result: Response = { error: true, data: null };
 
     try {
       const auth = getAuth();
-      const response = await signInWithEmailAndPassword(auth, userAccount.email, userAccount.password);
+      const response = await signInWithEmailAndPassword(
+        auth,
+        userAccount.email,
+        userAccount.password
+      );
 
       if (response) {
         result.error = false;
@@ -100,79 +123,73 @@ export class UsersOperation {
     } catch (error) {
       return result;
     }
-  };
+  }
 
-  async handleGetUserProfilePicture() {
-    let result: Response = { error: true, data: null };
-
+  async handleGetUserProfilePicture() :  Promise<string | null>{
     const auth = getAuth();
-    const user = auth.currentUser;
-
-    if (user) {
-      try {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (data && data.profilePicture) {
-            result.error = false;
-            result.data = data.profilePicture;
+  return new Promise((resolve) => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data && data.profilePicture) {
+              resolve(data.profilePicture);
+            }
           }
+        } catch (error) {
+          resolve(null);
         }
-      } catch (error) {
-        return result
+      } else {
+        resolve(null);
       }
-    }
+       });
+  });
+  }
 
-    return result;
-  };
-
-  async getUserEmail() {
-    let result: Response = { error: true, data: null };
-
+  async getUserEmail() :  Promise<string | null> {
     const auth = getAuth();
-    const user = auth.currentUser;
-
-    if (user) {
-      try {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (data && data.email) {
-            result.error = false;
-            result.data = data.email;
+  return new Promise((resolve) => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data && data.email) {
+              resolve(data.email);
+            }
           }
+        } catch (error) {
+          resolve(null);
         }
-      } catch (error) {
-        return result;
+      } else {
+        resolve(null);
       }
-    }
-
-    return result;
-  };
+      });
+  });
+  }
 
   async onClickLogOut() {
     const auth = getAuth();
     auth.signOut();
-  };
+  }
 
   async checkUserLoggedIn() {
-    let result: Response = { error: true, data: null };
-
-    const auth = getAuth();
-    const user = auth.currentUser;
-
-    if (user) {
-      result.error = false;
-      result.data = true;
-    } else {
-      result.error = false;
-      result.data = false;
-    }
-
-    return result;
-  };
+    return new Promise((resolve) => {
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        resolve(true); // User is signed in.
+      } else {
+        resolve(false); // No user is signed in.
+      }
+    });
+  });
+    
+  }
 
   async handleForgotPass(userAccount: ForgotPass) {
     let result: Response = { error: true, data: undefined };
@@ -186,5 +203,5 @@ export class UsersOperation {
     } catch (error) {
       return result;
     }
-  };
-};
+  }
+}
