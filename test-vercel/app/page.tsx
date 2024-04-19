@@ -12,6 +12,8 @@ import { UsersOperation } from "@/library/account";
 import NotiPopup from "@/components/notification";
 import { useRouter } from "next/navigation";
 import { useUserContext } from "@/providers/UserInfoProvider";
+import { VehicleOperation } from "@/library/vehicle";
+import { RouteOperation } from "@/library/route";
 type Props = {};
 
 const AuthPage: FC<Props> = () => {
@@ -82,6 +84,7 @@ const AuthPage: FC<Props> = () => {
       setMessage("Đăng nhập thành công");
       setModal(true);
     }
+    console.log(response)
   };
 
   const handleForgotPw = async () => {
@@ -128,7 +131,18 @@ const AuthPage: FC<Props> = () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [form, email, password]);
+  // useEffect(() => {
+  //   const handleTestApi = async () => {
+  //    const User2 = new RouteOperation()
+  //    const response = await User2.createRoute({
 
+  //    })
+  //    console.log("hello")
+  //    console.log(response)
+  //   };
+
+  //   handleTestApi()
+  // }, [ ]);
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">
