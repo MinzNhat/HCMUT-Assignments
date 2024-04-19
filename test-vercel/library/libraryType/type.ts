@@ -25,7 +25,7 @@ export interface Driver {
     driverName: string,
     driverNumber: string,
     driverAddress: Address,
-    driverStatus?: string,
+    driverStatus?: number,
 }
 
 export interface Vehicle {
