@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useUserContext } from "@/providers/UserInfoProvider";
 import { VehicleOperation } from "@/library/vehicle";
 import { RouteOperation } from "@/library/route";
+import { DriverOperation } from "@/library/driver";
 type Props = {};
 
 const AuthPage: FC<Props> = () => {
@@ -131,18 +132,41 @@ const AuthPage: FC<Props> = () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [form, email, password]);
-  // useEffect(() => {
-  //   const handleTestApi = async () => {
-  //    const User2 = new RouteOperation()
-  //    const response = await User2.createRoute({
+//   export interface Driver {
+//     id?:string
+//     // type: string,
+//     //change here when we have updateIMG func
+//     driveHistory: Route[],               // we can cal experience by check the length of this
+//     driverName: string,
+//     driverNumber: string,
+//     driverAddress: Address,
+//     driverStatus?: string,
+// }
+let ktx= {
+  latitude: 10,
+  longitude: 10,
+  address: "deexe"
+}
+let Nhat={
+  driverName: "dang tran minh nhat",
+  driverNumber: "2212245",
+    driverAddress: ktx,
+    driverStatus: "available",
 
-  //    })
-  //    console.log("hello")
-  //    console.log(response)
-  //   };
+} 
+  useEffect(() => {
+    const handleTestApi = async () => {
+     const User2 = new VehicleOperation()
+     const response = await  User2.createVehicle({
+      type:"Bus",
+      licenseplate:"dsasdqw"
+     })
+     console.log("hello")
+     console.log(response)
+    };
 
-  //   handleTestApi()
-  // }, [ ]);
+    handleTestApi()
+  }, [ ]);
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">

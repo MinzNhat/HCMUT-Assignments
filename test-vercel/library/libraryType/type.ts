@@ -6,6 +6,7 @@ export interface Address {
     address: string
 }
 export interface Route {
+    id:string
     begin: Address,
     end: Address,
     beginDate: Date,
@@ -17,16 +18,18 @@ export interface Route {
     driver: Driver          // check status if u want , we need to access driveHistory to assign our route(response.data)to that His
 }
 export interface Driver {
-    type: string,
+    id?:string
+    // type: string,
     //change here when we have updateIMG func
-    driveHistory: Route[],               // we can cal experience by check the length of this
+    driveHistory?: Route[],               // we can cal experience by check the length of this
     driverName: string,
     driverNumber: string,
     driverAddress: Address,
-    driverStatus: string,
+    driverStatus?: string,
 }
 
 export interface Vehicle {
+    id?:string
     type: string
     licenseplate: string,
     enginefuel?: string,

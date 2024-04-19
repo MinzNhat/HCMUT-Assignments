@@ -6,7 +6,7 @@ import {
     getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc,
     query, where, getDocs, GeoPoint, updateDoc, getDoc, writeBatch
 } from 'firebase/firestore';
-import { Driver, Response } from './libraryType/type';
+import { Driver, Response, Address, Route } from './libraryType/type';
 import { app } from './account'
 import { constants } from 'buffer';
 import { data } from 'autoprefixer';
@@ -21,8 +21,47 @@ const DriverRef = collection(db, 'Driver');
 const RouteRef = collection(db, 'Route');
 
 class DriverRegister {
-    number: string
-    constructor(driverInfo: Driver) { this.number = driverInfo.driverNumber }
+
+    id?: string
+    // type: string
+    //change here when we have updateIMG func
+    driveHistory?: Route[]               // we can cal experience by check the length of this
+    driverName: string
+    driverNumber: string
+    driverAddress: Address
+    driverStatus: string
+    constructor(driverInfo: Driver) {
+
+        this.driverNumber = driverInfo.driverNumber
+        this.driverName = driverInfo.driverName
+        this.driverAddress = driverInfo.driverAddress
+        this.driverStatus = driverInfo.driverStatus ? driverInfo.driverStatus : "busy"
+
+    }
+    async storeToFB() {
+        try {
+            await addDoc(DriverRef, {
+
+                driverName: this.driverName,
+                driverNumber: this.driverNumber,
+                driverAddress: JSON.stringify(this.driverAddress),
+                driverStatus: this.driverStatus
+            })
+        }
+        catch (error) {
+            throw error
+        }
+    }
+    static async deleteDriver(id: string) {
+        const docRef = doc(db, 'Driver', id)
+        const data = await getDoc(docRef)
+        if (!data.exists) throw "id not exist when call delete driver by ID"
+        const result = { ...data.data(), id: data.id }
+        await deleteDoc(docRef)
+        return result
+
+
+    }
 }
 export class DriverOperation {
     constructor() { }
@@ -34,22 +73,19 @@ export class DriverOperation {
         var a = new GeoPoint(driverInfo.driverAddress.latitude, driverInfo.driverAddress.longitude)
         const driver = new DriverRegister(driverInfo)
         try {
-            await addDoc(DriverRef, {
+            if (driver) {
+                await driver.storeToFB()
+                response.error = false
+                response.data = driver
+            }
 
-                driverName: driverInfo.driverName,
-                driverNumber: driverInfo.driverNumber,
-                driverAddress: JSON.stringify(driverInfo.driverAddress)
-            })
+
         }
-        catch {
+        catch(error) {
+            console.log(error)
+        } finally {
             return response
         }
-        if (driver) {
-            response.error = false
-            response.data = driver
-            return response
-        }
-        else return response
     }
     async viewAllDriver() {
         let response: Response = {
@@ -63,22 +99,28 @@ export class DriverOperation {
 
             driverArray.docs.forEach((doc) => {
                 result.push({
+                    id: doc.id,
                     driverName: doc.data().driverName,
                     driverNumber: doc.data().driverNumber,
-                    driverAddress: JSON.parse(doc.data().driverAdress),
+                    driverAddress: JSON.parse(doc.data().driverAddress),
+                    driverStatus: doc.data().driverStatus,
                 })
             })
+            if (result) {
+                response.error=false
+                response.data = result
+
+            }
+            else throw "empty when call viewAllDriver"
 
         }
-        catch {
-            return response
+        catch (error) {
+            console.log(error)
         }
-        if (result) {
-            response.data = result
+
+        finally {
             return response             // this will return Object array NOT a single Object
-
         }
-        else return response
     }
     async viewAvailableDriver() {      // use this when create route
         let response: Response = {
@@ -86,25 +128,26 @@ export class DriverOperation {
             data: null
         }
         let result: any[] = []
-        const q = query(DriverRef, where("status", "==", "available"))
+        const q = query(DriverRef, where("driverStatus", "==", "available"))
         try {
 
             const driverArray = await (getDocs(q))
 
             driverArray.docs.forEach((doc) => {
-                result.push({ ...doc.data() })
+                result.push({ ...doc.data(), id: doc.id })
             })
+            if (result) {
+                response.error=false
+                response.data = result
+            }
 
         }
-        catch {
-            return response
+        catch (error) {
+            console.log(error)
         }
-        if (result) {
-            response.data = result
+        finally {
             return response             // this will return Object array NOT a single Object
-
         }
-        else return response
     }
     async deleteAllDriver() {
         let response: Response = {
@@ -116,49 +159,33 @@ export class DriverOperation {
             const querySnapshot = await getDocs(query(DriverRef));
 
             querySnapshot.forEach((doc) => {
-                batch.delete(doc.ref);
+                deleteDoc(doc.ref);
             });
+            response.error = false
         }
-        catch{
+        catch (error) {
+            console.log(error)
+        }
+        finally {
             return response
         }
-        response.error=false
-        return response
-
 
     }
-    async deleteDriverByName(driverNumber: string) {
+    async deleteDriverByID(driverID: string) {
         let response: Response = {
             error: true,
             data: null
         }
         try {
-            // 1. Build the query to find the driver by number
-            const q= query(DriverRef,where("driverNumber", "==", driverNumber)) 
-            // 2. Get a query snapshot to check if the driver exists
-            const querySnapshot = await getDocs(q);
-        
-            // 3. Check if any document was found
-            if (querySnapshot.size === 0) {
-              response.error = true;
-              response.data = "Driver not found";
-              return response; // Return error if not found
-            }
-        
-            // 4. If found, get the document reference and delete it
-            const docToDelete = querySnapshot.docs[0].ref;
-            await deleteDoc(docToDelete);
-        
-            response.error = false;
-            response.data = "Driver deleted successfully";
-          } catch (error) {
-            // console.error("Error deleting driver:", error);
-            response.error = true;
-            // response.data = "Error deleting driver";
-          }
-            return response; // Always return the response
-          
-        
+            response.data = await DriverRegister.deleteDriver(driverID)
+            response.error = false
+        } catch (error) {
+            // console.log(error)
+        }
+        finally {
+            return response;
+        }
+
 
     }
 
