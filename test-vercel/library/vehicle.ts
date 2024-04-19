@@ -26,6 +26,7 @@ class vehicle { // complete this class and delete this comment
     enginefuel: string
     height: string
     length: string
+    width: string
     mass: string
     status: string
     price: number
@@ -34,7 +35,8 @@ class vehicle { // complete this class and delete this comment
         this.type = "vehicle"
         this.licenseplate = vehicleInfo.licenseplate
         this.enginefuel = vehicleInfo.enginefuel ? vehicleInfo.enginefuel : "vehicleInfo.enginefuel"
-        this.height = vehicleInfo.height ? vehicleInfo.height : "vehicleInfo.heightl",
+        this.height = vehicleInfo.height ? vehicleInfo.height : "vehicleInfo.height",
+            this.width = vehicleInfo.width ? vehicleInfo.width : "vehicleInfo.width",
             this.length = vehicleInfo.length ? vehicleInfo.length : " vehicleInfo.length",
             this.mass = vehicleInfo.mass ? vehicleInfo.mass : " vehicleInfo.mass",
             this.status = vehicleInfo.status ? vehicleInfo.status : "vehicleInfo.status",
@@ -49,6 +51,7 @@ class vehicle { // complete this class and delete this comment
                 engineFuel: this.enginefuel,
                 height: this.height,
                 length: this.length,
+                width: this.width,
                 mass: this.mass,
                 status: this.status,
                 price: this.price,
@@ -75,8 +78,8 @@ class Car extends vehicle {                                                     
         this.type = "Car"
         this.licenseplate = vehicleInfo.licenseplate
         this.enginefuel = vehicleInfo.enginefuel ? vehicleInfo.enginefuel : "Gasoline"
-        this.height = vehicleInfo.height ? vehicleInfo.height : "1,5 "
-        this.length = vehicleInfo.length ? vehicleInfo.length : "4,6 "
+        this.height = vehicleInfo.height ? vehicleInfo.height : "1,5"
+        this.length = vehicleInfo.length ? vehicleInfo.length : "4,6"
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "500 "
         this.status = vehicleInfo.status ? vehicleInfo.status : "Unavailable"
         this.price = vehicleInfo.price ? vehicleInfo.price : 2500
@@ -91,6 +94,7 @@ class Bus extends vehicle {
         this.enginefuel = vehicleInfo.enginefuel ? vehicleInfo.enginefuel : "Diesel"
         this.height = vehicleInfo.height ? vehicleInfo.height : "3.81 "
         this.length = vehicleInfo.length ? vehicleInfo.length : "12 "
+        this.width = vehicleInfo.width ? vehicleInfo.width : "3"
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "700 "
         this.status = vehicleInfo.status ? vehicleInfo.status : "Unavailable"
         this.price = vehicleInfo.price ? vehicleInfo.price : 4500
@@ -104,6 +108,7 @@ class Truck extends vehicle {
         this.licenseplate = vehicleInfo.licenseplate
         this.enginefuel = vehicleInfo.enginefuel ? vehicleInfo.enginefuel : "Gasoline"
         this.height = vehicleInfo.height ? vehicleInfo.height : "1,9 "
+        this.width = vehicleInfo.width ? vehicleInfo.width : "3"
         this.length = vehicleInfo.length ? vehicleInfo.length : "3,1 "
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "500 "
         this.status = vehicleInfo.status ? vehicleInfo.status : "Unavailable"
@@ -119,6 +124,7 @@ class motorbike extends vehicle {
         this.enginefuel = vehicleInfo.enginefuel ? vehicleInfo.enginefuel : "Gasoline"
         this.height = vehicleInfo.height ? vehicleInfo.height : "1"
         this.length = vehicleInfo.length ? vehicleInfo.length : "1,2"
+        this.width = vehicleInfo.width ? vehicleInfo.width : "3"
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "115 "
         this.status = vehicleInfo.status ? vehicleInfo.status : "Unavailable"
         this.price = vehicleInfo.price ? vehicleInfo.price : 1000
@@ -134,7 +140,9 @@ export class VehicleOperation {
             error: true,
             data: null
         }
+
         var veh: vehicle
+
         switch (vehicleInfo.type.toUpperCase()) {                    //factory design pattern
             case "BUS":
                 veh = new Bus(vehicleInfo)
@@ -190,15 +198,17 @@ export class VehicleOperation {
             console.log(error)
         }
         finally {
-            return response                  // this will return Object array NOT a single Object
+            return response
         }
     }
-    async viewAvailableVehicle() {      // use this when create route
+    async viewAvailableVehicle() {
         let response: Response = {
             error: true,
             data: null
         }
+
         let result: any[] = []
+
         const q = query(VehicleRef, where("status", "==", "available"))
         try {
 
@@ -217,7 +227,7 @@ export class VehicleOperation {
             return response
         }
         finally {
-            return response        // this will return Object array NOT a single Object
+            return response
         }
     }
     async deleteAllVehicle() {
@@ -225,6 +235,7 @@ export class VehicleOperation {
             error: true,
             data: null
         }
+
         try {
             const batch = writeBatch(db);
             const querySnapshot = await getDocs(query(VehicleRef));
@@ -249,16 +260,13 @@ export class VehicleOperation {
         }
         try {
             response.data = await vehicle.deleteVehicle(vehicleID)
-            response.error=false
+            response.error = false
         } catch (error) {
             console.log(error)
         } finally {
 
-            return response; // Always return the response
+            return response;
         }
-
-
     }
-
 };
 

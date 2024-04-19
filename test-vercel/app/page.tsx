@@ -26,6 +26,7 @@ const AuthPage: FC<Props> = () => {
   const [password, setPassword] = useState("");
   const route = useRouter();
   const user = new UsersOperation();
+
   const validateEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -100,6 +101,7 @@ const AuthPage: FC<Props> = () => {
       setModal(true);
     }
   };
+
   const handleSignInByGoogle = async (): Promise<void> => {
     const response = await user.handleAuth();
     if (response && !response.error) {
@@ -111,12 +113,14 @@ const AuthPage: FC<Props> = () => {
       setModal(true);
     }
   };
+
   const handleNotificationClose = async () => {
     setModal(false);
     if (!error) {
       route.push("/data");
     } else setError(false);
   };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter") {
@@ -132,41 +136,14 @@ const AuthPage: FC<Props> = () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [form, email, password]);
-//   export interface Driver {
-//     id?:string
-//     // type: string,
-//     //change here when we have updateIMG func
-//     driveHistory: Route[],               // we can cal experience by check the length of this
-//     driverName: string,
-//     driverNumber: string,
-//     driverAddress: Address,
-//     driverStatus?: string,
-// }
-let ktx= {
-  latitude: 10,
-  longitude: 10,
-  address: "deexe"
-}
-let Nhat={
-  driverName: "dang tran minh nhat",
-  driverNumber: "2212245",
-    driverAddress: ktx,
-    driverStatus: "available",
 
-} 
   useEffect(() => {
-    const handleTestApi = async () => {
-     const User2 = new VehicleOperation()
-     const response = await  User2.createVehicle({
-      type:"Bus",
-      licenseplate:"dsasdqw"
-     })
-     console.log("hello")
-     console.log(response)
+    const fetchData = async () => {
+      const loggedIn2 = await user.checkUserLoggedIn();
+      if (loggedIn2) await user.onClickLogOut();
     };
-
-    handleTestApi()
-  }, [ ]);
+    fetchData();
+  }, []);
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">
