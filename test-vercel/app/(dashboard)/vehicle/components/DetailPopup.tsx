@@ -5,28 +5,26 @@ import { IoMdClose } from "react-icons/io";
 import { Button } from "@nextui-org/react";
 import { FaTrash, FaPen } from "react-icons/fa";
 import MiniCalendar from "@/components/calendar/MiniCalendar";
-
-interface VehicleData {
-    type: string;
-    licenseplate: string;
-    enginefuel: string;
-    height: string;
-    length: string;
-    width: string;
-    mass: string;
-    status: string;
-}
+import { Vehicle } from "@/library/libraryType/type";
+import { VehicleOperation } from "@/library/vehicle";
+import NotiPopup from "@/components/notification";
+import SubmitPopup from "@/components/submit";
 
 interface DetailPopupProps {
     onClose: () => void;
-    dataInitial: VehicleData;
+    dataInitial: Vehicle;
+    reloadData: () => void
 }
 
-const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
+const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadData }) => {
     const notificationRef = useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(true);
     const [data, setData] = useState(dataInitial);
     const [isEditing, setIsEditing] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
+    const [openError, setOpenError] = useState(false);
+    const [message, setMessage] = useState("");
+    const vehice = new VehicleOperation()
     const [errors, setErrors] = useState({
         licenseplate: "",
         height: "",
@@ -42,22 +40,9 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
     const handleAnimationComplete = () => {
         if (!isVisible) {
             onClose();
+            reloadData();
         }
     };
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-                handleClose();
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [onClose]);
 
     const handleClose = () => {
         setIsVisible(false);
@@ -92,7 +77,6 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
         if (hasError) {
             setErrors(tempErrors);
         } else {
-            setIsEditing(false);
             setErrors({
                 licenseplate: "",
                 height: "",
@@ -100,6 +84,19 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
                 width: "",
                 mass: "",
             });
+            const hasChanges =
+                data.licenseplate !== dataInitial.licenseplate ||
+                data.height !== dataInitial.height ||
+                data.length !== dataInitial.length ||
+                data.width !== dataInitial.width ||
+                data.mass !== dataInitial.mass;
+
+            if (hasChanges) {
+                setMessage("Bạn có xác nhận muốn thay đổi thông tin phương tiện?");
+                setOpenModal(true);
+            } else {
+                setIsEditing(false);
+            }
         }
     };
 
@@ -128,6 +125,9 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
         }
     };
 
+    const handleChangeData = async () => {
+    };
+
     return (
         <motion.div
             className={`fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-[#000000] bg-opacity-10 dark:bg-white dark:bg-opacity-5 z-50`}
@@ -140,6 +140,8 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {
             }}
             onAnimationComplete={handleAnimationComplete}
         >
+            {openError && <NotiPopup message={message} onClose={() => { setOpenError(false); setIsEditing(false); }} />}
+            {openModal && <SubmitPopup message={message} onClose={() => { setOpenModal(false); }} submit={handleChangeData} />}
             <motion.div
                 ref={notificationRef}
                 className={`relative w-[98%] sm:w-9/12 dark:bg-navy-900 bg-white rounded-xl p-4`}

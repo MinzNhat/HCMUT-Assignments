@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useUserContext } from "@/providers/UserInfoProvider";
 import { VehicleOperation } from "@/library/vehicle";
 import { RouteOperation } from "@/library/route";
+import { DriverOperation } from "@/library/driver";
 type Props = {};
 
 const AuthPage: FC<Props> = () => {
@@ -25,6 +26,7 @@ const AuthPage: FC<Props> = () => {
   const [password, setPassword] = useState("");
   const route = useRouter();
   const user = new UsersOperation();
+
   const validateEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -98,6 +100,7 @@ const AuthPage: FC<Props> = () => {
       setModal(true);
     }
   };
+
   const handleSignInByGoogle = async (): Promise<void> => {
     const response = await user.handleAuth();
     if (response && !response.error) {
@@ -109,6 +112,7 @@ const AuthPage: FC<Props> = () => {
       setModal(true);
     }
   };
+
   const handleNotificationClose = async () => {
     setModal(false);
     if (!error) {
@@ -139,18 +143,6 @@ const AuthPage: FC<Props> = () => {
     };
     fetchData();
   }, []);
-  // useEffect(() => {
-  //   const handleTestApi = async () => {
-  //    const User2 = new RouteOperation()
-  //    const response = await User2.createRoute({
-
-  //    })
-  //    console.log("hello")
-  //    console.log(response)
-  //   };
-
-  //   handleTestApi()
-  // }, [ ]);
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">

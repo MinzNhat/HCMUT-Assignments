@@ -5,26 +5,24 @@ import { IoMdClose } from "react-icons/io";
 import { Button } from "@nextui-org/react";
 import { FaTrash, FaPen } from "react-icons/fa";
 import MiniCalendar from "@/components/calendar/MiniCalendar";
-
-interface VehicleData {
-    type: string;
-    licenseplate: string;
-    enginefuel: string;
-    height: string;
-    length: string;
-    width: string;
-    mass: string;
-    status: string;
-}
+import { Vehicle } from "@/library/libraryType/type";
+import { VehicleOperation } from "@/library/vehicle";
+import NotiPopup from "@/components/notification";
+import SubmitPopup from "@/components/submit";
 
 interface AddPopupProps {
     onClose: () => void;
+    reloadData: () => void;
 }
 
-const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
+const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
     const notificationRef = useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(true);
-    const [data, setData] = useState<VehicleData>({
+    const [openModal, setOpenModal] = useState(false);
+    const [openError, setOpenError] = useState(false);
+    const [message, setMessage] = useState("");
+    const vehice = new VehicleOperation()
+    const [data, setData] = useState<Vehicle>({
         type: "Bus",
         licenseplate: "",
         enginefuel: "Gasoline",
@@ -32,7 +30,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
         length: "0",
         width: "0",
         mass: "0",
-        status: "Working",
+        status: "Active",
     });
 
     const [errors, setErrors] = useState({
@@ -48,20 +46,6 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
             onClose();
         }
     };
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-                handleClose();
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [onClose]);
 
     const handleClose = () => {
         setIsVisible(false);
@@ -103,8 +87,23 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                 width: "",
                 mass: "",
             });
+            setMessage("Xác nhận tạo phương tiện?")
+            setOpenModal(true)
         }
     };
+
+    const handleAddVehicle = async () => {
+        const response = await vehice.createVehicle(data);
+        console.log(response)
+        setOpenModal(false)
+        if (response.error) {
+            setMessage("Đã có lỗi khi tạo mới phương tiện.");
+            setOpenError(true);
+        } else {
+            setMessage("Đã tạo mới phương tiện thành công!");
+            setOpenError(true)
+        }
+    }
 
     useEffect(() => {
         if (data.licenseplate.match(/^\d{2}[A-Z]-\d{3}.\d{2}$/)) {
@@ -143,6 +142,8 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
             }}
             onAnimationComplete={handleAnimationComplete}
         >
+            {openError && <NotiPopup message={message} onClose={() => { handleClose(); setOpenError(false); reloadData(); }} />}
+            {openModal && <SubmitPopup message={message} onClose={() => { setOpenModal(false); }} submit={handleAddVehicle} />}
             <motion.div
                 ref={notificationRef}
                 className={`relative w-[98%] sm:w-9/12 dark:bg-navy-900 bg-white rounded-xl p-4 overflow-y-auto`}
@@ -179,6 +180,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                                 <option value="Bus">Xe khách</option>
                                 <option value="Container Truck">Xe Container</option>
                                 <option value="Truck">Xe tải</option>
+                                <option value="Motorbike">Xe máy</option>
                             </select>
                         </div>
                         <div className="flex">

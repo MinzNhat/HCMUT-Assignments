@@ -4,9 +4,28 @@ import { motion } from "framer-motion";
 import {
   columnsData,
 } from "./variables/columnsData";
-import tableData from "./variables/carsData.json";
+import { VehicleOperation } from "@/library/vehicle";
+import { useCallback, useEffect, useState } from "react";
+import CustomLoadingElement from "../loading";
 
 const DataTablesPage = () => {
+  const [tableData, setTableData] = useState<any>(null)
+  const vehice = new VehicleOperation();
+
+  const handleFetchVehicle = async () => {
+    const response = await vehice.viewAllVehicle();
+    setTableData(response.data)
+  }
+
+  useEffect(() => {
+    handleFetchVehicle()
+  }, []);
+
+  const reloadData = useCallback(() => {
+    setTableData(null)
+    handleFetchVehicle();
+  }, []);
+
   return (
     <div className="mt-5 grid min-h-[calc(100vh-126px)] grid-cols-1 gap-5">
       <motion.div
@@ -14,10 +33,11 @@ const DataTablesPage = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <CheckTable
+        {tableData ? <CheckTable
           columnsData={columnsData}
           tableData={tableData}
-        />
+          reloadData={reloadData}
+        /> : <CustomLoadingElement />}
       </motion.div>
     </div>
   );
