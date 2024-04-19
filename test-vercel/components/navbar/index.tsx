@@ -100,7 +100,7 @@ const Navbar = ({ }: Props) => {
   };
 
   return (
-    <nav className="sticky top-4 z-40 flex flex-col md:flex-row md:justify-between h-full justify-start gap-4 flex-wrap items-center rounded-xl bg-white/10 p-2 backdrop-blur-xl dark:bg-[#0b14374d]">
+    <nav className="sticky top-4 z-[45] flex flex-col md:flex-row md:justify-between h-full justify-start gap-4 flex-wrap items-center rounded-xl bg-white/10 p-2 backdrop-blur-xl dark:bg-[#0b14374d]">
       <div className="ml-[6px] w-full md:w-[224px]">
         <div className="h-6 w-full pt-1 text-left">
           <Link
@@ -189,13 +189,13 @@ const Navbar = ({ }: Props) => {
                 alt="avatar"
                 width={19200}
                 height={10800}
-                className="w-full h-full object-cover rounded-full  "
+                className="w-full h-full object-cover rounded-full"
               />}
             </div>
           }
           className={"py-2 top-8 -left-[180px] w-max"}
         >
-          <div className="flex w-56 flex-col justify-start rounded-[20px] bg-white bg-cover bg-no-repeat shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none">
+          <div className="flex w-56 z-50 flex-col justify-start rounded-[20px] bg-white bg-cover bg-no-repeat shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none">
             <div className="p-3.5">
               <div className="flex items-center flex-col gap-.5">
                 <p className="text-sm font-normal text-navy-700 dark:text-white w-full text-left">
