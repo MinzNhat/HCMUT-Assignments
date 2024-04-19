@@ -24,29 +24,26 @@ import { IoAddOutline } from "react-icons/io5";
 import AddPopup from "./AddPopup";
 import { motion } from "framer-motion";
 import { FiSearch } from "react-icons/fi";
-
-interface VehicleData {
-  type: string;
-  licenseplate: string;
-  enginefuel: string;
-  height: string;
-  length: string;
-  width: string;
-  mass: string;
-  status: string;
-}
+import { Vehicle } from "@/library/libraryType/type";
+import { VehicleOperation } from "@/library/vehicle";
+import NotiPopup from "@/components/notification";
+import SubmitPopup from "@/components/submit";
 
 type Props = {
   columnsData: any[];
-  tableData: VehicleData[];
+  tableData: Vehicle[];
+  reloadData: () => void;
 };
 
 const CheckTable = (props: Props) => {
-  const { columnsData, tableData } = props;
+  const { columnsData, tableData, reloadData } = props;
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [openModal, setOpenModal] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
-
+  const [openModal2, setOpenModal2] = useState(false);
+  const [openError, setOpenError] = useState(false);
+  const [message, setMessage] = useState("");
+  const vehice = new VehicleOperation()
   const handleClodeModal = () => {
     setOpenModal(false);
   };
@@ -109,7 +106,7 @@ const CheckTable = (props: Props) => {
     setGlobalFilter,
   } = tableInstance;
 
-  const [dataRow, setDataRow] = useState({
+  const [dataRow, setDataRow] = useState<Vehicle>({
     type: "",
     licenseplate: "",
     enginefuel: "",
@@ -117,21 +114,45 @@ const CheckTable = (props: Props) => {
     length: "",
     width: "",
     mass: "",
-    status: ""
+    status: "",
+    id: ""
   })
+
+  const handleDelete = async () => {
+    setOpenModal2(false)
+    const selectedIds = Array.from(selectedRows).map(index => tableData[index].id);
+    let error = false;
+    selectedIds.forEach(async (id) => {
+      if (id) {
+        const response = await vehice.deleteVehicleByID(id)
+        if (response.error) error = true;
+      }
+    });
+    if (error) {
+      setMessage("Đã có lỗi xảy ra khi xoá phương tiện.");
+      setOpenError(true);
+    } else {
+      setMessage("Xoá các phương tiện đã chọn thành công.");
+      setOpenError(true);
+    }
+  };
   return (
     <Card className={"w-full sm:overflow-auto p-4"}>
       {openAdd && (
         <AddPopup
           onClose={handleClodeAddModal}
+          reloadData={reloadData}
         />
       )}
       {openModal && (
         <DetailPopup
           onClose={handleClodeModal}
           dataInitial={dataRow}
+          reloadData={reloadData}
         />
       )}
+      {openError && <NotiPopup message={message} onClose={() => { setOpenError(false); reloadData() }} />}
+      {openModal2 && <SubmitPopup message={message} onClose={() => { setOpenModal2(false); }} submit={handleDelete} />}
       <div className="flex justify-between items-center flex-col lg:flex-row">
         <div className="flex flex-col lg:flex-row gap-3 h-full mb-2 lg:mb-0 w-full place-items-center">
           <div
@@ -160,7 +181,7 @@ const CheckTable = (props: Props) => {
           <div className="flex gap-2">
             <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
             border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-900 dark:hover:bg-white/20 dark:active:bg-white/10
-              linear justify-center rounded-lg font-bold transition duration-200`}
+              linear justify-center rounded-lg font-medium transition duration-200`}
               onClick={() => setOpenAdd(true)}>
               <MdAddCircleOutline className="mr-1" />Thêm
               <p className={`sm:block ${selectedRows.size != 0 ? "hidden" : "block"}`}>&nbsp;phương tiện</p>
@@ -168,7 +189,9 @@ const CheckTable = (props: Props) => {
             {selectedRows.size != 0 &&
               <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
             border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-900 dark:hover:bg-white/20 dark:active:bg-white/10
-              linear justify-center rounded-lg font-bold transition duration-200`}>
+              linear justify-center rounded-lg font-medium transition duration-200`}
+                onClick={() => { setMessage("Xác nhận xoá các phương tiện đã chọn?"); setOpenModal2(true) }}
+              >
                 <MdOutlineRemoveCircleOutline className="mr-1" />Xoá đã chọn
               </Button>}
           </div>

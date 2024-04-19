@@ -5,7 +5,7 @@ import {
   columnsData,
 } from "./variables/columnsData";
 import { VehicleOperation } from "@/library/vehicle";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import CustomLoadingElement from "../loading";
 
 const DataTablesPage = () => {
@@ -14,12 +14,16 @@ const DataTablesPage = () => {
 
   const handleFetchVehicle = async () => {
     const response = await vehice.viewAllVehicle();
-    console.log(response)
     setTableData(response.data)
   }
 
   useEffect(() => {
     handleFetchVehicle()
+  }, []);
+
+  const reloadData = useCallback(() => {
+    setTableData(null)
+    handleFetchVehicle();
   }, []);
 
   return (
@@ -32,6 +36,7 @@ const DataTablesPage = () => {
         {tableData ? <CheckTable
           columnsData={columnsData}
           tableData={tableData}
+          reloadData={reloadData}
         /> : <CustomLoadingElement />}
       </motion.div>
     </div>

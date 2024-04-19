@@ -38,7 +38,8 @@ export interface Vehicle {
     mass?: string,
     status?: string,
     price?: number,
-    velocity?: number
+    velocity?: number,
+    id?: string,
 }
 
 export interface Response {

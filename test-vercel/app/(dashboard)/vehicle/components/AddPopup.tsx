@@ -12,9 +12,10 @@ import SubmitPopup from "@/components/submit";
 
 interface AddPopupProps {
     onClose: () => void;
+    reloadData: () => void;
 }
 
-const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
+const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
     const notificationRef = useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(true);
     const [openModal, setOpenModal] = useState(false);
@@ -141,7 +142,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
             }}
             onAnimationComplete={handleAnimationComplete}
         >
-            {openError && <NotiPopup message={message} onClose={() => { handleClose(); setOpenError(false); }} />}
+            {openError && <NotiPopup message={message} onClose={() => { handleClose(); setOpenError(false); reloadData(); }} />}
             {openModal && <SubmitPopup message={message} onClose={() => { setOpenModal(false); }} submit={handleAddVehicle} />}
             <motion.div
                 ref={notificationRef}
