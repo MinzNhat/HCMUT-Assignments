@@ -152,7 +152,7 @@ const CheckTable = (props: Props) => {
                 setGlobalFilter(e.target.value)
               }}
               type="text"
-              placeholder="Tìm kiếm theo biển số  ..."
+              placeholder="Tìm kiếm theo biển số..."
               className={`block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-[#1488DB] placeholder:text-[#1488DB]
             outline-none dark:bg-navy-900 dark:text-[#1488DB]`}
             />
