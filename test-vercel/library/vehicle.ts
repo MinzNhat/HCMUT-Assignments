@@ -4,53 +4,109 @@ import { QuerySnapshot } from 'firebase-admin/firestore';
 import { initializeApp } from 'firebase/app';
 import {
     getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc,
-    query, where, getDocs, GeoPoint, updateDoc, getDoc
+    query, where, getDocs, GeoPoint, updateDoc, getDoc,
+    setDoc
 } from 'firebase/firestore';
 import { Car, Response } from './libraryType/type';
+import { app, db } from './account'
+import { constants } from 'buffer';
+import { data } from 'autoprefixer';
+import { Result } from 'postcss';
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCQVhfhnMG3TPsgZaX2viK1AKiruUkpBvc",
-    authDomain: "laptrinhnangcao-aeb32.firebaseapp.com",
-    projectId: "laptrinhnangcao-aeb32",
-    storageBucket: "laptrinhnangcao-aeb32.appspot.com",
-    messagingSenderId: "280682153048",
-    appId: "1:280682153048:web:73242b55214b6e9ec4762d",
-    measurementId: "G-HBRLQSWFDL"
-};
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-const db = getFirestore();
-const colRef = collection(db, 'books');
 const CarRef = collection(db, 'Car');
 const DriverRef = collection(db, 'Driver');
 const RouteRef = collection(db, 'Route');
 
-
-export class CarsOperation {
+class Vehicle { // complete this class and delete this comment
+    type: string
+    constructor(carInfo: Car) { this.type = carInfo.type }
+}
+export class VehicleOperation {
     constructor() { }
     async createCar(carInfo: Car) {
         let response: Response = {
-            error: false,
+            error: true,
             data: null
         }
-        await addDoc(CarRef, {
-            type: carInfo.type,
-            licensePlate: carInfo.licenseplate,
-            engineFuel: carInfo.enginefuel,
-            height: carInfo.height,
-            length: carInfo.length,
-            mass: carInfo.mass,
-            status: carInfo.status,
-            price: carInfo.price
-        })
-            .then((docRef) => {
-                response.data = docRef.id;
-
-            }).catch((err) => {
-                response.error = true;
+        
+        const car = new Vehicle(carInfo)
+        try {
+            
+            await addDoc(CarRef, {
+                type: carInfo.type,
+                licenseplate: carInfo.licenseplate,
+                engineFuel: carInfo.enginefuel,
+                height: carInfo.height,
+                length: carInfo.length,
+                mass: carInfo.mass,
+                status: carInfo.status,
+                price: carInfo.price
+            });
+        }
+        catch {
+            return response
+        }
+        if (car) {
+            response.error = false
+            response.data = car
+            return response
+        }
+        else return response
+    }
+    async viewAllCar() {
+        let response: Response = {
+            error: true,
+            data: null
+        }
+        let result: any[] = []
+        try {
+            const carArray = await (getDocs(CarRef))
+            carArray.docs.forEach((doc) => {
+                result.push({ ...doc.data(), id: doc.id })
             })
-        return response
+
+        }
+        catch {
+            return response
+        }
+        if (result) {
+            response.error =false
+            response.data = result
+            return response             // this will return Object array NOT a single Object
+
+        }
+        else return response
+    }
+      async viewAllDriver() {
+        let response: Response = {
+            error: true,
+            data: null
+        }
+        let result: any[] = []
+        try {
+
+            const driverArray = await (getDocs(DriverRef))
+
+            driverArray.docs.forEach((doc) => {
+                result.push({ 
+                    driverName: doc.data().driverName,
+                    driverNumber:doc.data().driverNumber,
+                    driverAddress:JSON.parse(doc.data().driverAdress),
+                })
+            })
+
+        }
+        catch {
+            return response
+        }
+        if (result) {
+            response.data = result
+            return response             // this will return Object array NOT a single Object
+
+        }
+        else return response
     }
 };
+
