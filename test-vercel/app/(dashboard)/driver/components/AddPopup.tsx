@@ -6,14 +6,10 @@ import { Button } from "@nextui-org/react";
 import Dropzone from "./Dropzone";
 import axios from "axios";
 import InputWithError from "./Input";
-
-interface DriverData {
-    driver_name: string;
-    phone_num: string;
-    address: string;
-    status: number;
-    license: File[];
-}
+import { Address, Driver } from "@/library/libraryType/type";
+import { DriverOperation } from "@/library/driver";
+import SubmitPopup from "@/components/submit";
+import NotiPopup from "@/components/notification";
 
 interface City {
     Id: string;
@@ -39,18 +35,24 @@ interface AddPopupProps {
 const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
     const notificationRef = useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(true);
-    const [files, setFiles] = useState<File[]>([]);
-    const [data, setData] = useState<DriverData>({
-        driver_name: "",
-        phone_num: "",
-        address: "",
-        status: 0,
-        license: [],
+    const [files, setFiles] = useState<Blob[]>([]);
+    const driver = new DriverOperation();
+    const [address, setAddress] = useState<Address>({
+        latitude: 0,
+        longitude: 0,
+        address: ""
+    })
+    const [data, setData] = useState<Driver>({
+        driverName: "",
+        driverNumber: "",
+        driverAddress: address,
+        driverStatus: 0,
+        driverLicense: []
     });
 
     const [errors, setErrors] = useState({
-        driver_name: "",
-        phone_num: "",
+        driverName: "",
+        driverNumber: "",
         address: "",
         status: "",
         license: "",
@@ -63,6 +65,9 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
+    const [openModal, setOpenModal] = useState(false);
+    const [openError, setOpenError] = useState(false);
+    const [message, setMessage] = useState("");
 
     const validatePhoneNumber = (phone: string) => {
         const phoneRegex = /^\d{10}$/;
@@ -73,35 +78,28 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
         const tempErrors = { ...errors };
         let hasError = false;
 
-        if (data.driver_name.trim() === "") {
-            tempErrors.driver_name = "Tên tài xế không được bỏ trống.";
+        if (data.driverName.trim() === "") {
+            tempErrors.driverName = "Tên tài xế không được bỏ trống.";
             hasError = true;
         } else {
-            tempErrors.driver_name = "";
+            tempErrors.driverName = "";
         }
 
-        if (data.phone_num.trim() === "" || !validatePhoneNumber(data.phone_num)) {
-            tempErrors.phone_num = "Số điện thoại không hợp lệ.";
+        if (data.driverNumber.trim() === "" || !validatePhoneNumber(data.driverNumber)) {
+            tempErrors.driverNumber = "Số điện thoại không hợp lệ.";
             hasError = true;
         } else {
-            tempErrors.phone_num = "";
+            tempErrors.driverNumber = "";
         }
 
-        if (data.address.trim() === "") {
+        if (address.address.trim() === "") {
             tempErrors.address = "Địa chỉ không được bỏ trống.";
             hasError = true;
         } else {
             tempErrors.address = "";
         }
 
-        if (data.status === 0) {
-            tempErrors.status = "Trạng thái không được bỏ trống.";
-            hasError = true;
-        } else {
-            tempErrors.status = "";
-        }
-
-        if (data.license.length === 0) {
+        if (files.length === 0) {
             tempErrors.license = "Giấy phép lái xe không được bỏ trống.";
             hasError = true;
         } else {
@@ -133,8 +131,8 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
             setErrors(tempErrors);
         } else {
             setErrors({
-                driver_name: "",
-                phone_num: "",
+                driverName: "",
+                driverNumber: "",
                 address: "",
                 status: "",
                 license: "",
@@ -142,6 +140,8 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                 district: "",
                 ward: ""
             });
+            setMessage("Xác nhận tạo tài xế?")
+            setOpenModal(true)
         }
     };
 
@@ -176,7 +176,6 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
 
     const selectedCityObj = cities.find((city) => city.Id === selectedCity);
     const districts = selectedCityObj ? selectedCityObj.Districts : [];
-
     const selectedDistrictObj = districts.find(
         (district) => district.Id === selectedDistrict
     );
@@ -187,6 +186,26 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
             onClose();
         }
     };
+
+    const handleAddNewDriver = async () => {
+        const sendData: Driver = {
+            driverName: data.driverName,
+            driverNumber: data.driverNumber,
+            driverAddress: { ...address, address: `${address.address}, ${selectedCity}, ${selectedDistrict}, ${selectedWard}` },
+            driverStatus: data.driverStatus,
+            driverLicense: files
+        };
+        const response = await driver.createDriver(sendData);
+        console.log(response)
+        setOpenModal(false)
+        if (response.error) {
+            setMessage("Đã có lỗi khi tạo mới tài xế.");
+            setOpenError(true);
+        } else {
+            setMessage("Đã tạo mới tài xế thành công!");
+            setOpenError(true)
+        }
+    }
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -218,6 +237,8 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
             }}
             onAnimationComplete={handleAnimationComplete}
         >
+            {openError && <NotiPopup message={message} onClose={() => { handleClose(); setOpenError(false); }} />}
+            {openModal && <SubmitPopup message={message} onClose={() => { setOpenModal(false); }} submit={handleAddNewDriver} />}
             <motion.div
                 ref={notificationRef}
                 className={`relative w-[98%] sm:w-9/12 dark:bg-navy-900 bg-white rounded-xl p-4 overflow-y-auto`}
@@ -242,20 +263,20 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                     <div className="flex flex-col gap-5 lg:w-1/2 lg:pt-2 lg:pr-5">
                         <InputWithError
                             label="Tên tài xế"
-                            value={data.driver_name}
-                            onChange={(e) => setData({ ...data, driver_name: e.target.value })}
-                            error={errors.driver_name}
+                            value={data.driverName}
+                            onChange={(e) => setData({ ...data, driverName: e.target.value })}
+                            error={errors.driverName}
                         />
                         <InputWithError
                             label="Số điện thoại"
-                            value={data.phone_num}
-                            onChange={(e) => setData({ ...data, phone_num: e.target.value })}
-                            error={errors.phone_num}
+                            value={data.driverNumber}
+                            onChange={(e) => setData({ ...data, driverNumber: e.target.value })}
+                            error={errors.driverNumber}
                         />
                         <InputWithError
                             label="Địa chỉ cụ thể"
-                            value={data.address}
-                            onChange={(e) => setData({ ...data, address: e.target.value })}
+                            value={address.address}
+                            onChange={(e) => setAddress({ ...address, address: e.target.value })}
                             error={errors.address}
                         />
                         <div className={`flex ${errors.city ? "-mb-3" : ""}`}>
@@ -331,8 +352,8 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                             </div>
                             <select
                                 className="w-1/2 dark:text-[#000000] px-2 rounded"
-                                value={data.status}
-                                onChange={(e) => setData({ ...data, status: parseInt(e.target.value) })}
+                                value={data.driverStatus}
+                                onChange={(e) => setData({ ...data, driverStatus: parseInt(e.target.value) })}
                             >
                                 <option value={0}>Sẵn sàng</option>
                             </select>

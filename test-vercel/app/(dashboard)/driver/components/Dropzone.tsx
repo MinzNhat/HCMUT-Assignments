@@ -1,3 +1,4 @@
+"use client"
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from '@nextui-org/react';
 import Image from 'next/image';
@@ -6,15 +7,16 @@ import { IoMdClose } from 'react-icons/io';
 
 interface DropzoneProps {
     className?: string;
-    files: File[];
-    setFiles: React.Dispatch<React.SetStateAction<File[]>>;
+    files: Blob[];
+    setFiles: React.Dispatch<React.SetStateAction<Blob[]>>;
 }
 
 const Dropzone: React.FC<DropzoneProps> = ({ className, files, setFiles }) => {
-    const [rejected, setRejected] = useState<File[]>([]);
+    const [rejected, setRejected] = useState<Blob[]>([]);
 
     const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: File[]) => {
-        let newFiles = [...files, ...acceptedFiles];
+        const blobFiles: Blob[] = acceptedFiles.map(file => file instanceof Blob ? file : new Blob([file]));
+        let newFiles = [...files, ...blobFiles];
 
         if (newFiles.length > 2) {
             newFiles.shift();
@@ -23,7 +25,8 @@ const Dropzone: React.FC<DropzoneProps> = ({ className, files, setFiles }) => {
         setFiles(newFiles);
 
         if (rejectedFiles.length) {
-            setRejected(previousFiles => [...previousFiles, ...rejectedFiles]);
+            const blobRejected: Blob[] = rejectedFiles.map(file => file instanceof Blob ? file : new Blob([file]));
+            setRejected(previousFiles => [...previousFiles, ...blobRejected]);
         }
     }, [files, setFiles]);
 

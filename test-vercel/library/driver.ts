@@ -4,10 +4,13 @@ import { QuerySnapshot } from 'firebase-admin/firestore';
 import { initializeApp } from 'firebase/app';
 import {
     getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc,
-    query, where, getDocs, GeoPoint, updateDoc, getDoc, writeBatch
+    query, where, getDocs, GeoPoint, updateDoc, getDoc, writeBatch,
+    arrayUnion
 } from 'firebase/firestore';
+
+import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 import { Driver, Response, Address, Route } from './libraryType/type';
-import { app } from './account'
+import { app, storage } from './account'
 import { constants } from 'buffer';
 import { data } from 'autoprefixer';
 import { Result } from 'postcss';
@@ -30,26 +33,40 @@ class DriverRegister {
     driverNumber: string
     driverAddress: Address
     driverStatus: number
+    driverLicense: Blob[]
     constructor(driverInfo: Driver) {
 
         this.driverNumber = driverInfo.driverNumber
         this.driverName = driverInfo.driverName
         this.driverAddress = driverInfo.driverAddress
         this.driverStatus = driverInfo.driverStatus ? driverInfo.driverStatus : 0
+        this.driverLicense = driverInfo.driverLicense
 
     }
     async storeToFB() {
         try {
-            await addDoc(DriverRef, {
-
+            const docRef = await addDoc(DriverRef, {
                 driverName: this.driverName,
                 driverNumber: this.driverNumber,
                 driverAddress: JSON.stringify(this.driverAddress),
                 driverStatus: this.driverStatus
-            })
-        }
-        catch (error) {
-            throw error
+            });
+
+            const downloadURLs = await Promise.all(
+                this.driverLicense.map(async (image: Blob) => {
+                    const fileName = `Driver_license_${Date.now()}`;
+                    const imageRef = ref(storage, `Driver/${docRef.id}/${fileName}`);
+                    //@ts-ignore
+                    await uploadBytes(imageRef, image, "data_url");
+                    return getDownloadURL(imageRef);
+                })
+            );
+
+            await updateDoc(doc(db, "Driver", docRef.id), {
+                driverLicense: arrayUnion(...downloadURLs)
+            });
+        } catch (error) {
+            throw error;
         }
     }
     static async deleteDriver(id: string) {
@@ -59,8 +76,6 @@ class DriverRegister {
         const result = { ...data.data(), id: data.id }
         await deleteDoc(docRef)
         return result
-
-
     }
 }
 export class DriverOperation {
@@ -70,7 +85,6 @@ export class DriverOperation {
             error: true,
             data: null
         }
-        var a = new GeoPoint(driverInfo.driverAddress.latitude, driverInfo.driverAddress.longitude)
         const driver = new DriverRegister(driverInfo)
         try {
             if (driver) {
@@ -78,10 +92,8 @@ export class DriverOperation {
                 response.error = false
                 response.data = driver
             }
-
-
         }
-        catch(error) {
+        catch (error) {
             console.log(error)
         } finally {
             return response
@@ -94,7 +106,6 @@ export class DriverOperation {
         }
         let result: any[] = []
         try {
-
             const driverArray = await (getDocs(DriverRef))
 
             driverArray.docs.forEach((doc) => {
@@ -107,22 +118,18 @@ export class DriverOperation {
                 })
             })
             if (result) {
-                response.error=false
+                response.error = false
                 response.data = result
-
             }
-            else throw "empty when call viewAllDriver"
-
         }
         catch (error) {
             console.log(error)
         }
-
         finally {
-            return response             // this will return Object array NOT a single Object
+            return response
         }
     }
-    async viewAvailableDriver() {      // use this when create route
+    async viewAvailableDriver() {
         let response: Response = {
             error: true,
             data: null
@@ -137,16 +144,15 @@ export class DriverOperation {
                 result.push({ ...doc.data(), id: doc.id })
             })
             if (result) {
-                response.error=false
+                response.error = false
                 response.data = result
             }
-
         }
         catch (error) {
             console.log(error)
         }
         finally {
-            return response             // this will return Object array NOT a single Object
+            return response
         }
     }
     async deleteAllDriver() {
@@ -180,16 +186,12 @@ export class DriverOperation {
             response.data = await DriverRegister.deleteDriver(driverID)
             response.error = false
         } catch (error) {
-            // console.log(error)
+            console.log(error)
         }
         finally {
             return response;
         }
-
-
     }
-
-
 };
 
 

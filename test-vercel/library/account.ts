@@ -19,6 +19,7 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { ForgotPass, Response, SignUp } from "./libraryType/type";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDZ4OnCgIJmfbD5e68xLndPzDMk9lEsd3s",
@@ -33,6 +34,7 @@ firebase.initializeApp(firebaseConfig);
 
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+export const storage = getStorage();
 const firestore = firebase.firestore();
 
 export class UsersOperation {

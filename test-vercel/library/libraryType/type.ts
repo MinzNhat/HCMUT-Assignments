@@ -26,6 +26,7 @@ export interface Driver {
     driverNumber: string,
     driverAddress: Address,
     driverStatus?: number,
+    driverLicense: Blob[]
 }
 
 export interface Vehicle {
