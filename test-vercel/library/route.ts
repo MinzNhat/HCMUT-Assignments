@@ -6,7 +6,7 @@ import {
     getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc,
     query, where, getDocs, GeoPoint, updateDoc, getDoc
 } from 'firebase/firestore';
-import { Route, Response,Address, Car, Driver } from './libraryType/type';
+import { Route, Response,Address, Vehicle, Driver } from './libraryType/type';
 import { app } from './account'
 import { constants } from 'buffer';
 import { data } from 'autoprefixer';
@@ -20,7 +20,7 @@ import { stringify } from 'querystring';
 
 const db = getFirestore();
 const colRef = collection(db, 'books');
-const CarRef = collection(db, 'Car');
+const CarRef = collection(db, '');
 const DriverRef = collection(db, 'Driver');
 const RouteRef = collection(db, 'Route');
  async function updateStatus(objectType :string, number :string, status: string) { // dont touch this 
@@ -30,29 +30,25 @@ const RouteRef = collection(db, 'Route');
   }
   if (objectType.toUpperCase() =="CAR" ) {
     const q = query(CarRef, where("licenseplate", "==", number))
-    await getDocs(q)             //find car exist or not
-      .then((querySnapshot) => {
-        if (querySnapshot.empty) {
-          console.log("no Car found when call updateStatus");
-          response.error = true
-        } else {
-          updateDoc(querySnapshot.docs[0].ref, {
-            status: status
-          }).then(
-            () => {
-              response.data = `update car id :${querySnapshot}  when call updateStatus successfully`
-              response.error = false
-            })
-            .catch((error) => {
-              console.error("Error updating car when call updateStatus:", error);
-            })
-        }
-      })
-      .catch((error) => {
-        console.error("error in checking Car's existance when call updateStatus", error);
-      });
-    return response
-  }
+    const result =await getDocs(q)
+    if ( result.empty) {
+        response.error = true
+        return response
+      } else {
+      try {
+         const a= await  updateDoc( result.docs[0].ref, {
+          status: status
+        })
+        console.log(a)
+      }
+      catch{
+          response.error=true
+          return response
+      }
+        
+        
+  return response
+  }}
   else if (objectType.toUpperCase() =="DRIVER") {
     const q = query(DriverRef, where(" driverNumber", "==", number))
      const result =await getDocs(q)             //find car exist or not
@@ -84,10 +80,10 @@ class trip {
     begin: Address
     end: Address
     beginDate: Date
-    endDate: Date
+    endDate?: Date
     carLicenseplate: string
     DriverNumber: string
-    price: number
+    price?: number
     vehiclePrice:number
     vehicleVelocity:number
     constructor(routeInfo: Route) {
@@ -96,15 +92,9 @@ class trip {
         this.beginDate=routeInfo.beginDate,
         this.carLicenseplate=routeInfo.car.licenseplate,
         this.DriverNumber=routeInfo.driver.driverNumber,
-        
-
-
-
-        this.vehiclePrice=routeInfo.car.price
-        this.vehicleVelocity=routeInfo.car.velocity,
+        this.vehiclePrice=routeInfo.car.price?routeInfo.car.price:0,
+        this.vehicleVelocity=routeInfo.car.velocity?routeInfo.car.velocity:0,
         // set endDate and price to some value bc if not the err occur
-        this.endDate =this.beginDate
-        this.price=0
 
         // cal and assign real val
         this.calculateEndDateAndPrice(this.vehiclePrice,this.vehicleVelocity)
@@ -155,7 +145,7 @@ export class RouteOperation {
                 begin: b,
                 end: e,
                 beginDate: route.beginDate.toString(),   // convert to timestamp or sth      
-                endDate: route.endDate.toString(),
+                endDate: route.endDate?route.endDate.toString():"error",
                 Carlicenseplate: route.carLicenseplate,
                 DriverNumber: routeInfo.DriverNumber,
                 price: route.price

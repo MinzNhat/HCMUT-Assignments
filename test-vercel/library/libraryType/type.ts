@@ -1,3 +1,5 @@
+
+
 export interface Address {
     latitude: number,
     longitude: number,
@@ -11,29 +13,29 @@ export interface Route {
     licenplate?: string,     //no need to pass bc we'll get it from car
     DriverNumber?: string, //no need to pass bc we'll get it from driver
     price: number
-    car:Car,                // get velocity and price from this
+    car: Vehicle,                // get velocity and price from this
     driver: Driver          // check status if u want , we need to access driveHistory to assign our route(response.data)to that His
 }
 export interface Driver {
-    type:string,   
+    type: string,
     //change here when we have updateIMG func
-    driveHistory:Route[],               // we can cal experience by check the length of this
+    driveHistory: Route[],               // we can cal experience by check the length of this
     driverName: string,
     driverNumber: string,
     driverAddress: Address,
-    driverStatus:string,
+    driverStatus: string,
 }
 
-export interface Car {
-    type: string,
+export interface Vehicle {
+    type: string
     licenseplate: string,
-    enginefuel: string,
-    height: string,
-    length: string,
-    mass: string,
-    status: string,
-    price: number,
-    velocity:number     // add this bc we need to calculate time depend on distance
+    enginefuel?: string,
+    height?: string,
+    length?: string,
+    mass?: string,
+    status?: string,
+    price?: number,
+    velocity?: number     // add this bc we need to calculate time depend on distance
 }
 
 export interface Response {
