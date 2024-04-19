@@ -154,7 +154,7 @@ const CheckTable = (props: Props) => {
               type="text"
               placeholder="Tìm kiếm theo biển số..."
               className={`block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-[#1488DB] placeholder:text-[#1488DB]
-            outline-none dark:bg-navy-900 dark:text-[#1488DB]`}
+            outline-none dark:bg-navy-900 dark:text-[#1488DB] pl-1 pr-3`}
             />
           </div>
           <div className="flex gap-2">
