@@ -6,6 +6,7 @@ import {
 } from "./variables/columnsData";
 import { VehicleOperation } from "@/library/vehicle";
 import { useEffect, useState } from "react";
+import CustomLoadingElement from "../loading";
 
 const DataTablesPage = () => {
   const [tableData, setTableData] = useState<any>(null)
@@ -28,10 +29,10 @@ const DataTablesPage = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {tableData && <CheckTable
+        {tableData ? <CheckTable
           columnsData={columnsData}
           tableData={tableData}
-        />}
+        /> : <CustomLoadingElement />}
       </motion.div>
     </div>
   );

@@ -5,21 +5,11 @@ import { IoMdClose } from "react-icons/io";
 import { Button } from "@nextui-org/react";
 import { FaTrash, FaPen } from "react-icons/fa";
 import MiniCalendar from "@/components/calendar/MiniCalendar";
-
-interface VehicleData {
-    type: string;
-    licenseplate: string;
-    enginefuel: string;
-    height: string;
-    length: string;
-    width: string;
-    mass: string;
-    status: string;
-}
+import { Vehicle } from "@/library/libraryType/type";
 
 interface DetailPopupProps {
     onClose: () => void;
-    dataInitial: VehicleData;
+    dataInitial: Vehicle;
 }
 
 const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial }) => {

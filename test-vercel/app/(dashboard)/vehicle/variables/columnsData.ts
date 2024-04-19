@@ -12,7 +12,7 @@ export const columnsData = [
   },
   {
     Header: "Loại động cơ",
-    accessor: "engineFuel",
+    accessor: "enginefuel",
   },
   {
     Header: "Trạng thái",
