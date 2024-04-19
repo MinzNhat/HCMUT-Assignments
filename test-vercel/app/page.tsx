@@ -86,7 +86,6 @@ const AuthPage: FC<Props> = () => {
       setMessage("Đăng nhập thành công");
       setModal(true);
     }
-    console.log(response)
   };
 
   const handleForgotPw = async () => {

@@ -12,7 +12,6 @@ const CarsList = ({ selectedType, setSelectedType }) => {
     const { distance, setDistance } = useContext(DistanceContext);
 
     const handleSelectType = (type: any) => {
-        console.log(type)
         setSelectedType(type === selectedType ? null : type);
     };
 

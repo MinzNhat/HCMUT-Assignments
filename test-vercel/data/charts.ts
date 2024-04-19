@@ -147,10 +147,11 @@ export const barChartOptionsDailyTraffic = {
 };
 
 export const pieChartOptions = {
-  labels: ["Your files", "System", "Empty"],
-  colors: ["#4318FF", "#6AD2FF", "#EFF4FB"],
+  labels: ["Sẵn sàng", "Đang nhận đơn"],
+  colors: ["#4318FF", "#6AD2FF"],
   chart: {
     width: "50px",
+    foreColor: '#ffffff'
   },
   states: {
     hover: {
@@ -172,6 +173,7 @@ export const pieChartOptions = {
       donut: {
         labels: {
           show: false,
+          colors: ["#4318FF", "#6AD2FF", "#EFF4FB"],
         },
       },
     },
@@ -190,7 +192,7 @@ export const pieChartOptions = {
   },
 };
 
-export const pieChartData = [63, 25, 12];
+export const pieChartData = [63, 37];
 
 export const barChartDataWeeklyRevenue = [
   {
@@ -301,12 +303,12 @@ export const barChartOptionsWeeklyRevenue = {
 
 export const lineChartDataTotalSpent = [
   {
-    name: "Revenue",
+    name: "Doanh thu",
     data: [50, 64, 48, 66, 49, 68],
     color: "#4318FF",
   },
   {
-    name: "Profit",
+    name: "Lợi nhuận",
     data: [30, 40, 24, 46, 20, 46],
     color: "#6AD2FF",
   },
