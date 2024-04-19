@@ -32,7 +32,7 @@ const AddPanel = () => {
     }, []);
 
     return (
-        <div className={`relative ${isCollapsed ? 'w-full h-8 sm:w-8 sm:h-full' : ' w-full h-[calc(100vh-208px)] md:h-[calc(100vh-126px)] sm:w-2/3 md:w-[550px]'} sticky z-40 transition-all duration-500 ease-in-out`}>
+        <div className={`relative ${isCollapsed ? 'w-full h-8 sm:w-8 sm:h-full' : ' w-full h-[calc(100dvh-208px)] md:h-[calc(100dvh-126px)] sm:w-2/3 md:w-[550px]'} sticky z-40 transition-all duration-500 ease-in-out`}>
             <div className={`border-8 border-white dark:border-navy-900 shadow-xl shadow-shadow-500 dark:shadow-none rounded-xl sm:rounded-tr-none sm:rounded-l-xl transition-all duration-500 ${isCollapsed ? 'opacity-0 h-8' : 'opacity-100 h-[calc(100vh-208px)] md:h-[calc(100vh-126px)]'}`} style={{ transitionDelay: isCollapsed ? '0ms' : '200ms' }}>
                 <div className={`bg-white/10 backdrop-blur-sm dark:bg-[#0b14374d] h-full transition-opacity rounded-[4px] sm:rounded-tr-none sm:rounded-l-[4px] duration-200 border-b-2 dark:border-b border-white/10 dark:border-white/30 flex flex-col overflow-y-scroll no-scrollbar ${isCollapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: isCollapsed ? '0ms' : '400ms' }}>
                     <SearchBox />
