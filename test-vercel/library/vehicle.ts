@@ -13,6 +13,7 @@ import { constants } from 'buffer';
 import { data } from 'autoprefixer';
 import { Result } from 'postcss';
 import { error } from 'console';
+import { BsTruck } from 'react-icons/bs';
 
 
 // Initialize Firebase
@@ -48,7 +49,7 @@ class vehicle { // complete this class and delete this comment
             await addDoc(VehicleRef, {
                 type: this.type,
                 licenseplate: this.licenseplate,
-                engineFuel: this.enginefuel,
+                enginefuel: this.enginefuel,
                 height: this.height,
                 length: this.length,
                 width: this.width,
@@ -72,16 +73,16 @@ class vehicle { // complete this class and delete this comment
         return result
     }
 }
-class Car extends vehicle {                                                                  //inheritance
+class Truck extends vehicle {                                                                  //inheritance
     constructor(vehicleInfo: Vehicle) {
         super(vehicleInfo)
-        this.type = "Car"
+        this.type = "Truck"
         this.licenseplate = vehicleInfo.licenseplate
         this.enginefuel = vehicleInfo.enginefuel ? vehicleInfo.enginefuel : "Gasoline"
         this.height = vehicleInfo.height ? vehicleInfo.height : "1,5"
         this.length = vehicleInfo.length ? vehicleInfo.length : "4,6"
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "500 "
-        this.status = vehicleInfo.status ? vehicleInfo.status : "Unavailable"
+        this.status = vehicleInfo.status ? vehicleInfo.status : "active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 2500
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 60
     }
@@ -96,41 +97,27 @@ class Bus extends vehicle {
         this.length = vehicleInfo.length ? vehicleInfo.length : "12 "
         this.width = vehicleInfo.width ? vehicleInfo.width : "3"
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "700 "
-        this.status = vehicleInfo.status ? vehicleInfo.status : "Unavailable"
+        this.status = vehicleInfo.status ? vehicleInfo.status : "active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 4500
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 47
     }
 }
-class Truck extends vehicle {
+class ContainerTruck extends vehicle {
     constructor(vehicleInfo: Vehicle) {
         super(vehicleInfo)
-        this.type = "Truck"
+        this.type = "Container Truck"
         this.licenseplate = vehicleInfo.licenseplate
         this.enginefuel = vehicleInfo.enginefuel ? vehicleInfo.enginefuel : "Gasoline"
         this.height = vehicleInfo.height ? vehicleInfo.height : "1,9 "
         this.width = vehicleInfo.width ? vehicleInfo.width : "3"
         this.length = vehicleInfo.length ? vehicleInfo.length : "3,1 "
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "500 "
-        this.status = vehicleInfo.status ? vehicleInfo.status : "Unavailable"
+        this.status = vehicleInfo.status ? vehicleInfo.status : "active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 3000
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 60
     }
 }
-class motorbike extends vehicle {
-    constructor(vehicleInfo: Vehicle) {
-        super(vehicleInfo)
-        this.type = "motorbike"
-        this.licenseplate = vehicleInfo.licenseplate
-        this.enginefuel = vehicleInfo.enginefuel ? vehicleInfo.enginefuel : "Gasoline"
-        this.height = vehicleInfo.height ? vehicleInfo.height : "1"
-        this.length = vehicleInfo.length ? vehicleInfo.length : "1,2"
-        this.width = vehicleInfo.width ? vehicleInfo.width : "3"
-        this.mass = vehicleInfo.mass ? vehicleInfo.mass : "115 "
-        this.status = vehicleInfo.status ? vehicleInfo.status : "Unavailable"
-        this.price = vehicleInfo.price ? vehicleInfo.price : 1000
-        this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 40
-    }
-}
+
 
 
 export class VehicleOperation {
@@ -147,16 +134,14 @@ export class VehicleOperation {
             case "BUS":
                 veh = new Bus(vehicleInfo)
                 break;
-            case "MOTORBIKE":
-                veh = new motorbike(vehicleInfo)
+            case "CONTAINERTRUCK":
+                veh = new ContainerTruck(vehicleInfo)
                 break;
             case "TRUCK":
                 veh = new Truck(vehicleInfo)
                 break;
-            case "CAR":
-                veh = new Car(vehicleInfo)
-                break;
             default:
+                console.log("wrong type when calling vehicle")
                 veh = new vehicle(vehicleInfo)
                 break;
         }

@@ -29,13 +29,13 @@ class DriverRegister {
     driverName: string
     driverNumber: string
     driverAddress: Address
-    driverStatus: string
+    driverStatus: number
     constructor(driverInfo: Driver) {
 
         this.driverNumber = driverInfo.driverNumber
         this.driverName = driverInfo.driverName
         this.driverAddress = driverInfo.driverAddress
-        this.driverStatus = driverInfo.driverStatus ? driverInfo.driverStatus : "busy"
+        this.driverStatus = driverInfo.driverStatus ? driverInfo.driverStatus : 0
 
     }
     async storeToFB() {
