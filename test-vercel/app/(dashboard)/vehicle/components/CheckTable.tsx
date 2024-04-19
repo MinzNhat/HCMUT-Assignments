@@ -160,7 +160,7 @@ const CheckTable = (props: Props) => {
           <div className="flex gap-2">
             <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
             border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-900 dark:hover:bg-white/20 dark:active:bg-white/10
-              linear justify-center rounded-lg font-bold transition duration-200`}
+              linear justify-center rounded-lg font-medium transition duration-200`}
               onClick={() => setOpenAdd(true)}>
               <MdAddCircleOutline className="mr-1" />Thêm
               <p className={`sm:block ${selectedRows.size != 0 ? "hidden" : "block"}`}>&nbsp;phương tiện</p>
@@ -168,7 +168,7 @@ const CheckTable = (props: Props) => {
             {selectedRows.size != 0 &&
               <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
             border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-900 dark:hover:bg-white/20 dark:active:bg-white/10
-              linear justify-center rounded-lg font-bold transition duration-200`}>
+              linear justify-center rounded-lg font-medium transition duration-200`}>
                 <MdOutlineRemoveCircleOutline className="mr-1" />Xoá đã chọn
               </Button>}
           </div>

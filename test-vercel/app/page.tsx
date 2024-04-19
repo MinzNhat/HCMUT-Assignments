@@ -84,7 +84,6 @@ const AuthPage: FC<Props> = () => {
       setMessage("Đăng nhập thành công");
       setModal(true);
     }
-    console.log(response)
   };
 
   const handleForgotPw = async () => {
@@ -116,6 +115,7 @@ const AuthPage: FC<Props> = () => {
       route.push("/data");
     } else setError(false);
   };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter") {
@@ -131,6 +131,14 @@ const AuthPage: FC<Props> = () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [form, email, password]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const loggedIn2 = await user.checkUserLoggedIn();
+      if (loggedIn2) await user.onClickLogOut();
+    };
+    fetchData();
+  }, []);
   // useEffect(() => {
   //   const handleTestApi = async () => {
   //    const User2 = new RouteOperation()
