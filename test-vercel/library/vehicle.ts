@@ -7,7 +7,7 @@ import {
     query, where, getDocs, GeoPoint, updateDoc, getDoc,
     setDoc, writeBatch
 } from 'firebase/firestore';
-import { Vehicle, Response } from './libraryType/type';
+import { Vehicle, Response,updateVehicle } from './libraryType/type';
 import { app, db } from './account'
 import { constants } from 'buffer';
 import { data } from 'autoprefixer';
@@ -71,6 +71,19 @@ class vehicle { // complete this class and delete this comment
         const result = { ...data.data(), id: data.id }
         await deleteDoc(docRef)
         return result
+    }
+    static async updateVehicle(id: string , updateField:updateVehicle){
+        const docRef = doc(db, 'Vehicle', id)
+        const data = await getDoc(docRef)
+        if (!data.exists) throw "id not exist when call update vehicle by ID"
+        const updateData = {...data.data()};
+        for (const [fieldName, fieldValue] of Object.entries(updateField)) {
+            updateData[fieldName] = fieldValue; // Update only provided fields
+          } 
+        await updateDoc(docRef,
+            updateData
+        )
+        return updateData
     }
 }
 class Truck extends vehicle {                                                                  //inheritance
@@ -253,5 +266,23 @@ export class VehicleOperation {
             return response;
         }
     }
+    async updateVehicleByID(vehicleID:string, updateField:updateVehicle ){
+        let response: Response = {
+            error: true,
+            data: null
+        }
+        try {
+            response.data = await vehicle.updateVehicle(vehicleID,updateField)
+            response.data.id=vehicleID
+            response.error = false
+        } catch (error) {
+            console.log(error)
+        } finally {
+
+            return response;
+        }
+    }
+    
+
 };
 
