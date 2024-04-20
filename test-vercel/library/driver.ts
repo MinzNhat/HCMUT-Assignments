@@ -9,7 +9,7 @@ import {
 } from 'firebase/firestore';
 
 import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
-import { Driver, Response, Address, Route } from './libraryType/type';
+import { Driver, Response, Address, Route, updateDriver } from './libraryType/type';
 import { app, storage } from './account'
 import { constants } from 'buffer';
 import { data } from 'autoprefixer';
@@ -76,6 +76,19 @@ class DriverRegister {
         const result = { ...data.data(), id: data.id }
         await deleteDoc(docRef)
         return result
+    }
+    static async updateDriver(id: string , updateField:updateDriver){
+        const docRef = doc(db, 'Driver', id)
+        const data = await getDoc(docRef)
+        if (!data.exists) throw "id not exist when call update driver by ID"
+        const updateData = {...data.data()};
+        for (const [fieldName, fieldValue] of Object.entries(updateField)) {
+            updateData[fieldName] = fieldValue; // Update only provided fields
+          } 
+        await updateDoc(docRef,
+            updateData
+        )
+        return updateData
     }
 }
 export class DriverOperation {
@@ -189,6 +202,22 @@ export class DriverOperation {
             console.log(error)
         }
         finally {
+            return response;
+        }
+    }
+    async updateDriverByID(driverID:string, updateField:updateDriver ){
+        let response: Response = {
+            error: true,
+            data: null
+        }
+        try {
+            response.data = await DriverRegister.updateDriver(driverID,updateField)
+            response.data.id=driverID
+            response.error = false
+        } catch (error) {
+            console.log(error)
+        } finally {
+
             return response;
         }
     }
