@@ -25,31 +25,30 @@ import AddPopup from "./AddPopup";
 import DetailPopup from "./DetailPopup";
 import { FiSearch } from "react-icons/fi";
 import { motion } from "framer-motion";
-
-interface DriverData {
-  driver_name: string;
-  phone_num: string;
-  address: string;
-  status: number;
-  license: string[];
-}
+import { Address, Driver } from "@/library/libraryType/type";
 
 type Props = {
   columnsData: any[];
-  tableData: DriverData[];
+  tableData: Driver[];
+  reloadData: () => void;
 };
 
 const CheckTable = (props: Props) => {
-  const { columnsData, tableData } = props;
+  const { columnsData, tableData, reloadData } = props;
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [openModal, setOpenModal] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
-  const [dataRow, setDataRow] = useState<DriverData>({
-    driver_name: "",
-    phone_num: "",
-    address: "",
-    status: 0,
-    license: []
+  const [address, setAddress] = useState<Address>({
+    latitude: 0,
+    longitude: 0,
+    address: ""
+  })
+  const [dataRow, setDataRow] = useState<Driver>({
+    driverName: "",
+    driverNumber: "",
+    driverAddress: address,
+    driverStatus: 0,
+    driverLicense: []
   })
   const handleClodeModal = () => {
     setOpenModal(false);
@@ -118,13 +117,15 @@ const CheckTable = (props: Props) => {
       {openAdd && (
         <AddPopup
           onClose={handleClodeAddModal}
+          reloadData={reloadData}
         />
       )}
       {openModal && (
-        <DetailPopup
-          onClose={handleClodeModal}
-          dataInitial={dataRow}
-        />
+        <></>
+        // <DetailPopup
+        //   onClose={handleClodeModal}
+        //   dataInitial={dataRow}
+        // />
       )}
       <div className="flex justify-between items-center flex-col lg:flex-row">
         <div className="flex flex-col lg:flex-row gap-3 h-full mb-2 lg:mb-0 w-full place-items-center">
@@ -240,7 +241,7 @@ const CheckTable = (props: Props) => {
                       );
                     } else if (cell.column.Header === "Địa chỉ") {
                       renderData = (
-                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
+                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 line-clamp-3 min-w-[150px]">
                           {cell.value}
                         </p>
                       );

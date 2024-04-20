@@ -4,19 +4,19 @@ export const columnsData = [
   },
   {
     Header: "Tên tài xế",
-    accessor: "driver_name",
+    accessor: "driverName",
   },
   {
     Header: "Số điện thoại",
-    accessor: "phone_num",
+    accessor: "driverNumber",
   },
   {
     Header: "Địa chỉ",
-    accessor: "address",
+    accessor: "driverAddress.address",
   },
   {
     Header: "Trạng thái",
-    accessor: "status",
+    accessor: "driverStatus",
   },
   {
     Header: "Chi tiết",

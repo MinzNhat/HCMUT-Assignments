@@ -22,7 +22,6 @@ const DataTablesPage = () => {
   }, []);
 
   const reloadData = useCallback(() => {
-    setTableData(null)
     handleFetchVehicle();
   }, []);
 

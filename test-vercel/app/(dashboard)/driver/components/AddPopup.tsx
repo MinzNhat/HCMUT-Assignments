@@ -30,9 +30,10 @@ interface Ward {
 
 interface AddPopupProps {
     onClose: () => void;
+    reloadData: () => void;
 }
 
-const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
+const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
     const notificationRef = useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(true);
     const [files, setFiles] = useState<Blob[]>([]);
@@ -65,6 +66,9 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
+    const [selectedCity2, setSelectedCity2] = useState("");
+    const [selectedDistrict2, setSelectedDistrict2] = useState("");
+    const [selectedWard2, setSelectedWard2] = useState("");
     const [openModal, setOpenModal] = useState(false);
     const [openError, setOpenError] = useState(false);
     const [message, setMessage] = useState("");
@@ -158,20 +162,31 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
 
     const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCity(event.target.value);
+        const city = cities.find((city) => city.Id === event.target.value)?.Name;
+        //@ts-ignore
+        setSelectedCity2(city);
         setSelectedDistrict("");
+        setSelectedDistrict2("");
     };
 
     const handleDistrictChange = (
         event: React.ChangeEvent<HTMLSelectElement>
     ) => {
         setSelectedDistrict(event.target.value);
+        const district = districts.find((district) => district.Id === event.target.value)?.Name;
+        //@ts-ignore
+        setSelectedDistrict2(district);
         setSelectedWard("");
+        setSelectedWard2("");
     };
 
     const handleWardChange = (
         event: React.ChangeEvent<HTMLSelectElement>
     ) => {
         setSelectedWard(event.target.value);
+        const ward = wards.find((ward) => ward.Id === event.target.value)?.Name;
+        //@ts-ignore
+        setSelectedWard2(ward);
     };
 
     const selectedCityObj = cities.find((city) => city.Id === selectedCity);
@@ -191,7 +206,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
         const sendData: Driver = {
             driverName: data.driverName,
             driverNumber: data.driverNumber,
-            driverAddress: { ...address, address: `${address.address}, ${selectedCity}, ${selectedDistrict}, ${selectedWard}` },
+            driverAddress: { ...address, address: `${address.address}, ${selectedWard2}, ${selectedDistrict2}, ${selectedCity2}` },
             driverStatus: data.driverStatus,
             driverLicense: files
         };
@@ -206,20 +221,6 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
             setOpenError(true)
         }
     }
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-                handleClose();
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [onClose]);
 
     const handleClose = () => {
         setIsVisible(false);
@@ -237,7 +238,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
             }}
             onAnimationComplete={handleAnimationComplete}
         >
-            {openError && <NotiPopup message={message} onClose={() => { handleClose(); setOpenError(false); }} />}
+            {openError && <NotiPopup message={message} onClose={() => { setOpenError(false); handleClose(); reloadData(); }} />}
             {openModal && <SubmitPopup message={message} onClose={() => { setOpenModal(false); }} submit={handleAddNewDriver} />}
             <motion.div
                 ref={notificationRef}
