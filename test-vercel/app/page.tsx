@@ -11,9 +11,6 @@ import ParticlesBackground from "@/components/Particle";
 import { UsersOperation } from "@/library/account";
 import NotiPopup from "@/components/notification";
 import { useRouter } from "next/navigation";
-import { VehicleOperation } from "@/library/vehicle";
-import { RouteOperation } from "@/library/route";
-import { DriverOperation } from "@/library/driver";
 type Props = {};
 
 const AuthPage: FC<Props> = () => {
@@ -134,6 +131,14 @@ const AuthPage: FC<Props> = () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [form, email, password]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const loggedIn2 = await user.checkUserLoggedIn();
+      if (loggedIn2) await user.onClickLogOut();
+    };
+    fetchData();
+  }, []);
 
   // useEffect(() => {
   //   const handleTestApi = async () => {

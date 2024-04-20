@@ -8,34 +8,41 @@ import axios from "axios";
 import InputWithError from "./Input";
 import { FaPen } from "react-icons/fa6";
 import { CarouselSlider } from "@/components/slider";
+import { Address } from "@/library/libraryType/type";
+import { DriverOperation } from "@/library/driver";
+import NotiPopup from "@/components/notification";
+import SubmitPopup from "@/components/submit";
 
 interface DriverData {
-    driver_name: string;
-    phone_num: string;
-    address: string;
-    status: number;
-    license: string[];
+    driverName: string;
+    driverNumber: string;
+    driverAddress: Address;
+    driverStatus: number;
+    driverLicense: string[];
 }
 
 interface AddPopupProps {
     onClose: () => void;
     dataInitial: DriverData;
+    reloadData: () => void;
 }
 
-const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial }) => {
+const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData }) => {
     const notificationRef = useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
-
-    const [files, setFiles] = useState<File[]>([]);
     const [data, setData] = useState<DriverData>(dataInitial);
-
+    const [files, setFiles] = useState<Blob[]>([]);
+    const [openModal, setOpenModal] = useState(false);
+    const [openError, setOpenError] = useState(false);
+    const [message, setMessage] = useState("");
+    const driver = new DriverOperation()
     const [errors, setErrors] = useState({
-        driver_name: "",
-        phone_num: "",
-        address: "",
-        status: "",
-        license: "",
+        driverName: "",
+        driverNumber: "",
+        driverAddress: "",
+        driverStatus: "",
+        driverLicense: "",
     });
 
     const handleEditClick = () => {
@@ -51,84 +58,107 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial }) => {
         const tempErrors = { ...errors };
         let hasError = false;
 
-        if (data.driver_name.trim() === "") {
-            tempErrors.driver_name = "Tên tài xế không được bỏ trống.";
+        if (data.driverName.trim() === "") {
+            tempErrors.driverName = "Tên tài xế không được bỏ trống.";
             hasError = true;
         } else {
-            tempErrors.driver_name = "";
+            tempErrors.driverName = "";
         }
 
-        if (data.phone_num.trim() === "" || !validatePhoneNumber(data.phone_num)) {
-            tempErrors.phone_num = "Số điện thoại không hợp lệ.";
+        if (data.driverNumber.trim() === "" || !validatePhoneNumber(data.driverNumber)) {
+            tempErrors.driverNumber = "Số điện thoại không hợp lệ.";
             hasError = true;
         } else {
-            tempErrors.phone_num = "";
+            tempErrors.driverNumber = "";
         }
 
-        if (data.address.trim() === "") {
-            tempErrors.address = "Địa chỉ không được bỏ trống.";
+        if (data.driverAddress.address.trim() === "") {
+            tempErrors.driverAddress = "Địa chỉ không được bỏ trống.";
             hasError = true;
         } else {
-            tempErrors.address = "";
+            tempErrors.driverAddress = "";
         }
 
-        if (data.license.length === 0) {
-            tempErrors.license = "Giấy phép lái xe không được bỏ trống.";
+        if (files.length === 0 && (data.driverName !== dataInitial.driverName ||
+            data.driverNumber !== dataInitial.driverNumber ||
+            data.driverAddress !== dataInitial.driverAddress)) {
+            tempErrors.driverLicense = "Thiếu giấy phép lái xe.";
             hasError = true;
         } else {
-            tempErrors.license = "";
+            tempErrors.driverLicense = "";
         }
         if (hasError) {
             setErrors(tempErrors);
         } else {
             setErrors({
-                driver_name: "",
-                phone_num: "",
-                address: "",
-                status: "",
-                license: "",
+                driverName: "",
+                driverNumber: "",
+                driverAddress: "",
+                driverStatus: "",
+                driverLicense: "",
             });
-            setIsEditing(false)
+            const hasChanges =
+                data.driverName !== dataInitial.driverName ||
+                data.driverNumber !== dataInitial.driverNumber ||
+                data.driverAddress !== dataInitial.driverAddress
+            if (hasChanges) {
+                setMessage("Bạn có xác nhận muốn thay đổi thông tin tài xế?");
+                setOpenModal(true);
+            } else {
+                setIsEditing(false);
+            }
+            // const uploadedFilesUrls = files.map(file => URL.createObjectURL(file));
+            // setData(prevData => ({ ...prevData, driverLicense: uploadedFilesUrls }));
         }
     };
 
     useEffect(() => {
-        if (data.phone_num.match(/^\d{10}$/)) {
-            setErrors(prevErrors => ({ ...prevErrors, phone_num: "" }));
+        if (data.driverNumber.match(/^\d{10}$/)) {
+            setErrors(prevErrors => ({ ...prevErrors, driverNumber: "" }));
         }
-        if (data.driver_name !== "") {
-            setErrors(prevErrors => ({ ...prevErrors, driver_name: "" }));
+        if (data.driverName !== "") {
+            setErrors(prevErrors => ({ ...prevErrors, driverName: "" }));
         }
-        if (data.address !== "") {
-            setErrors(prevErrors => ({ ...prevErrors, address: "" }));
+        if (data.driverAddress.address !== "") {
+            setErrors(prevErrors => ({ ...prevErrors, driverAddress: "" }));
         }
-        if (data.license.length !== 0) {
-            setErrors(prevErrors => ({ ...prevErrors, license: "" }));
+        if (data.driverLicense.length !== 0) {
+            setErrors(prevErrors => ({ ...prevErrors, driverLicense: "" }));
         }
     }, [data]);
 
     const handleAnimationComplete = () => {
         if (!isVisible) {
             onClose();
+            reloadData();
         }
     };
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-                handleClose();
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [onClose]);
-
     const handleClose = () => {
         setIsVisible(false);
+    };
+
+    const handleChangeData = async () => {
+        const updateDriverData = {
+            driverName: data.driverName,
+            driverNumber: data.driverNumber,
+            driverAddress: data.driverAddress,
+            driverStatus: data.driverStatus,
+            driverLicense: files
+        }
+        //@ts-ignore
+        const response = await driver.updateDriverByID(dataInitial.id, updateDriverData)
+        setOpenModal(false)
+        if (response.error) {
+            setMessage("Cập nhật tài xế thất bại.");
+            setOpenError(true);
+        } else {
+            dataInitial.driverAddress = data.driverAddress;
+            dataInitial.driverName = data.driverName;
+            dataInitial.driverNumber = data.driverNumber;
+            setMessage("Cập nhật tài xế thành công.");
+            setOpenError(true);
+        }
     };
 
     return (
@@ -143,6 +173,8 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial }) => {
             }}
             onAnimationComplete={handleAnimationComplete}
         >
+            {openError && <NotiPopup message={message} onClose={() => { setOpenError(false); setIsEditing(false); }} />}
+            {openModal && <SubmitPopup message={message} onClose={() => { setOpenModal(false); }} submit={handleChangeData} />}
             <motion.div
                 ref={notificationRef}
                 className={`relative w-[98%] sm:w-9/12 dark:bg-navy-900 bg-white rounded-xl p-4 overflow-y-auto`}
@@ -170,14 +202,14 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial }) => {
                                 <div className="w-1/2 font-bold text-base">
                                     Tên tài xế:
                                 </div>
-                                <div>{data.driver_name}</div>
+                                <div>{data.driverName}</div>
                             </div>
                             :
                             <InputWithError
                                 label="Tên tài xế"
-                                value={data.driver_name}
-                                onChange={(e) => setData({ ...data, driver_name: e.target.value })}
-                                error={errors.driver_name}
+                                value={data.driverName}
+                                onChange={(e) => setData({ ...data, driverName: e.target.value })}
+                                error={errors.driverName}
                             />
                         }
                         {!isEditing ?
@@ -185,14 +217,14 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial }) => {
                                 <div className="w-1/2 font-bold text-base">
                                     Số điện thoại:
                                 </div>
-                                <div>{data.phone_num}</div>
+                                <div>{data.driverNumber}</div>
                             </div>
                             :
                             <InputWithError
                                 label="Số điện thoại"
-                                value={data.phone_num}
-                                onChange={(e) => setData({ ...data, phone_num: e.target.value })}
-                                error={errors.phone_num}
+                                value={data.driverNumber}
+                                onChange={(e) => setData({ ...data, driverNumber: e.target.value })}
+                                error={errors.driverNumber}
                             />
                         }
                         {!isEditing ?
@@ -200,21 +232,21 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial }) => {
                                 <div className="w-1/2 font-bold text-base">
                                     Địa chỉ cụ thể:
                                 </div>
-                                <div>{data.address}</div>
+                                <div className="w-1/2 line-clamp-3">{data.driverAddress.address}</div>
                             </div>
                             :
                             <InputWithError
                                 label="Địa chỉ cụ thể"
-                                value={data.address}
-                                onChange={(e) => setData({ ...data, address: e.target.value })}
-                                error={errors.address}
+                                value={data.driverAddress.address}
+                                onChange={(e) => setData({ ...data, driverAddress: { ...data.driverAddress, address: e.target.value } })}
+                                error={errors.driverAddress}
                             />
                         }
                         <div className="flex lg:pb-4">
                             <div className="w-1/2 font-bold text-base">
                                 Trạng thái:
                             </div>
-                            <div>{data.status == 0 ? "Sẵn sàng" : "Đang nhận đơn"}</div>
+                            <div>{data.driverStatus == 0 ? "Sẵn sàng" : "Đang nhận đơn"}</div>
                         </div>
                     </div>
 
@@ -224,12 +256,12 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial }) => {
                         </span>
                         {isEditing ?
                             <>
-                                {errors.license && <div className="text-red-500 absolute w-full text-center mt-12 -ml-4">{errors.license}</div>}
+                                {errors.driverLicense && <div className="text-red-500 absolute w-full text-center mt-12 -ml-4">{errors.driverLicense}</div>}
                                 <Dropzone files={files} setFiles={setFiles} className={`${files.length == 0 ? "h-full" : "h-28 px-3"}  flex justify-center place-items-center mt-1`} />
                             </>
                             :
                             <div className="relative grow">
-                                <CarouselSlider urls={data.license} />
+                                <CarouselSlider urls={data.driverLicense} />
                             </div>
                         }
 
@@ -244,7 +276,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial }) => {
                             hover:shadow-md flex sm:gap-2"
                             onClick={handleEditClick}
                         >
-                            <FaPen />
+                            <FaPen className="mr-1" />
                             <span>
                                 Chỉnh sửa
                             </span>
@@ -256,8 +288,8 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial }) => {
                             hover:shadow-md flex sm:gap-2"
                             onClick={handleSaveClick}
                         >
-                            <FaPen className="xs:mr-2" />
-                            <span className="xs:block">
+                            <FaPen className="mr-1" />
+                            <span >
                                 Lưu
                             </span>
                         </Button>

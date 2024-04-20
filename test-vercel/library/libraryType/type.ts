@@ -33,10 +33,10 @@ export interface Vehicle {
     type: string
     licenseplate: string,
     enginefuel?: string,
-    height?: string,
-    length?: string,
-    width?: string,
-    mass?: string,
+    height: string,
+    length: string,
+    width: string,
+    mass: string,
     status?: string,
     price?: number,
     velocity?: number,
@@ -56,7 +56,7 @@ export interface SignUp {
 export interface ForgotPass {
     email: string,
 }
-export interface updateVehicle{
+export interface updateVehicle {
     type?: string
     licenseplate?: string,
     enginefuel?: string,

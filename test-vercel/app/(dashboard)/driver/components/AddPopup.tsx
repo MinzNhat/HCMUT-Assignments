@@ -10,6 +10,7 @@ import { Address, Driver } from "@/library/libraryType/type";
 import { DriverOperation } from "@/library/driver";
 import SubmitPopup from "@/components/submit";
 import NotiPopup from "@/components/notification";
+import { getCoordinates } from "@/app/components/GetCoordinates";
 
 interface City {
     Id: string;
@@ -104,7 +105,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
         }
 
         if (files.length === 0) {
-            tempErrors.license = "Giấy phép lái xe không được bỏ trống.";
+            tempErrors.license = "Thiếu giấy phép lái xe.";
             hasError = true;
         } else {
             tempErrors.license = "";
@@ -203,15 +204,15 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
     };
 
     const handleAddNewDriver = async () => {
+        const { lat, lng } = await getCoordinates(`${address.address}, ${selectedWard2}, ${selectedDistrict2}, ${selectedCity2}`)
         const sendData: Driver = {
             driverName: data.driverName,
             driverNumber: data.driverNumber,
-            driverAddress: { ...address, address: `${address.address}, ${selectedWard2}, ${selectedDistrict2}, ${selectedCity2}` },
+            driverAddress: { latitude: lat, longitude: lng, address: `${address.address}, ${selectedWard2}, ${selectedDistrict2}, ${selectedCity2}` },
             driverStatus: data.driverStatus,
             driverLicense: files
         };
         const response = await driver.createDriver(sendData);
-        console.log(response)
         setOpenModal(false)
         if (response.error) {
             setMessage("Đã có lỗi khi tạo mới tài xế.");
@@ -365,7 +366,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
                         <span className="w-full text-center font-bold text-lg pb-2">
                             Thêm giấy phép lái xe
                         </span>
-                        {errors.license && <div className="text-red-500 absolute w-full text-center mt-12 -ml-4">{errors.license}</div>}
+                        {errors.license && <div className="text-red-500 absolute w-full text-center mt-12 -ml-4 px-6">{errors.license}</div>}
 
                         <Dropzone files={files} setFiles={setFiles} className={`${files.length == 0 ? "h-full" : "h-28 px-3"}  flex justify-center place-items-center mt-1`} />
                     </div>

@@ -9,6 +9,7 @@ import { Vehicle } from "@/library/libraryType/type";
 import { VehicleOperation } from "@/library/vehicle";
 import NotiPopup from "@/components/notification";
 import SubmitPopup from "@/components/submit";
+import InputWithError from "./Input";
 
 interface DetailPopupProps {
     onClose: () => void;
@@ -89,8 +90,9 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
                 data.height !== dataInitial.height ||
                 data.length !== dataInitial.length ||
                 data.width !== dataInitial.width ||
-                data.mass !== dataInitial.mass;
-
+                data.mass !== dataInitial.mass ||
+                data.enginefuel !== dataInitial.enginefuel ||
+                data.type !== dataInitial.type
             if (hasChanges) {
                 setMessage("Bạn có xác nhận muốn thay đổi thông tin phương tiện?");
                 setOpenModal(true);
@@ -126,6 +128,23 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
     };
 
     const handleChangeData = async () => {
+        //@ts-ignore
+        const response = await vehice.updateVehicleByID(dataInitial.id, data)
+        setOpenModal(false)
+        if (response.error) {
+            setMessage("Cập nhật phương tiện thất bại.");
+            setOpenError(true);
+        } else {
+            dataInitial.licenseplate = data.licenseplate;
+            dataInitial.height = data.height;
+            dataInitial.length = data.length;
+            dataInitial.width = data.width;
+            dataInitial.mass = data.mass;
+            dataInitial.type = data.type;
+            dataInitial.enginefuel = data.enginefuel;
+            setMessage("Cập nhật phương tiện thành công.");
+            setOpenError(true);
+        }
     };
 
     return (
@@ -152,7 +171,7 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
             >
                 <div className="relative items-center justify-center flex-col flex h-10 w-full border-b-2 border-gray-200 dark:!border-navy-700 overflow-hidden">
                     <div className="font-bold text-lg sm:text-2xl pb-2 w-full text-center">
-                        Thông tin xe
+                        Thông tin phương tiện
                     </div>
                     <Button
                         className="absolute right-0 w-8 h-8 top-0 rounded-full mb-2 hover:bg-gray-200 dark:hover:text-navy-900"
@@ -184,29 +203,23 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
                                 <div>{data.type === "Bus" ? "Xe khách" : (data.type === "Container Truck" ? "Xe Container" : "Xe tải")}</div>
                             )}
                         </div>
-                        <div className="flex">
-                            <div className="w-1/2 font-bold text-base">
-                                Biển số xe:
-                            </div>
-                            {isEditing ? (
-                                <div className="relative w-1/2 flex flex-col gap-2">
-                                    <input
-                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.licenseplate ? "border-2 border-red-500" : ""}`}
-                                        type="text"
-                                        value={data.licenseplate}
-                                        onChange={(e) =>
-                                            setData({ ...data, licenseplate: e.target.value })
-                                        }
-                                    />
-                                    {errors.licenseplate && (
-                                        <span className=" text-red-500 text-sm">{errors.licenseplate}</span>
-                                    )}
+                        {isEditing ?
+                            <InputWithError
+                                value={data.licenseplate}
+                                error={errors.licenseplate}
+                                onChange={(e) => setData({ ...data, licenseplate: e.target.value })}
+                                name2="licenseplate"
+                                label="Biển số xe"
+                            />
+                            :
+                            <div className="flex">
+                                <div className="w-1/2 font-bold text-base">
+                                    Biển số xe:
                                 </div>
-                            ) : (
                                 <div>{data.licenseplate}</div>
-                            )}
-                        </div>
-                        <div className={`flex ${errors.licenseplate ? "-mt-3" : ""}`}>
+                            </div>
+                        }
+                        <div className={`flex`}>
                             <div className="w-1/2 font-bold text-base">
                                 Loại động cơ:
                             </div>
@@ -237,98 +250,76 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
                                         setData({ ...data, status: e.target.value })
                                     }
                                 >
-                                    <option value="Active">Đang hoạt động</option>
-                                    <option value="Inactive">Không hoạt động</option>
-                                    <option value="Maintenance">Đang bảo trì</option>
+                                    {data.status === "Active" ? <option value="Active">Đang nhận đơn</option> : (data.status === "Inactive" ? <option value="Inactive">Sẵn sàng</option> : <option value="Inactive">Đang bảo trì</option>)}
                                 </select>
                             ) : (
-                                <div>{data.status === "Active" ? "Đang hoạt động" : (data.status === "Inactive" ? "Không hoạt động" : "Đang bảo trì")}</div>
+                                <div>{data.status === "Active" ? "Đang nhận đơn" : (data.status === "Inactive" ? "Sẵn sàng" : "Đang bảo trì")}</div>
                             )}
                         </div>
-                        <div className="flex">
-                            <div className="w-1/2 font-bold text-base">
-                                Tải trọng:
-                            </div>
-                            {isEditing ? (
-                                <div className="relative w-1/2">
-                                    <input
-                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.mass ? "border-2 border-red-500" : ""}`}
-                                        type="text"
-                                        name="mass"
-                                        value={data.mass}
-                                        onChange={handleNumericInputChange}
-                                    />
-                                    {errors.mass && (
-                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.mass}</span>
-                                    )}
+                        {isEditing ?
+                            <InputWithError
+                                value={data.mass}
+                                error={errors.mass}
+                                onChange={handleNumericInputChange}
+                                name2="mass"
+                                label="Tải trọng"
+                            />
+                            :
+                            <div className="flex">
+                                <div className="w-1/2 font-bold text-base">
+                                    Tải trọng:
                                 </div>
-                            ) : (
                                 <div>{data.mass}</div>
-                            )}
-                        </div>
-                        <div className={`flex ${errors.mass ? "mt-1.5" : ""}`}>
-                            <div className="w-1/2 font-bold text-base">
-                                Chiều dài:
                             </div>
-                            {isEditing ? (
-                                <div className="relative w-1/2">
-                                    <input
-                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.length ? "border-2 border-red-500" : ""}`}
-                                        type="text"
-                                        name="length"
-                                        value={data.length}
-                                        onChange={handleNumericInputChange}
-                                    />
-                                    {errors.length && (
-                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.length}</span>
-                                    )}
+                        }
+                        {isEditing ?
+                            <InputWithError
+                                value={data.length}
+                                error={errors.length}
+                                onChange={handleNumericInputChange}
+                                name2="length"
+                                label="Chiều dài"
+                            />
+                            :
+                            <div className="flex">
+                                <div className="w-1/2 font-bold text-base">
+                                    Chiều dài:
                                 </div>
-                            ) : (
                                 <div>{data.length}</div>
-                            )}
-                        </div>
-                        <div className={`flex ${errors.length ? "mt-1.5" : ""}`}>
-                            <div className="w-1/2 font-bold text-base">
-                                Chiều rộng:
                             </div>
-                            {isEditing ? (
-                                <div className="relative w-1/2">
-                                    <input
-                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.width ? "border-2 border-red-500" : ""}`}
-                                        type="text"
-                                        name="width"
-                                        value={data.width}
-                                        onChange={handleNumericInputChange}
-                                    />
-                                    {errors.width && (
-                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.width}</span>
-                                    )}
+                        }
+                        {isEditing ?
+                            <InputWithError
+                                value={data.width}
+                                error={errors.width}
+                                onChange={handleNumericInputChange}
+                                name2="width"
+                                label="Chiều rộng"
+                            />
+                            :
+                            <div className="flex">
+                                <div className="w-1/2 font-bold text-base">
+                                    Chiều rộng:
                                 </div>
-                            ) : (
                                 <div>{data.width}</div>
-                            )}
-                        </div>
-                        <div className={`flex ${errors.width ? "mt-1.5" : ""}`}>
-                            <div className="w-1/2 font-bold text-base">
-                                Chiều cao:
                             </div>
-                            {isEditing ? (
-                                <div className="relative w-1/2">
-                                    <input
-                                        className={`w-full dark:text-[#000000] pl-2 rounded ${errors.height ? "border-2 border-red-500" : ""}`}
-                                        type="text"
-                                        name="height"
-                                        value={data.height}
-                                        onChange={handleNumericInputChange}
-                                    />
-                                    {errors.height && (
-                                        <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.height}</span>
-                                    )}
+                        }
+                        {isEditing ?
+                            <InputWithError
+                                value={data.height}
+                                error={errors.height}
+                                onChange={handleNumericInputChange}
+                                name2="height"
+                                label="Chiều cao"
+                            />
+                            :
+                            <div className="flex">
+                                <div className="w-1/2 font-bold text-base">
+                                    Chiều cao:
                                 </div>
-                            ) : (
                                 <div>{data.height}</div>
-                            )}
-                        </div>
+                            </div>
+                        }
                     </div>
                     <div className="flex flex-col lg:w-1/2 dark:bg-navy-900 bg-white rounded-xl p-4 mt-6 lg:mt-0">
                         <span className="w-full text-center font-bold text-base pb-2">
@@ -346,7 +337,7 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
                             hover:shadow-md flex sm:gap-2"
                             onClick={handleEditClick}
                         >
-                            <FaPen />
+                            <FaPen className="mr-1" />
                             <span>
                                 Chỉnh sửa
                             </span>
@@ -358,8 +349,8 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
                             hover:shadow-md flex sm:gap-2"
                             onClick={handleSaveClick}
                         >
-                            <FaPen className="xs:mr-2" />
-                            <span className="xs:block">
+                            <FaPen className="mr-1" />
+                            <span>
                                 Lưu
                             </span>
                         </Button>

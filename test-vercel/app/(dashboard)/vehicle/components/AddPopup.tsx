@@ -9,6 +9,7 @@ import { Vehicle } from "@/library/libraryType/type";
 import { VehicleOperation } from "@/library/vehicle";
 import NotiPopup from "@/components/notification";
 import SubmitPopup from "@/components/submit";
+import InputWithError from "./Input";
 
 interface AddPopupProps {
     onClose: () => void;
@@ -30,7 +31,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
         length: "0",
         width: "0",
         mass: "0",
-        status: "Active",
+        status: "Inactive",
     });
 
     const [errors, setErrors] = useState({
@@ -94,7 +95,6 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
 
     const handleAddVehicle = async () => {
         const response = await vehice.createVehicle(data);
-        console.log(response)
         setOpenModal(false)
         if (response.error) {
             setMessage("Đã có lỗi khi tạo mới phương tiện.");
@@ -154,7 +154,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
             >
                 <div className="relative items-center justify-center flex-col flex h-10 w-full border-b-2 border-gray-200 dark:!border-navy-700 overflow-hidden">
                     <div className="font-bold text-lg lg:text-2xl pb-2 w-full text-center">
-                        Thông tin xe
+                        Thêm phương tiện
                     </div>
                     <Button
                         className="absolute right-0 w-8 h-8 top-0 rounded-full mb-2 hover:bg-gray-200 dark:hover:text-navy-900"
@@ -183,25 +183,13 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
                                 <option value="Motorbike">Xe máy</option>
                             </select>
                         </div>
-                        <div className="flex">
-                            <div className="w-1/2 font-bold text-base">
-                                Biển số xe:
-                            </div>
-                            <div className="relative w-1/2 flex flex-col gap-2">
-                                <input
-                                    className={`w-full dark:text-[#000000] pl-2 rounded ${errors.licenseplate ? "border-2 border-red-500" : ""}`}
-                                    type="text"
-                                    value={data.licenseplate}
-                                    onChange={(e) =>
-                                        setData({ ...data, licenseplate: e.target.value })
-                                    }
-                                />
-                                {errors.licenseplate && (
-                                    <span className=" text-red-500 text-sm">{errors.licenseplate}</span>
-                                )}
-                            </div>
-                        </div>
-                        <div className={`flex ${errors.licenseplate ? "-mt-3" : ""}`}>
+                        <InputWithError
+                            label="Biển số xe"
+                            value={data.licenseplate}
+                            onChange={(e) => setData({ ...data, licenseplate: e.target.value })}
+                            error={errors.licenseplate}
+                        />
+                        <div className={`flex`}>
                             <div className="w-1/2 font-bold text-base">
                                 Loại động cơ:
                             </div>
@@ -227,79 +215,37 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
                                     setData({ ...data, status: e.target.value })
                                 }
                             >
-                                <option value="Active">Đang hoạt động</option>
-                                <option value="Inactive">Không hoạt động</option>
-                                <option value="Maintenance">Đang bảo trì</option>
+                                <option value="Inactive">Sẵn sàng</option>
                             </select>
                         </div>
-                        <div className="flex">
-                            <div className="w-1/2 font-bold text-base">
-                                Tải trọng:
-                            </div>
-                            <div className="relative w-1/2">
-                                <input
-                                    className={`w-full dark:text-[#000000] pl-2 rounded ${errors.mass ? "border-2 border-red-500" : ""}`}
-                                    type="text"
-                                    name="mass"
-                                    value={data.mass}
-                                    onChange={handleNumericInputChange}
-                                />
-                                {errors.mass && (
-                                    <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.mass}</span>
-                                )}
-                            </div>
-                        </div>
-                        <div className={`flex ${errors.mass ? "mt-1.5" : ""}`}>
-                            <div className="w-1/2 font-bold text-base">
-                                Chiều dài:
-                            </div>
-                            <div className="relative w-1/2">
-                                <input
-                                    className={`w-full dark:text-[#000000] pl-2 rounded ${errors.length ? "border-2 border-red-500" : ""}`}
-                                    type="text"
-                                    name="length"
-                                    value={data.length}
-                                    onChange={handleNumericInputChange}
-                                />
-                                {errors.length && (
-                                    <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.length}</span>
-                                )}
-                            </div>
-                        </div>
-                        <div className={`flex ${errors.length ? "mt-1.5" : ""}`}>
-                            <div className="w-1/2 font-bold text-base">
-                                Chiều rộng:
-                            </div>
-                            <div className="relative w-1/2">
-                                <input
-                                    className={`w-full dark:text-[#000000] pl-2 rounded ${errors.width ? "border-2 border-red-500" : ""}`}
-                                    type="text"
-                                    name="width"
-                                    value={data.width}
-                                    onChange={handleNumericInputChange}
-                                />
-                                {errors.width && (
-                                    <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.width}</span>
-                                )}
-                            </div>
-                        </div>
-                        <div className={`flex ${errors.width ? "mt-1.5" : ""}`}>
-                            <div className="w-1/2 font-bold text-base">
-                                Chiều cao:
-                            </div>
-                            <div className="relative w-1/2">
-                                <input
-                                    className={`w-full dark:text-[#000000] pl-2 rounded ${errors.height ? "border-2 border-red-500" : ""}`}
-                                    type="text"
-                                    name="height"
-                                    value={data.height}
-                                    onChange={handleNumericInputChange}
-                                />
-                                {errors.height && (
-                                    <span className="absolute text-red-500 text-sm -bottom-6 left-0">{errors.height}</span>
-                                )}
-                            </div>
-                        </div>
+                        <InputWithError
+                            value={data.mass}
+                            error={errors.mass}
+                            onChange={handleNumericInputChange}
+                            name2="mass"
+                            label="Tải trọng"
+                        />
+                        <InputWithError
+                            value={data.length}
+                            error={errors.length}
+                            onChange={handleNumericInputChange}
+                            name2="length"
+                            label="Chiều dài"
+                        />
+                        <InputWithError
+                            value={data.width}
+                            error={errors.width}
+                            onChange={handleNumericInputChange}
+                            name2="width"
+                            label="Chiều rộng"
+                        />
+                        <InputWithError
+                            value={data.height}
+                            error={errors.height}
+                            onChange={handleNumericInputChange}
+                            name2="height"
+                            label="Chiều cao"
+                        />
                     </div>
                     <div className="flex flex-col lg:w-1/2 dark:bg-navy-900 bg-white rounded-xl p-4 mt-6 lg:mt-0">
                         <span className="w-full text-center font-bold text-base pb-2">
