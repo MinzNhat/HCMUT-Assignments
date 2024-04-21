@@ -39,7 +39,7 @@ const TaskCard = () => {
               <p className="text-base font-bold text-navy-700 dark:text-white">{task.title}</p>
             </div>
             <div>
-              <Button className="px-2 py-1.5 border border-gray-500 dark:text-gray-300 rounded-xl">
+              <Button className="px-2 py-1.5 border border-gray-500 dark:text-gray-300 rounded-md">
                 Donate <p className="hidden sm:block pl-1">🐧</p>
               </Button>
             </div>

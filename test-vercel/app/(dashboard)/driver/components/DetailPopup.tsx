@@ -45,7 +45,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
         driverLicense: "",
     });
 
-    const handleEditClick = () => {
+    const handleEditClick = async () => {
         setIsEditing(true);
     };
 
@@ -100,15 +100,15 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
             const hasChanges =
                 data.driverName !== dataInitial.driverName ||
                 data.driverNumber !== dataInitial.driverNumber ||
-                data.driverAddress !== dataInitial.driverAddress
+                data.driverAddress !== dataInitial.driverAddress ||
+                files.length !== 0
             if (hasChanges) {
                 setMessage("Bạn có xác nhận muốn thay đổi thông tin tài xế?");
                 setOpenModal(true);
             } else {
                 setIsEditing(false);
             }
-            // const uploadedFilesUrls = files.map(file => URL.createObjectURL(file));
-            // setData(prevData => ({ ...prevData, driverLicense: uploadedFilesUrls }));
+
         }
     };
 
@@ -156,6 +156,8 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
             dataInitial.driverAddress = data.driverAddress;
             dataInitial.driverName = data.driverName;
             dataInitial.driverNumber = data.driverNumber;
+            const uploadedFilesUrls = files.map(file => URL.createObjectURL(file));
+            setData(prevData => ({ ...prevData, driverLicense: uploadedFilesUrls }));
             setMessage("Cập nhật tài xế thành công.");
             setOpenError(true);
         }
