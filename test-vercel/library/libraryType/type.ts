@@ -14,6 +14,7 @@ export interface Route {
     licenplate?: string,     //no need to pass bc we'll get it from car
     DriverNumber?: string, //no need to pass bc we'll get it from driver
     price: number
+    owner?: string, //email address of the owner
     car: Vehicle,                // get velocity and price from this
     driver: Driver          // check status if u want , we need to access driveHistory to assign our route(response.data)to that His
 }
@@ -77,4 +78,7 @@ export interface updateDriver {
     driverAddress?: Address,
     driverStatus?: number,
     driverLicense?: Blob[]
+}
+export interface Observer {
+    update(route: Route): void;
 }

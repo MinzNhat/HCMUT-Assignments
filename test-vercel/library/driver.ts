@@ -5,7 +5,8 @@ import { initializeApp } from 'firebase/app';
 import {
     getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc,
     query, where, getDocs, GeoPoint, updateDoc, getDoc, writeBatch,
-    arrayUnion
+    arrayUnion,
+    setDoc
 } from 'firebase/firestore';
 
 import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
@@ -99,6 +100,8 @@ class DriverRegister {
                         return getDownloadURL(imageRef);
                     })
                 );
+                updateData[fieldName] = [];
+                await setDoc(docRef, updateData, { merge: true });
                 updateData[fieldName] = arrayUnion(...downloadURLs);
             } else if (fieldName === 'driverAddress') {
                 updateData[fieldName] = JSON.stringify(fieldValue);
@@ -108,7 +111,7 @@ class DriverRegister {
             }
         }
 
-        await updateDoc(docRef, updateData);
+        await setDoc(docRef, updateData, { merge: true });
         return updateData;
     }
 }

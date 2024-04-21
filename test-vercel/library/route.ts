@@ -6,7 +6,7 @@ import {
     getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc,
     query, where, getDocs, GeoPoint, updateDoc, getDoc
 } from 'firebase/firestore';
-import { Route, Response,Address, Vehicle, Driver } from './libraryType/type';
+import { Route, Response,Address, Vehicle, Driver, Observer } from './libraryType/type';
 import { app } from './account'
 import { constants } from 'buffer';
 import { data } from 'autoprefixer';
@@ -202,3 +202,23 @@ export class RouteOperation {
       
 };
 
+export class Subject {
+    private observers: Observer[] = [];
+
+    public attach(observer: Observer): void {
+        this.observers.push(observer);
+    }
+
+    public detach(observer: Observer): void {
+        const index = this.observers.indexOf(observer);
+        if (index !== -1) {
+            this.observers.splice(index, 1);
+        }
+    }
+
+    public notify(route: Route): void {
+        for (const observer of this.observers) {
+            observer.update(route);
+        }
+    }
+}
