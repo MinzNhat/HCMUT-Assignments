@@ -8,7 +8,7 @@ import axios from "axios";
 import InputWithError from "./Input";
 import { FaPen } from "react-icons/fa6";
 import { CarouselSlider } from "@/components/slider";
-import { Address } from "@/library/libraryType/type";
+import { Address, updateDriver } from "@/library/libraryType/type";
 import { DriverOperation } from "@/library/driver";
 import NotiPopup from "@/components/notification";
 import SubmitPopup from "@/components/submit";
@@ -79,15 +79,6 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
         } else {
             tempErrors.driverAddress = "";
         }
-
-        if (files.length === 0 && (data.driverName !== dataInitial.driverName ||
-            data.driverNumber !== dataInitial.driverNumber ||
-            data.driverAddress !== dataInitial.driverAddress)) {
-            tempErrors.driverLicense = "Thiếu giấy phép lái xe.";
-            hasError = true;
-        } else {
-            tempErrors.driverLicense = "";
-        }
         if (hasError) {
             setErrors(tempErrors);
         } else {
@@ -140,13 +131,13 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
     };
 
     const handleChangeData = async () => {
-        const updateDriverData = {
+        let updateDriverData: updateDriver = {
             driverName: data.driverName,
             driverNumber: data.driverNumber,
             driverAddress: data.driverAddress,
             driverStatus: data.driverStatus,
-            driverLicense: files
         }
+        if (files.length != 0) { updateDriverData = { ...updateDriverData, driverLicense: files } }
         //@ts-ignore
         const response = await driver.updateDriverByID(dataInitial.id, updateDriverData)
         setOpenModal(false)
@@ -157,8 +148,10 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
             dataInitial.driverAddress = data.driverAddress;
             dataInitial.driverName = data.driverName;
             dataInitial.driverNumber = data.driverNumber;
-            const uploadedFilesUrls = files.map(file => URL.createObjectURL(file));
-            setData(prevData => ({ ...prevData, driverLicense: uploadedFilesUrls }));
+            if (files.length != 0) {
+                const uploadedFilesUrls = files.map(file => URL.createObjectURL(file));
+                setData(prevData => ({ ...prevData, driverLicense: uploadedFilesUrls }));
+            }
             setMessage("Cập nhật tài xế thành công.");
             setOpenError(true);
         }
@@ -259,7 +252,6 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
                         </span>
                         {isEditing ?
                             <>
-                                {errors.driverLicense && <div className="text-red-500 absolute w-full text-center mt-12 -ml-4">{errors.driverLicense}</div>}
                                 <Dropzone files={files} setFiles={setFiles} className={`${files.length == 0 ? "h-full" : "h-32 px-3"}  flex justify-center place-items-center mt-1`} />
                             </>
                             :

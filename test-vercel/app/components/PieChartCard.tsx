@@ -24,7 +24,7 @@ const PieChartCard = ({ driver }: { driver: any }) => {
     busyPercentage = 100 - readyPercentage;
   }
   return (
-    <Card className="rounded-[20px] p-3 md:max-w-[300px]">
+    <Card className="rounded-[20px] p-3 md:w-[300px]">
       <div className="flex flex-row justify-between px-3 pt-2">
         <div className="w-full flex place-items-center sm:place-items-start">
           <h4 className="text-lg font-bold text-navy-700 dark:text-white w-full">
