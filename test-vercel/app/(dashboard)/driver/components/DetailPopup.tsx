@@ -12,6 +12,7 @@ import { Address } from "@/library/libraryType/type";
 import { DriverOperation } from "@/library/driver";
 import NotiPopup from "@/components/notification";
 import SubmitPopup from "@/components/submit";
+import { FaSave } from "react-icons/fa";
 
 interface DriverData {
     driverName: string;
@@ -259,7 +260,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
                         {isEditing ?
                             <>
                                 {errors.driverLicense && <div className="text-red-500 absolute w-full text-center mt-12 -ml-4">{errors.driverLicense}</div>}
-                                <Dropzone files={files} setFiles={setFiles} className={`${files.length == 0 ? "h-full" : "h-28 px-3"}  flex justify-center place-items-center mt-1`} />
+                                <Dropzone files={files} setFiles={setFiles} className={`${files.length == 0 ? "h-full" : "h-32 px-3"}  flex justify-center place-items-center mt-1`} />
                             </>
                             :
                             <div className="relative grow">
@@ -275,10 +276,10 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
                         <Button
                             className="w-full rounded-lg mt-5 mb-1 py-3 text-[#545e7b] border-[#545e7b] hover:border-green-600 dark:hover:bg-green-700 
                             bg-transparent  hover:text-white border-2 hover:bg-green-600 dark:text-white dark:hover:border-green-700 
-                            hover:shadow-md flex sm:gap-2"
+                            hover:shadow-md flex gap-1"
                             onClick={handleEditClick}
                         >
-                            <FaPen className="mr-1" />
+                            <FaPen />
                             <span>
                                 Chỉnh sửa
                             </span>
@@ -287,10 +288,10 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
                         <Button
                             className="w-full rounded-lg mt-5 mb-1 py-3 border-green-400 hover:border-green-600 dark:border-green-700 dark:hover:bg-green-700 text-green-500
                             bg-transparent  hover:text-white border-2 hover:bg-green-600
-                            hover:shadow-md flex sm:gap-2"
+                            hover:shadow-md flex gap-1"
                             onClick={handleSaveClick}
                         >
-                            <FaPen className="mr-1" />
+                            <FaSave />
                             <span >
                                 Lưu
                             </span>

@@ -368,7 +368,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
                         </span>
                         {errors.license && <div className="text-red-500 absolute w-full text-center mt-12 -ml-4 px-6">{errors.license}</div>}
 
-                        <Dropzone files={files} setFiles={setFiles} className={`${files.length == 0 ? "h-full" : "h-28 px-3"}  flex justify-center place-items-center mt-1`} />
+                        <Dropzone files={files} setFiles={setFiles} className={`${files.length == 0 ? "h-full" : "h-32 px-3"}  flex justify-center place-items-center mt-1`} />
                     </div>
                 </div>
 

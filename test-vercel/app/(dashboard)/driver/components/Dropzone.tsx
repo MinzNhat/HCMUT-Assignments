@@ -73,7 +73,7 @@ const Dropzone: React.FC<DropzoneProps> = ({ className, files, setFiles }) => {
             </div>
 
             {files.length != 0 && <section className='mt-1 p-2 pb-6 rounded-lg'>
-                <ul className='mt-6 grid grid-cols-2 gap-6 sm:grid-cols-2 min-h-[130px]'>
+                <ul className='mt-2 grid grid-cols-2 gap-6 sm:grid-cols-2 min-h-[130px]'>
                     {files.map((file, index) => (
                         <li key={index} className='relative h-32 w-full rounded-md px-2 border border-gray-300'>
                             <Image
@@ -88,7 +88,7 @@ const Dropzone: React.FC<DropzoneProps> = ({ className, files, setFiles }) => {
                             </div>
                             <button
                                 type='button'
-                                className='absolute -right-3 -top-3 bg-red-500 pr-.5 flex h-7 w-7 place-items-center justify-center rounded-full hover:bg-gray-300 text-white'
+                                className='absolute right-3 top-3 bg-red-500 pr-.5 flex h-7 w-7 place-items-center justify-center rounded-full hover:bg-gray-300 text-white'
                                 onClick={() => removeFile(file.name)}
                             >
                                 <IoMdClose className='h-5 w-5' />

@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IoMdClose } from "react-icons/io";
 import { Button } from "@nextui-org/react";
-import { FaTrash, FaPen } from "react-icons/fa";
+import { FaTrash, FaPen, FaSave } from "react-icons/fa";
 import MiniCalendar from "@/components/calendar/MiniCalendar";
 import { Vehicle } from "@/library/libraryType/type";
 import { VehicleOperation } from "@/library/vehicle";
@@ -334,10 +334,10 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
                         <Button
                             className="w-full rounded-lg mt-5 mb-1 py-3 text-[#545e7b] border-[#545e7b] hover:border-green-600 dark:hover:bg-green-700 
                             bg-transparent  hover:text-white border-2 hover:bg-green-600 dark:text-white dark:hover:border-green-700 
-                            hover:shadow-md flex sm:gap-2"
+                            hover:shadow-md flex gap-1"
                             onClick={handleEditClick}
                         >
-                            <FaPen className="mr-1" />
+                            <FaPen />
                             <span>
                                 Chỉnh sửa
                             </span>
@@ -346,10 +346,10 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
                         <Button
                             className="w-full rounded-lg mt-5 mb-1 py-3 border-green-400 hover:border-green-600 dark:border-green-700 dark:hover:bg-green-700 text-green-500
                             bg-transparent  hover:text-white border-2 hover:bg-green-600
-                            hover:shadow-md flex sm:gap-2"
+                            hover:shadow-md flex gap-1"
                             onClick={handleSaveClick}
                         >
-                            <FaPen className="mr-1" />
+                            <FaSave />
                             <span>
                                 Lưu
                             </span>
