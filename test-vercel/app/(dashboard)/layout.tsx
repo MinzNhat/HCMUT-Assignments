@@ -68,7 +68,7 @@ const RootStructure = ({ children }: { children: React.ReactNode }) => {
                               {children}
                             </div>
                           </div>
-                          <div className="absolute h-screen w-[calc(100%+75px)] top-0 -left-[63px]">
+                          <div className="absolute h-[calc(100dvh)] w-screen xl:w-[calc(100vw-250px)] top-0 -left-[12px] xl:-left-[63px]">
                             <MapExport />
                           </div>
                         </main>

@@ -57,6 +57,7 @@ function MapExport() {
                 travelMode: google.maps.TravelMode.DRIVING,
             }, (result: any, status) => {
                 if (status === google.maps.DirectionsStatus.OK) {
+                    setIsCollapsed(true)
                     setdirectionRoutePoints(result);
                     let totalDistance = 0;
                     result.routes[0].legs?.forEach((leg: any) => {
@@ -225,7 +226,7 @@ function MapExport() {
                 }}
             />
         }
-        <div className="absolute bottom-5 right-1/2 translate-x-[calc(50%+26px)] sm:bottom-1/2 sm:translate-y-1/2 sm:right-5 sm:translate-x-0 flex sm:flex-col gap-1 items-center">
+        <div className="absolute bottom-5 right-1/2 translate-x-1/2 sm:bottom-1/2 sm:translate-y-1/2 sm:right-5 sm:translate-x-0 flex sm:flex-col gap-1 items-center">
             <Button
                 className="linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 w-8 h-8 shadow-xl"
                 onClick={zoomIn}

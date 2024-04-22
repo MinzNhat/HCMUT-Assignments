@@ -13,6 +13,7 @@ import { DriverOperation } from "@/library/driver";
 import NotiPopup from "@/components/notification";
 import SubmitPopup from "@/components/submit";
 import { FaSave } from "react-icons/fa";
+import MapPopup from "./MapPopup";
 
 interface DriverData {
     driverName: string;
@@ -36,6 +37,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
     const [files, setFiles] = useState<Blob[]>([]);
     const [openModal, setOpenModal] = useState(false);
     const [openError, setOpenError] = useState(false);
+    const [openMap, setOpenMap] = useState(false);
     const [message, setMessage] = useState("");
     const driver = new DriverOperation()
     const [errors, setErrors] = useState({
@@ -47,6 +49,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
     });
 
     const handleEditClick = async () => {
+        console.log(data)
         setIsEditing(true);
     };
 
@@ -171,6 +174,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
         >
             {openError && <NotiPopup message={message} onClose={() => { setOpenError(false); setIsEditing(false); }} />}
             {openModal && <SubmitPopup message={message} onClose={() => { setOpenModal(false); }} submit={handleChangeData} />}
+            {openMap && <MapPopup onClose={() => { setOpenMap(false) }} dataInitial={data.driverAddress} setData={setData} data={data} />}
             <motion.div
                 ref={notificationRef}
                 className={`relative w-[98%] sm:w-9/12 dark:bg-navy-900 bg-white rounded-xl p-4 overflow-y-auto`}
@@ -231,12 +235,20 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
                                 <div className="w-1/2 line-clamp-3">{data.driverAddress.address}</div>
                             </div>
                             :
-                            <InputWithError
-                                label="Địa chỉ cụ thể"
-                                value={data.driverAddress.address}
-                                onChange={(e) => setData({ ...data, driverAddress: { ...data.driverAddress, address: e.target.value } })}
-                                error={errors.driverAddress}
-                            />
+                            <div className="flex">
+                                <div className="w-1/2 font-bold text-base">
+                                    Địa chỉ cụ thể:
+                                </div>
+                                <div className="w-1/2 flex flex-col gap-2">
+                                    <div className="w-full line-clamp-3">{data.driverAddress.address}</div>
+                                    <Button
+                                        className="h-8 w-full rounded-md border-2 dark:border-white border-[#000000] bg-white dark:bg-navy-800"
+                                        onClick={() => { setOpenMap(true) }}
+                                    >
+                                        Chọn
+                                    </Button>
+                                </div>
+                            </div>
                         }
                         <div className="flex lg:pb-4">
                             <div className="w-1/2 font-bold text-base">

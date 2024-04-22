@@ -144,7 +144,7 @@ export class DriverOperation {
         let result: any[] = []
         try {
             const driverArray = await (getDocs(DriverRef))
-
+            console.log(driverArray)
             driverArray.docs.forEach((doc) => {
                 result.push({
                     id: doc.id,
