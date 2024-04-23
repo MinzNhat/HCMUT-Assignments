@@ -102,12 +102,32 @@ const SearchBox = () => {
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
                                 }),
+                                clearIndicator: (provided) => ({
+                                    ...provided,
+                                    color: theme === "dark" ? "#D1D5DB" : "#374151",
+                                }),
                                 singleValue: (provided) => ({
                                     ...provided,
-                                    color: theme == "dark" ? "#a0aec0" : "#a0aec0",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
+                                    backgroundColor: "transparent",
+                                    color: theme === "dark" ? "#D1D5DB" : "#374151",
+                                    marginTop: "2px"
                                 }),
+                                menu: (provided) => ({
+                                    ...provided,
+                                    backgroundColor: theme === "dark" ? "#0B1437" : "#FFFFFF",
+                                }),
+                                menuList: (provided) => ({
+                                    ...provided,
+                                    backgroundColor: "transparent",
+                                    color: theme === "dark" ? "#ffffff" : "#374151",
+                                    marginTop: "2px",
+                                }),
+                                option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                                    return {
+                                        ...styles,
+                                        backgroundColor: isFocused ? (theme === "dark" ? '#707EAE' : "#d1d5db") : "transparent",
+                                    }
+                                },
                                 container: (provided, state) => ({
                                     ...provided,
                                     color: "#4a5568",
@@ -163,12 +183,32 @@ const SearchBox = () => {
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
                                 }),
+                                clearIndicator: (provided) => ({
+                                    ...provided,
+                                    color: theme === "dark" ? "#D1D5DB" : "#374151",
+                                }),
                                 singleValue: (provided) => ({
                                     ...provided,
-                                    color: theme == "dark" ? "#a0aec0" : "#a0aec0",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
+                                    backgroundColor: "transparent",
+                                    color: theme === "dark" ? "#D1D5DB" : "#374151",
+                                    marginTop: "2px"
                                 }),
+                                menu: (provided) => ({
+                                    ...provided,
+                                    backgroundColor: theme === "dark" ? "#0B1437" : "#FFFFFF",
+                                }),
+                                menuList: (provided) => ({
+                                    ...provided,
+                                    backgroundColor: "transparent",
+                                    color: theme === "dark" ? "#ffffff" : "#374151",
+                                    marginTop: "2px",
+                                }),
+                                option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                                    return {
+                                        ...styles,
+                                        backgroundColor: isFocused ? (theme === "dark" ? '#707EAE' : "#d1d5db") : "transparent",
+                                    }
+                                },
                                 container: (provided, state) => ({
                                     ...provided,
                                     color: "#4a5568",

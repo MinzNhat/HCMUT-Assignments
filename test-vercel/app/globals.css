@@ -76,3 +76,7 @@ input:checked.defaultCheckbox::before {
 	background-color: #FFC107;
 	/* Màu highlight */
 }
+
+.gm-style iframe+div {
+	border: none !important;
+}

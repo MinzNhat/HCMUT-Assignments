@@ -11,6 +11,7 @@ import lightTheme from '@/app/(dashboard)/plan/maptheme/light.json'
 import { getGeocode } from '@/app/components/GetLocationAddress';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import { getCoordinates } from '@/app/components/GetCoordinates';
+import { FaMapMarkerAlt } from 'react-icons/fa';
 interface sourceProps {
     lat: number,
     lng: number,
@@ -156,9 +157,9 @@ const MapExport: React.FC<MapProps> = ({ source, setSource }) => {
             <MarkerF
                 position={source}
                 icon={{
-                    url: "/img/placeholder/placeHolder2.png",
+                    url: theme == "dark" ? "/img/placeholder/placeHolder3.png" : "/img/placeholder/placeHolder2.png",
                     // @ts-ignore
-                    scaledSize: { equals: null, width: 50, height: 50 },
+                    scaledSize: { equals: null, width: theme == "dark" ? 45 : 50, height: theme == "dark" ? 45 : 50 },
                 }}
                 className="relative shadow"
             >
@@ -166,7 +167,7 @@ const MapExport: React.FC<MapProps> = ({ source, setSource }) => {
                     position={source}
                     mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
                 >
-                    <div className="absolute top-2 right-0 translate-x-1/2 p-2 bg-white text-[#1488DB] border-2 border-[#1488DB]
+                    <div className="absolute top-2 right-0 translate-x-1/2 p-2 text-[#1488D8] dark:bg-navy-900 dark:text-gray-300 bg-white border-[#1488D8] border-2 dark:border-gray-300
                     transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 shadow-xl rounded-xl font-semibold text-xs truncate max-w-10">
                         <p>{source.label}</p>
                     </div>
@@ -174,89 +175,102 @@ const MapExport: React.FC<MapProps> = ({ source, setSource }) => {
             </MarkerF>
         )}
         <div className="absolute top-3 left-3 w-[calc(100%-80px)] sm:w-1/2 self-start">
-            <GooglePlacesAutocomplete
-                selectProps={{
-                    id: "searchOnMap",
-                    onChange: (place: any) => {
-                        setValueSearchBox(place);
-                        handleSearch(place);
-                    },
-                    value: valueSearchBox,
-                    placeholder: "Tìm kiếm...",
-                    isClearable: true,
-                    className: `    rounded-md w-full p-[1.5px] bg-[#1488DB] dark:bg-white`,
-                    components: {
-                        DropdownIndicator: null,
-                        //@ts-ignore
-                        LoadingIndicator: null,
-                    },
-                    styles: {
-                        control: (provided, state) => ({
-                            ...provided,
-                            border: "none",
-                            backgroundColor: theme === "dark" ? "#0B1437" : "#ffffff",
-                            boxShadow: state.isFocused ? "none" : provided.boxShadow,
-                            "&:hover": {
-                                border: "none",
-                            },
-                        }),
-                        placeholder: (provided) => ({
-                            ...provided,
-                            color: theme === "dark" ? "#ffffff" : "#000000",
-                            fontSize: "0.875rem",
-                            marginTop: "2px"
-                        }),
-                        input: (provided) => ({
-                            ...provided,
-                            backgroundColor: "transparent",
-                            color: theme === "dark" ? "#D1D5DB" : "#374151",
-                            marginTop: "2px"
-                        }),
-                        clearIndicator: (provided) => ({
-                            ...provided,
-                            color: theme === "dark" ? "#D1D5DB" : "#374151",
-                        }),
-                        singleValue: (provided) => ({
-                            ...provided,
-                            backgroundColor: "transparent",
-                            color: theme === "dark" ? "#D1D5DB" : "#374151",
-                            marginTop: "2px"
-                        }),
-                        menu: (provided) => ({
-                            ...provided,
-                            backgroundColor: theme === "dark" ? "#0B1437" : "#FFFFFF",
-                        }),
-                        menuList: (provided) => ({
-                            ...provided,
-                            backgroundColor: "transparent",
-                            color: theme === "dark" ? "#ffffff" : "#374151",
-                            marginTop: "2px",
-                        }),
-                        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-                            return {
-                                ...styles,
-                                backgroundColor: isFocused ? (theme === "dark" ? '#707EAE' : "#d1d5db") : "transparent",
-                            }
+            <div className="flex items-center rounded-full border-2 border-[#1488D8] dark:border-gray-300 bg-white text-navy-700 dark:bg-navy-900 dark:text-white w-full h-10">
+                <p className="pl-5 pr-2 text-xl">
+                    <FaMapMarkerAlt className="h-4 w-4 text-[#1488D8] dark:text-gray-300" />
+                </p>
+                <GooglePlacesAutocomplete
+                    selectProps={{
+                        id: "orderAddress",
+                        onChange: (place: any) => {
+                            setValueSearchBox(place)
+                            handleSearch(place);
                         },
-                    },
-                }}
-            />
+                        value: valueSearchBox,
+                        placeholder: "Tìm kiếm...",
+                        isClearable: true,
+                        className: `peer h-10 self-center w-full rounded text-left pr-1 pt-[1px]`,
+                        components: {
+                            // @ts-ignore
+                            DropdownIndicator: false,
+                            // @ts-ignore
+                            LoadingIndicator: false
+                        },
+                        styles: {
+                            control: (provided, state) => ({
+                                ...provided,
+                                backgroundColor: "transparent",
+                                border: "none",
+                                boxShadow: state.isFocused ? "none" : provided.boxShadow,
+                                "&:hover": {
+                                    border: "none",
+                                },
+                                color: "#4a5568",
+                            }),
+                            placeholder: (provided) => ({
+                                ...provided,
+                                color: theme == "dark" ? "#a0aec0" : "#1488D8",
+                                fontSize: "0.875rem",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                            }),
+                            input: (provided) => ({
+                                ...provided,
+                                color: theme === "dark" ? "#D1D5DB" : "#1488D8",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                            }),
+                            clearIndicator: (provided) => ({
+                                ...provided,
+                                color: theme === "dark" ? "#D1D5DB" : "#1488D8",
+                            }),
+                            singleValue: (provided) => ({
+                                ...provided,
+                                backgroundColor: "transparent",
+                                color: theme === "dark" ? "#D1D5DB" : "#1488D8",
+                                marginTop: "2px"
+                            }),
+                            menu: (provided) => ({
+                                ...provided,
+                                backgroundColor: theme === "dark" ? "#0B1437" : "#FFFFFF",
+                            }),
+                            menuList: (provided) => ({
+                                ...provided,
+                                backgroundColor: "transparent",
+                                color: theme === "dark" ? "#ffffff" : "#1488D8",
+                                marginTop: "2px",
+                            }),
+                            option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                                return {
+                                    ...styles,
+                                    backgroundColor: isFocused ? (theme === "dark" ? '#707EAE' : "#e8eaed") : "transparent",
+                                }
+                            },
+                            container: (provided, state) => ({
+                                ...provided,
+                                color: "#4a5568",
+                            }),
+                        },
+                    }}
+                />
+            </div>
         </div>
         <div className="absolute bottom-[4.5rem] right-1/2 translate-x-1/2 sm:bottom-1/2 sm:translate-y-1/2 sm:right-5 sm:translate-x-0 flex sm:flex-col gap-1 items-center">
             <Button
-                className="linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 w-8 h-8 shadow-xl"
+                className="linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-gray-200 text-[#1488DB] border-2 border-[#1488DB] dark:border-gray-200 transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 w-8 h-8 shadow-xl"
                 onClick={zoomIn}
             >
                 <FiZoomIn />
             </Button>
             <Button
-                className="w-12 h-12 linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 shadow-xl"
+                className="w-12 h-12 linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-gray-200 text-[#1488DB] border-2 border-[#1488DB] dark:border-gray-200 transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 shadow-xl"
                 onClick={handleMyLocation}
             >
                 <MdOutlineMyLocation className="w-8 h-8" />
             </Button>
             <Button
-                className="linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-white text-[#1488DB] border-2 border-[#1488DB] dark:border-white transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 w-8 h-8 shadow-xl"
+                className="linear mt-1 flex items-center justify-center gap-2 rounded-full bg-white p-2 dark:text-gray-200 text-[#1488DB] border-2 border-[#1488DB] dark:border-gray-200 transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-800 dark:hover:opacity-90 dark:active:opacity-80 w-8 h-8 shadow-xl"
                 onClick={zoomOut}
             >
                 <FiZoomOut />

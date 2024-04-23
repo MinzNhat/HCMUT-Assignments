@@ -60,7 +60,7 @@ const MapPopup: React.FC<MapPopupProps> = ({ onClose, dataInitial, setData, data
                 transition={{ duration: 0.5 }}
             >
                 <Button
-                    className="absolute right-4 top-4 sm:right-3 sm:top-3 w-8 h-8 rounded-full mb-2 z-10 text-[#1488D8] dark:bg-navy-900 dark:text-white bg-white border-[#1488D8] border-2 dark:border-white shadow"
+                    className="absolute right-4 top-4 sm:right-3 sm:top-3 w-8 h-8 rounded-full mb-2 z-10 text-[#1488D8] dark:bg-navy-900 dark:text-gray-300 bg-white border-[#1488D8] border-2 dark:border-gray-200 shadow"
                     onClick={handleClose}
                 >
                     <IoMdClose className="w-5/6 h-5/6" />
@@ -71,7 +71,7 @@ const MapPopup: React.FC<MapPopupProps> = ({ onClose, dataInitial, setData, data
 
                 <div className="absolute bottom-0 w-full flex z-10">
                     <Button
-                        className="w-[calc(100%+3px)] rounded-b-lg py-3 text-[#1488D8] dark:bg-navy-900 dark:text-white bg-white border-[#1488D8] border-2 dark:border-white hover:shadow-md"
+                        className="w-[calc(100%+3px)] rounded-b-lg py-3 text-[#1488D8] dark:bg-navy-900 dark:text-gray-200 bg-white border-[#1488D8] border-2 dark:border-gray-200 hover:shadow-md font-semibold"
                         onClick={handleSubmitClick}
                     >
                         <span>
