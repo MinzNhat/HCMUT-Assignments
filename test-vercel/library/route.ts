@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { response } from 'express';
 import { QuerySnapshot } from 'firebase-admin/firestore';
 import { initializeApp } from 'firebase/app';
@@ -83,24 +82,27 @@ export class RouteOperation {
 
             await this.DriverStatusUpdate(routeInfo.driver, 1);
             await this.CarStatusUpdate(routeInfo.car, 'Active');
-            const RouteCost = await this.CalculatePricebyType(routeInfo.distance,routeInfo.typeCar);
+            await this.CalculatePrice(routeInfo.distance)
+            const RouteCost = await this.CalculatePricebyType(routeInfo.distance, routeInfo.typeCar);
             // Create route object
-            const route: Route = {
+            var b = JSON.stringify(routeInfo.begin)
+            var e = JSON.stringify(routeInfo.end)
+            const docRef = await addDoc(RouteRef, {
                 id: '', // Generate or set your ID here
-                begin: routeInfo.begin,
-                end: routeInfo.end,
+                begin: b,
+                end: e,
                 beginDate: routeInfo.beginDate,
                 distance: routeInfo.distance,
                 endDate: endDate,
-                status:"active",
+                status:"Active",
                 car: routeInfo.car,
                 driver: routeInfo.driver,
                 price: RouteCost,
                 task: routeInfo.task
-            };
-            const docRef = await addDoc(RouteRef, route);
-            route.id = docRef.id
-            response.data = route
+            });
+
+            // route.id = docRef.id
+            // response.data = route
         }
         catch (error) {
             response.error = true
@@ -114,6 +116,26 @@ export class RouteOperation {
         const time = distance / carVelocity;
         const endDate = new Date(beginDate.getTime() + (time * 3600000)); // Convert hours to milliseconds
         return endDate;
+    }
+
+    async CalculatePricebyType(distance: number, type: string): Promise<number> {
+        const prices: { [key: string]: number } = {
+            Truck: 2500,
+            Bus: 4500,
+            ContainerTruck: 3000
+        };
+    
+        try {
+            if (prices[type]) {
+                const totalPrice = distance * prices[type];
+                return totalPrice;
+            } else {
+                throw new Error(`Invalid vehicle type: ${type}`);
+            }
+        } catch (error) {
+            console.error("Error calculating price by type:", error);
+            throw error;
+        }
     }
 
     async CalculatePrice(distance: number) {
@@ -158,29 +180,28 @@ export class RouteOperation {
     async viewAllRoute() {
         let response: Response = {
             error: true,
-            data: []
+            data: null
         }
         let result: any[] = []
         try {
-            const routeArray = await getDocs(RouteRef);
+            const routeArray = await (getDocs(RouteRef));
             const currentTime = new Date();
-            for (const doc of routeArray.docs) {
-                console.log(doc.data())
+            routeArray.docs.forEach(async (doc) => {
                 const beginDate = new Date(doc.data().beginDate);
                 const endDate = new Date(doc.data().endDate);
                 let status = "active";
                 if (endDate < currentTime) {
                     status = "expired";
-                    // Update Status in database
+                    // Update Satatus in database
                     await updateDoc(doc.ref, { status: status });
                 }
-                await this.CarStatusUpdate(doc.data().car, status === "active" ? "Active" : "Inactive");
-                await this.DriverStatusUpdate(doc.data().driver, status === "active" ? 1 : 0);
-                // Calculating Route Progress
+                this.CarStatusUpdate(doc.data().car, status ==="active" ? "Active" : "Inactive");
+                this.DriverStatusUpdate(doc.data().driver, status ==="active" ? 0 : 1);
+                // Caculating Route Process
                 const progress = await this.calculateRouteProgress(beginDate, endDate);
                 result.push({
-                    begin: doc.data().begin,
-                    end: doc.data().begin,
+                    begin: JSON.parse(doc.data().begin),
+                    end: JSON.parse(doc.data().begin),
                     beginDate: new Date(doc.data().beginDate),
                     endDate: new Date(doc.data().beginDate),
                     carNumber: doc.data().carNumber,
@@ -190,13 +211,12 @@ export class RouteOperation {
                     status: status,
                     routeProgress: progress
                 })
-            }
+            })
         }
         catch {
             return response
         }
         if (result) {
-            response.error = false
             response.data = result
             return response
         }
@@ -226,42 +246,22 @@ export class RouteOperation {
             console.error("Error updating car status:", error);
         }
     }
-
+    
     async deleteRouteByID(routeID: string){
         try {
             // Check if the route exists
-            const routeDoc = await getDoc(doc(db, 'routes', routeID));
+            const routeDoc = await getDoc(doc(db, 'Route', routeID));
             if (!routeDoc.exists()) {
                 return { error: true, data: "Route not found" };
             }
     
             // Delete the route
-            await deleteDoc(doc(db, 'routes', routeID));
+            await deleteDoc(doc(db, 'Route', routeID));
     
             return { error: false, data: "Route deleted successfully" };
         } catch (error) {
             console.error("Error deleting route:", error);
             return { error: true, data: error };
-        }
-    }
-
-    async CalculatePricebyType(distance: number, type: string): Promise<number> {
-        const prices: { [key: string]: number } = {
-            Truck: 2500,
-            Bus: 4500,
-            ContainerTruck: 3000
-        };
-    
-        try {
-            if (prices[type]) {
-                const totalPrice = distance * prices[type];
-                return totalPrice;
-            } else {
-                throw new Error(`Invalid vehicle type: ${type}`);
-            }
-        } catch (error) {
-            console.error("Error calculating price by type:", error);
-            throw error;
         }
     }
 
