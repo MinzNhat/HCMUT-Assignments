@@ -9,6 +9,7 @@ import Image from "next/image";
 import "react-multi-carousel/lib/styles.css";
 import ParticlesBackground from "@/components/Particle";
 import { UsersOperation } from "@/library/account";
+import { RouteOperation } from "@/library/route";
 import NotiPopup from "@/components/notification";
 import { useRouter } from "next/navigation";
 type Props = {};
@@ -139,7 +140,10 @@ const AuthPage: FC<Props> = () => {
     };
     fetchData();
   }, []);
-
+  useEffect(() => {
+    const route=new RouteOperation();
+    console.log(route.viewAllRoute());
+  },[])
   // useEffect(() => {
   //   const handleTestApi = async () => {
   //    const User2 = new DriverOperation()
