@@ -155,8 +155,6 @@ const AuthPage: FC<Props> = () => {
   //    console.log(response)
   //   };
 
-  // //   handleTestApi()
-  // // }, [ ]);
   //   handleTestApi()
   // }, [ ]);
   return (

@@ -43,6 +43,8 @@ export interface Vehicle {
     price?: number,
     velocity?: number,
     id?: string,
+    maintainanceDay?:Date,
+    // maintainanceID:number  //use to cancel when Day being changed by updating ( this field can be seen only when use view function)
 }
 
 export interface Response {
@@ -69,6 +71,7 @@ export interface updateVehicle {
     status?: string,
     price?: number,
     velocity?: number,
+    maintainanceDay?:Date,
 }
 export interface updateDriver {
     // type: string,

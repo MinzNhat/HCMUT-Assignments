@@ -7,7 +7,7 @@ import {
     query, where, getDocs, GeoPoint, updateDoc, getDoc,
     setDoc, writeBatch
 } from 'firebase/firestore';
-import { Vehicle, Response,updateVehicle } from './libraryType/type';
+import { Vehicle, Response, updateVehicle } from './libraryType/type';
 import { app, db } from './account'
 import { constants } from 'buffer';
 import { data } from 'autoprefixer';
@@ -32,6 +32,7 @@ class vehicle { // complete this class and delete this comment
     status: string
     price: number
     velocity: number
+    maintananceDay: Date | null
     constructor(vehicleInfo: Vehicle) {
         this.type = "vehicle"
         this.licenseplate = vehicleInfo.licenseplate
@@ -41,8 +42,9 @@ class vehicle { // complete this class and delete this comment
             this.length = vehicleInfo.length ? vehicleInfo.length : " vehicleInfo.length",
             this.mass = vehicleInfo.mass ? vehicleInfo.mass : " vehicleInfo.mass",
             this.status = vehicleInfo.status ? vehicleInfo.status : "vehicleInfo.status",
-            this.price = vehicleInfo.price ? vehicleInfo.price : 0
-        this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 0
+            this.price = vehicleInfo.price ? vehicleInfo.price : 0,
+            this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 0,
+            this.maintananceDay = vehicleInfo.maintainanceDay ? vehicleInfo.maintainanceDay : null
     }
     async storeToFB() {
         try {
@@ -56,7 +58,8 @@ class vehicle { // complete this class and delete this comment
                 mass: this.mass,
                 status: this.status,
                 price: this.price,
-                velocity: this.velocity
+                velocity: this.velocity,
+                maintainanceDay: this.maintananceDay ? this.maintananceDay : "null"
             })
         }
         catch (error) {
@@ -72,19 +75,20 @@ class vehicle { // complete this class and delete this comment
         await deleteDoc(docRef)
         return result
     }
-    static async updateVehicle(id: string , updateField:updateVehicle){
+    static async updateVehicle(id: string, updateField: updateVehicle) {
         const docRef = doc(db, 'Vehicle', id)
         const data = await getDoc(docRef)
         if (!data.exists) throw "id not exist when call update vehicle by ID"
-        const updateData = {...data.data()};
+        const updateData = { ...data.data() };
         for (const [fieldName, fieldValue] of Object.entries(updateField)) {
             updateData[fieldName] = fieldValue; // Update only provided fields
-          } 
+        }
         await updateDoc(docRef,
             updateData
         )
         return updateData
     }
+
 }
 class Truck extends vehicle {                                                                  //inheritance
     constructor(vehicleInfo: Vehicle) {
@@ -98,6 +102,7 @@ class Truck extends vehicle {                                                   
         this.status = vehicleInfo.status ? vehicleInfo.status : "active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 2500
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 60
+        this.maintananceDay = vehicleInfo.maintainanceDay ? vehicleInfo.maintainanceDay : null
     }
 }
 class Bus extends vehicle {
@@ -113,6 +118,7 @@ class Bus extends vehicle {
         this.status = vehicleInfo.status ? vehicleInfo.status : "active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 4500
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 47
+        this.maintananceDay = vehicleInfo.maintainanceDay ? vehicleInfo.maintainanceDay : null
     }
 }
 class ContainerTruck extends vehicle {
@@ -128,6 +134,7 @@ class ContainerTruck extends vehicle {
         this.status = vehicleInfo.status ? vehicleInfo.status : "active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 3000
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 60
+        this.maintananceDay = vehicleInfo.maintainanceDay ? vehicleInfo.maintainanceDay : null
     }
 }
 
@@ -154,9 +161,8 @@ export class VehicleOperation {
                 veh = new Truck(vehicleInfo)
                 break;
             default:
-                console.log("wrong type when calling vehicle")
-                veh = new vehicle(vehicleInfo)
-                break;
+                throw "wrong type when calling vehicle"
+
         }
 
         try {
@@ -183,8 +189,32 @@ export class VehicleOperation {
 
             const vehicleArray = await (getDocs(VehicleRef))
 
-            vehicleArray.docs.forEach((doc) => {
-                result.push({ ...doc.data(), id: doc.id })
+            vehicleArray.docs.forEach(async (doc) => {
+                let realStatus = doc.data().status;
+                const checkMaintainanceDay = new Date()
+
+                if (checkMaintainanceDay == doc.data().maintainanceDay.toDate()) {
+                    realStatus = "Maintainance"
+                    await this.updateVehicleByID(doc.id, { status: "Maintainance" })
+                }
+                else if (realStatus == "Maintainance" && checkMaintainanceDay > doc.data().maintainanceDay.toDate()) {
+                    realStatus = "active"
+                    await this.updateVehicleByID(doc.id, { status: "active" })
+                } else;
+                result.push({
+                    type: doc.data().type,
+                    licenseplate: doc.data().licenseplate,
+                    enginefuel: doc.data().enginefuel,
+                    height: doc.data().height,
+                    length: doc.data().length,
+                    width: doc.data().width,
+                    mass: doc.data().mass,
+                    price: doc.data().price,
+                    velocity: doc.data().velocity,
+                    id: doc.id,
+                    maintainanceDay: doc.data().maintainanceDay,
+                    status: realStatus,
+                })
             })
             if (result) {
                 response.data = result
@@ -207,13 +237,20 @@ export class VehicleOperation {
 
         let result: any[] = []
 
-        const q = query(VehicleRef, where("status", "==", "available"))
+        const q = query(VehicleRef, where("status", "==", "active"))
         try {
 
             const vehicleArray = await (getDocs(q))
 
-            vehicleArray.docs.forEach((doc) => {
-                result.push({ ...doc.data(), id: doc.id })
+            vehicleArray.docs.forEach(async (doc) => {
+                let realStatus = doc.data().status;
+                const checkMaintainanceDay = new Date()
+                if (checkMaintainanceDay == doc.data().maintainanceDay.toDate()) {
+                    realStatus = "Maintainance"
+                    await this.updateVehicleByID(doc.id, { status: "Maintainance" })
+                }
+                 else
+                    result.push({ ...doc.data(), id: doc.id })
             })
             if (result) {
                 response.data = result
@@ -266,14 +303,14 @@ export class VehicleOperation {
             return response;
         }
     }
-    async updateVehicleByID(vehicleID:string, updateField:updateVehicle ){
+    async updateVehicleByID(vehicleID: string, updateField: updateVehicle) {
         let response: Response = {
             error: true,
             data: null
         }
         try {
-            response.data = await vehicle.updateVehicle(vehicleID,updateField)
-            response.data.id=vehicleID
+            response.data = await vehicle.updateVehicle(vehicleID, updateField)
+            response.data.id = vehicleID
             response.error = false
         } catch (error) {
             console.log(error)
@@ -282,7 +319,7 @@ export class VehicleOperation {
             return response;
         }
     }
-    
+
 
 };
 
