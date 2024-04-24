@@ -11,7 +11,7 @@ import { CollapseContext } from "./plan/context/CollapseContext";
 import { DestinationContext } from "./plan/context/DestinationContext";
 import { DistanceContext } from "./plan/context/DistanceContext";
 import { SourceContext } from "./plan/context/SourceContext";
-import CustomLoadingElement from "./loading";
+import CustomLoadingElement from "../components/loading";
 import CustomLoadingElement2 from "../loading";
 import { UsersOperation } from "@/library/account";
 const RootStructure = ({ children }: { children: React.ReactNode }) => {
@@ -54,9 +54,7 @@ const RootStructure = ({ children }: { children: React.ReactNode }) => {
                           <div className="h-full">
                             <Navbar />
                             <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
-                              <Suspense fallback={<CustomLoadingElement />}>
-                                {children}
-                              </Suspense>
+                              {children}
                             </div>
                           </div>
                         </main>
@@ -67,12 +65,10 @@ const RootStructure = ({ children }: { children: React.ReactNode }) => {
                             <Navbar />
 
                             <div className="pt-5s mx-auto mb-auto pt-2 md:pr-2">
-                              <Suspense fallback={<CustomLoadingElement />}>
-                                {children}
-                              </Suspense>
+                              {children}
                             </div>
                           </div>
-                          <div className="absolute h-screen w-[calc(100%+75px)] top-0 -left-[63px]">
+                          <div className="absolute h-[calc(100dvh)] w-screen xl:w-[calc(100vw-250px)] top-0 -left-[12px] xl:-left-[63px]">
                             <MapExport />
                           </div>
                         </main>

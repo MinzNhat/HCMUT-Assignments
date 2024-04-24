@@ -14,6 +14,8 @@ export interface Route {
     licenplate?: string,     //no need to pass bc we'll get it from car
     DriverNumber?: string, //no need to pass bc we'll get it from driver
     price: number
+    owner?: string, //email address of the owner
+    status: string,
     car: Vehicle,                // get velocity and price from this
     driver: Driver          // check status if u want , we need to access driveHistory to assign our route(response.data)to that His
 }
@@ -33,10 +35,10 @@ export interface Vehicle {
     type: string
     licenseplate: string,
     enginefuel?: string,
-    height?: string,
-    length?: string,
-    width?: string,
-    mass?: string,
+    height: string,
+    length: string,
+    width: string,
+    mass: string,
     status?: string,
     price?: number,
     velocity?: number,
@@ -58,7 +60,7 @@ export interface SignUp {
 export interface ForgotPass {
     email: string,
 }
-export interface updateVehicle{
+export interface updateVehicle {
     type?: string
     licenseplate?: string,
     enginefuel?: string,
@@ -80,4 +82,32 @@ export interface updateDriver {
     driverAddress?: Address,
     driverStatus?: number,
     driverLicense?: Blob[]
+}
+export interface Route {
+    id: string
+    begin: Address,
+    end: Address,
+    beginDate: Date,
+    distance: number,
+    endDate?: Date,
+    licenplate?: string,
+    DriverNumber?: string,
+    price: number,
+    owner?: string,
+    car: Vehicle,
+    driver: Driver
+    task: string
+}
+export interface CreateRoute {
+    begin: Address,
+    end: Address,
+    distance: number,
+    beginDate: Date,
+    driver: Driver,
+    task: string,
+    typeCar: string,
+    car?: Vehicle
+}
+export interface Observer {
+    update(route: Route): void;
 }

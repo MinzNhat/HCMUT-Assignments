@@ -77,7 +77,7 @@ export function CarouselSlider(ObjUrls: any) {
                 </div>
             )) : (
                 <div className="flex justify-center text-center">
-                    <p>No image uploaded</p>
+                    <p>Chưa có ảnh</p>
                 </div>
             )}
         </Carousel>

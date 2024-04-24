@@ -10,6 +10,7 @@ import { Address, Driver } from "@/library/libraryType/type";
 import { DriverOperation } from "@/library/driver";
 import SubmitPopup from "@/components/submit";
 import NotiPopup from "@/components/notification";
+import { getCoordinates } from "@/app/components/GetCoordinates";
 
 interface City {
     Id: string;
@@ -30,9 +31,10 @@ interface Ward {
 
 interface AddPopupProps {
     onClose: () => void;
+    reloadData: () => void;
 }
 
-const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
+const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
     const notificationRef = useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(true);
     const [files, setFiles] = useState<Blob[]>([]);
@@ -65,6 +67,9 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedWard, setSelectedWard] = useState("");
+    const [selectedCity2, setSelectedCity2] = useState("");
+    const [selectedDistrict2, setSelectedDistrict2] = useState("");
+    const [selectedWard2, setSelectedWard2] = useState("");
     const [openModal, setOpenModal] = useState(false);
     const [openError, setOpenError] = useState(false);
     const [message, setMessage] = useState("");
@@ -100,7 +105,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
         }
 
         if (files.length === 0) {
-            tempErrors.license = "Giấy phép lái xe không được bỏ trống.";
+            tempErrors.license = "Thiếu giấy phép lái xe.";
             hasError = true;
         } else {
             tempErrors.license = "";
@@ -158,20 +163,31 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
 
     const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCity(event.target.value);
+        const city = cities.find((city) => city.Id === event.target.value)?.Name;
+        //@ts-ignore
+        setSelectedCity2(city);
         setSelectedDistrict("");
+        setSelectedDistrict2("");
     };
 
     const handleDistrictChange = (
         event: React.ChangeEvent<HTMLSelectElement>
     ) => {
         setSelectedDistrict(event.target.value);
+        const district = districts.find((district) => district.Id === event.target.value)?.Name;
+        //@ts-ignore
+        setSelectedDistrict2(district);
         setSelectedWard("");
+        setSelectedWard2("");
     };
 
     const handleWardChange = (
         event: React.ChangeEvent<HTMLSelectElement>
     ) => {
         setSelectedWard(event.target.value);
+        const ward = wards.find((ward) => ward.Id === event.target.value)?.Name;
+        //@ts-ignore
+        setSelectedWard2(ward);
     };
 
     const selectedCityObj = cities.find((city) => city.Id === selectedCity);
@@ -188,15 +204,15 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
     };
 
     const handleAddNewDriver = async () => {
+        const { lat, lng } = await getCoordinates(`${address.address}, ${selectedWard2}, ${selectedDistrict2}, ${selectedCity2}`)
         const sendData: Driver = {
             driverName: data.driverName,
             driverNumber: data.driverNumber,
-            driverAddress: { ...address, address: `${address.address}, ${selectedCity}, ${selectedDistrict}, ${selectedWard}` },
+            driverAddress: { latitude: lat, longitude: lng, address: `${address.address}, ${selectedWard2}, ${selectedDistrict2}, ${selectedCity2}` },
             driverStatus: data.driverStatus,
             driverLicense: files
         };
         const response = await driver.createDriver(sendData);
-        console.log(response)
         setOpenModal(false)
         if (response.error) {
             setMessage("Đã có lỗi khi tạo mới tài xế.");
@@ -206,20 +222,6 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
             setOpenError(true)
         }
     }
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-                handleClose();
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [onClose]);
 
     const handleClose = () => {
         setIsVisible(false);
@@ -237,7 +239,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
             }}
             onAnimationComplete={handleAnimationComplete}
         >
-            {openError && <NotiPopup message={message} onClose={() => { handleClose(); setOpenError(false); }} />}
+            {openError && <NotiPopup message={message} onClose={() => { setOpenError(false); handleClose(); reloadData(); }} />}
             {openModal && <SubmitPopup message={message} onClose={() => { setOpenModal(false); }} submit={handleAddNewDriver} />}
             <motion.div
                 ref={notificationRef}
@@ -274,7 +276,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                             error={errors.driverNumber}
                         />
                         <InputWithError
-                            label="Địa chỉ cụ thể"
+                            label="Địa chỉ cư trú"
                             value={address.address}
                             onChange={(e) => setAddress({ ...address, address: e.target.value })}
                             error={errors.address}
@@ -364,9 +366,9 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                         <span className="w-full text-center font-bold text-lg pb-2">
                             Thêm giấy phép lái xe
                         </span>
-                        {errors.license && <div className="text-red-500 absolute w-full text-center mt-12 -ml-4">{errors.license}</div>}
+                        {errors.license && <div className="text-red-500 absolute w-full text-center mt-12 -ml-4 px-6">{errors.license}</div>}
 
-                        <Dropzone files={files} setFiles={setFiles} className={`${files.length == 0 ? "h-full" : "h-28 px-3"}  flex justify-center place-items-center mt-1`} />
+                        <Dropzone files={files} setFiles={setFiles} className={`${files.length == 0 ? "h-full" : "h-32 px-3"}  flex justify-center place-items-center mt-1`} />
                     </div>
                 </div>
 

@@ -28,20 +28,14 @@ const TaskCard = () => {
             Thành viên nhóm
           </h4>
         </div>
-        <CardMenu />
       </div>
 
       {/* task content */}
-      <div className="h-full w-full">
+      <div className="h-full w-full grid sm:grid-cols-2 mt-4 gap-1 lg:grid-cols-3">
         {tasks.map((task) => (
           <div key={task.id} className="mt-2 flex items-center justify-between p-2 gap-2">
             <div className="flex items-center justify-center gap-2">
               <p className="text-base font-bold text-navy-700 dark:text-white">{task.title}</p>
-            </div>
-            <div>
-              <Button className="px-2 py-1.5 border border-gray-500 dark:text-gray-300 rounded-xl">
-                Donate <p className="hidden sm:block pl-1">🐧</p>
-              </Button>
             </div>
           </div>
         ))}

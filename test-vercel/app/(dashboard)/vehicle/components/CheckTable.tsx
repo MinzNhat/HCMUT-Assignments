@@ -16,6 +16,7 @@ import {
   MdNavigateNext,
   MdNavigateBefore,
   MdOutlineRemoveCircleOutline,
+  MdPendingActions,
 } from "react-icons/md";
 import Progress from "@/components/progress";
 import { Button, useDisclosure } from "@nextui-org/react";
@@ -119,7 +120,6 @@ const CheckTable = (props: Props) => {
   })
 
   const handleDelete = async () => {
-    setOpenModal2(false)
     const selectedIds = Array.from(selectedRows).map(index => tableData[index].id);
     let error = false;
     selectedIds.forEach(async (id) => {
@@ -128,12 +128,14 @@ const CheckTable = (props: Props) => {
         if (response.error) error = true;
       }
     });
+    setOpenModal2(false)
     if (error) {
       setMessage("Đã có lỗi xảy ra khi xoá phương tiện.");
       setOpenError(true);
     } else {
       setMessage("Xoá các phương tiện đã chọn thành công.");
       setOpenError(true);
+      setSelectedRows(new Set())
     }
   };
   return (
@@ -190,8 +192,7 @@ const CheckTable = (props: Props) => {
               <Button className={`flex items-center text-md hover:cursor-pointer bg-lightPrimary p-2 text-[#1488DB] border 
             border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-900 dark:hover:bg-white/20 dark:active:bg-white/10
               linear justify-center rounded-lg font-medium transition duration-200`}
-                onClick={() => { setMessage("Xác nhận xoá các phương tiện đã chọn?"); setOpenModal2(true) }}
-              >
+                onClick={() => { setMessage("Xác nhận xoá các phương tiện đã chọn?"); setOpenModal2(true) }}>
                 <MdOutlineRemoveCircleOutline className="mr-1" />Xoá đã chọn
               </Button>}
           </div>
@@ -209,129 +210,131 @@ const CheckTable = (props: Props) => {
           </Button>
         </div>
       </div>
-      <div className="mt-4 sm:mt-8 overflow-x-auto">
-        <table {...getTableProps()} className="w-full" color="gray-500">
-          <thead>
-            {headerGroups.map((headerGroup, index) => (
-              <tr {...headerGroup.getHeaderGroupProps()} key={index}>
-                {headerGroup.headers.map((column, index) => (
-                  <th
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className={`border-b border-gray-200 pb-[10px] dark:!border-navy-700`}
-                    key={index}
+      {tableData.length == 0 ? <div className="h-40 flex w-full place-items-center text-center justify-center">Hiện tại chưa có phương tiện, vui lòng tạo mới.</div>
+        :
+        <div className="mt-4 sm:mt-8 overflow-x-auto">
+          <table {...getTableProps()} className="w-full" color="gray-500">
+            <thead>
+              {headerGroups.map((headerGroup, index) => (
+                <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+                  {headerGroup.headers.map((column, index) => (
+                    <th
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                      className={`border-b border-gray-200 pb-[10px] dark:!border-navy-700`}
+                      key={index}
+                    >
+                      <div className={`text-xs font-bold tracking-wide text-gray-600 lg:text-xs whitespace-nowrap ${column.render("Header") == "Chi tiết" ? "text-end" : "text-start pr-4 lg:pr-0"}`}>
+                        {column.render("Header") == "Checkbox" ? <Checkbox checked={selectedRows.size === tableData.length} onChange={() => selectAllRows()} />
+                          : column.render("Header")}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {page.map((row, rowIndex) => {
+                prepareRow(row);
+                const isSelected = selectedRows.has(rowIndex);
+                const rowClassName = isSelected
+                  ? `dark:bg-navy-900 bg-gray-200 dark:!border-navy-700 border-b`
+                  : `dark:!border-navy-700 border-b`;
+                return (
+                  <tr
+                    {...row.getRowProps()}
+                    key={rowIndex}
+                    className={rowClassName}
                   >
-                    <div className={`text-xs font-bold tracking-wide text-gray-600 lg:text-xs whitespace-nowrap ${column.render("Header") == "Chi tiết" ? "text-end" : "text-start pr-4 lg:pr-0"}`}>
-                      {column.render("Header") == "Checkbox" ? <Checkbox checked={selectedRows.size === tableData.length} onChange={() => selectAllRows()} />
-                        : column.render("Header")}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.map((row, rowIndex) => {
-              prepareRow(row);
-              const isSelected = selectedRows.has(rowIndex);
-              const rowClassName = isSelected
-                ? `dark:bg-navy-900 bg-gray-200 dark:!border-navy-700 border-b`
-                : `dark:!border-navy-700 border-b`;
-              return (
-                <tr
-                  {...row.getRowProps()}
-                  key={rowIndex}
-                  className={rowClassName}
-                >
-                  {row.cells.map((cell, cellIndex) => {
-                    let renderData;
-                    if (cell.column.Header === "Checkbox") {
-                      renderData = (
-                        <Checkbox
-                          checked={isSelected}
-                          onChange={() => toggleRowSelection(rowIndex)}
-                        />
-                      );
-                    } else if (cell.column.Header === "Loại phương tiện") {
-                      renderData = (
-                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
-                          {cell.value === "Bus"
-                            ? "Xe khách"
-                            : cell.value === "Container Truck"
-                              ? "Xe Container"
-                              : "Xe tải"}
-                        </p>
-                      );
-                    } else if (cell.column.Header === "Trạng thái") {
-                      renderData = (
-                        <div className="flex items-center gap-2">
-                          <div className={`rounded-full text-xl`}>
-                            {cell.value === "Active" ? (
-                              <MdCheckCircle className="text-green-500" />
-                            ) : cell.value === "Inactive" ? (
-                              <MdCancel className="text-red-500" />
-                            ) : cell.value === "Maintenance" ? (
-                              <MdOutlineError className="text-orange-500" />
-                            ) : null}
-                          </div>
-                          <p className="mt-0.5 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
-                            {cell.value === "Active"
-                              ? "Đang hoạt động"
-                              : cell.value === "Inactive"
-                                ? "Không hoạt động"
-                                : "Đang bảo trì"}
+                    {row.cells.map((cell, cellIndex) => {
+                      let renderData;
+                      if (cell.column.Header === "Checkbox") {
+                        renderData = (
+                          <Checkbox
+                            checked={isSelected}
+                            onChange={() => toggleRowSelection(rowIndex)}
+                          />
+                        );
+                      } else if (cell.column.Header === "Loại phương tiện") {
+                        renderData = (
+                          <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
+                            {cell.value === "Bus"
+                              ? "Xe khách"
+                              : cell.value === "Container Truck"
+                                ? "Xe Container"
+                                : "Xe tải"}
                           </p>
-                        </div>
-                      );
-                    } else if (cell.column.Header === "PROGRESS") {
-                      renderData = (
-                        <Progress width="w-[68px]" value={cell.value} />
-                      );
-                    } else if (cell.column.Header === "Biển số xe") {
-                      renderData = (
-                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
-                          {cell.value}
-                        </p>
-                      );
-                    } else if (cell.column.Header === "Loại động cơ") {
-                      renderData = (
-                        <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
-                          {cell.value}
-                        </p>
-                      );
-                    } else if (cell.column.Header === "Chi tiết") {
-                      renderData = (
-                        <div className="w-full flex justify-end">
-                          <Button
-                            onClick={() => {
-                              setDataRow(row.original)
-                              setOpenModal(true);
-                            }}
-                            className={`flex items-center hover:cursor-pointer bg-lightPrimary p-2 h-8 w-8 rounded-full text-[#1488DB] border 
+                        );
+                      } else if (cell.column.Header === "Trạng thái") {
+                        renderData = (
+                          <div className="flex items-center gap-2">
+                            <div className={`rounded-full text-xl`}>
+                              {cell.value === "Active" ? (
+                                <MdPendingActions className="text-orange-500" />
+                              ) : cell.value === "Inactive" ? (
+                                <MdCheckCircle className="text-green-500" />
+                              ) : cell.value === "Maintenance" ? (
+                                <MdOutlineError className="text-red-500" />
+                              ) : null}
+                            </div>
+                            <p className="mt-0.5 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
+                              {cell.value === "Active"
+                                ? "Đang nhận đơn"
+                                : cell.value === "Inactive"
+                                  ? "Sẵn sàng"
+                                  : "Đang bảo trì"}
+                            </p>
+                          </div>
+                        );
+                      } else if (cell.column.Header === "PROGRESS") {
+                        renderData = (
+                          <Progress width="w-[68px]" value={cell.value} />
+                        );
+                      } else if (cell.column.Header === "Biển số xe") {
+                        renderData = (
+                          <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
+                            {cell.value}
+                          </p>
+                        );
+                      } else if (cell.column.Header === "Loại động cơ") {
+                        renderData = (
+                          <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
+                            {cell.value}
+                          </p>
+                        );
+                      } else if (cell.column.Header === "Chi tiết") {
+                        renderData = (
+                          <div className="w-full flex justify-end">
+                            <Button
+                              onClick={() => {
+                                setDataRow(row.original)
+                                setOpenModal(true);
+                              }}
+                              className={`flex items-center hover:cursor-pointer bg-lightPrimary p-2 h-8 w-8 rounded-full text-[#1488DB] border 
                             border-gray-200 dark:!border-navy-700 hover:bg-gray-100 dark:bg-navy-700 dark:hover:bg-white/20 dark:active:bg-white/10
                               linear justify-center font-bold transition duration-200 mr-2`}
-                          >
-                            <IoAddOutline className="w-full h-full" />
-                          </Button>
+                            >
+                              <IoAddOutline className="w-full h-full" />
+                            </Button>
 
-                        </div>
+                          </div>
+                        );
+                      }
+                      return (
+                        <td
+                          {...cell.getCellProps()}
+                          key={cellIndex}
+                          className="pt-[14px] pb-[16px] sm:text-[14px]"
+                        >
+                          {renderData}
+                        </td>
                       );
-                    }
-                    return (
-                      <td
-                        {...cell.getCellProps()}
-                        key={cellIndex}
-                        className="pt-[14px] pb-[16px] sm:text-[14px]"
-                      >
-                        {renderData}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>}
     </Card>
   );
 };

@@ -6,7 +6,7 @@ import {
 } from "./variables/columnsData";
 import { VehicleOperation } from "@/library/vehicle";
 import { useCallback, useEffect, useState } from "react";
-import CustomLoadingElement from "../loading";
+import CustomLoadingElement from "../../components/loading";
 
 const DataTablesPage = () => {
   const [tableData, setTableData] = useState<any>(null)
@@ -14,6 +14,7 @@ const DataTablesPage = () => {
 
   const handleFetchVehicle = async () => {
     const response = await vehice.viewAllVehicle();
+    console.log(response)
     setTableData(response.data)
   }
 
@@ -22,23 +23,23 @@ const DataTablesPage = () => {
   }, []);
 
   const reloadData = useCallback(() => {
-    setTableData(null)
     handleFetchVehicle();
   }, []);
 
   return (
     <div className="mt-5 grid min-h-[calc(100vh-126px)] grid-cols-1 gap-5">
-      <motion.div
-        initial={{ opacity: 0, x: 50 }}
+      {tableData ? <motion.div
+        initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {tableData ? <CheckTable
+        <CheckTable
           columnsData={columnsData}
           tableData={tableData}
           reloadData={reloadData}
-        /> : <CustomLoadingElement />}
+        />
       </motion.div>
+        : <CustomLoadingElement />}
     </div>
   );
 };

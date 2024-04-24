@@ -1,22 +1,35 @@
 "use client"
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useThemeContext } from "@/providers/ThemeProvider";
 import { DistanceContext } from '../context/DistanceContext';
 import cars from '../variables/CarList.json'
 import { IoMdPerson } from "react-icons/io";
 import Image from 'next/image';
+import { RouteOperation } from '@/library/route';
 // @ts-ignore
 const CarsList = ({ selectedType, setSelectedType }) => {
     const { theme, setTheme } = useThemeContext()
     // @ts-ignore
     const { distance, setDistance } = useContext(DistanceContext);
+    const route = new RouteOperation()
+    const [data, setData] = useState<any>(null);
 
     const handleSelectType = (type: any) => {
         setSelectedType(type === selectedType ? null : type);
     };
 
+    useEffect(() => {
+        const calculateDistance = async (distance: number) => {
+            const response = await route.CalculatePrice(distance)
+            if (!response.error) setData(response.data)
+        }
+        if (distance) {
+            calculateDistance(distance)
+        }
+    }, [distance]);
+
     return (
-        <div className="flex flex-col w-full gap-2 px-2 pb-2 mb-14">
+        <div className="flex flex-col w-full gap-2 px-2 pb-2">
             <div className="flex flex-col w-full gap-2 p-4 bg-white dark:bg-navy-900 rounded-xl shadow">
                 <h1 className="text-xl w-full text-center font-bold text-gray-700 dark:text-gray-300 text-nowrap cursor-default pb-1">
                     Chọn loại xe
@@ -35,7 +48,10 @@ const CarsList = ({ selectedType, setSelectedType }) => {
                                     </div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{car.description}</p>
                                 </div>
-                                <div className="text-sm text-gray-500 dark:text-gray-400 flex gap-1"><p className='font-semibold whitespace-nowrap hidden sm:block'>Chi phí: </p> <p className='font-semibold sm:font-normal'>{distance ? `${(car.amount * distance * 10000).toLocaleString('vi-VN')}đ` : '__.___ đ'}</p></div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400 flex gap-1">
+                                    <p className='font-semibold whitespace-nowrap hidden sm:block'>Chi phí: </p>
+                                    <p className='font-semibold sm:font-normal'>{data ? `${(data[car.type]).toLocaleString('vi-VN')}đ` : '__.___ đ'}</p>
+                                </div>
                             </div>
                             <div className='w-36 flex place-items-center py-2'>
                                 <Image src={car.img} alt={car.name} layout="responsive" width={100} height={100} />

@@ -5,7 +5,8 @@ import { initializeApp } from 'firebase/app';
 import {
     getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc,
     query, where, getDocs, GeoPoint, updateDoc, getDoc, writeBatch,
-    arrayUnion
+    arrayUnion,
+    setDoc
 } from 'firebase/firestore';
 
 import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
@@ -77,18 +78,41 @@ class DriverRegister {
         await deleteDoc(docRef)
         return result
     }
-    static async updateDriver(id: string , updateField:updateDriver){
-        const docRef = doc(db, 'Driver', id)
-        const data = await getDoc(docRef)
-        if (!data.exists) throw "id not exist when call update driver by ID"
-        const updateData = {...data.data()};
+    static async updateDriver(id: string, updateField: updateDriver) {
+        const docRef = doc(db, 'Driver', id);
+        const data = await getDoc(docRef);
+
+        if (!data.exists) {
+            throw "ID does not exist when calling update driver by ID";
+        }
+
+        const updateData = { ...data.data() };
+
         for (const [fieldName, fieldValue] of Object.entries(updateField)) {
-            updateData[fieldName] = fieldValue; // Update only provided fields
-          } 
-        await updateDoc(docRef,
-            updateData
-        )
-        return updateData
+            if (fieldName === 'driverLicense') {
+                const downloadURLs = await Promise.all(
+                    fieldValue.map(async (image: Blob) => {
+                        const fileName = `Driver_license_${Date.now()}`;
+                        const imageRef = ref(storage, `Driver/${id}/${fileName}`);
+                        //@ts-ignore
+
+                        await uploadBytes(imageRef, image, "data_url");
+                        return getDownloadURL(imageRef);
+                    })
+                );
+                updateData[fieldName] = [];
+                await setDoc(docRef, updateData, { merge: true });
+                updateData[fieldName] = arrayUnion(...downloadURLs);
+            } else if (fieldName === 'driverAddress') {
+                updateData[fieldName] = JSON.stringify(fieldValue);
+            }
+            else {
+                updateData[fieldName] = fieldValue;
+            }
+        }
+
+        await setDoc(docRef, updateData, { merge: true });
+        return updateData;
     }
 }
 export class DriverOperation {
@@ -120,7 +144,7 @@ export class DriverOperation {
         let result: any[] = []
         try {
             const driverArray = await (getDocs(DriverRef))
-
+            console.log(driverArray)
             driverArray.docs.forEach((doc) => {
                 result.push({
                     id: doc.id,
@@ -128,6 +152,7 @@ export class DriverOperation {
                     driverNumber: doc.data().driverNumber,
                     driverAddress: JSON.parse(doc.data().driverAddress),
                     driverStatus: doc.data().driverStatus,
+                    driverLicense: doc.data().driverLicense,
                 })
             })
             if (result) {
@@ -205,14 +230,14 @@ export class DriverOperation {
             return response;
         }
     }
-    async updateDriverByID(driverID:string, updateField:updateDriver ){
+    async updateDriverByID(driverID: string, updateField: updateDriver) {
         let response: Response = {
             error: true,
             data: null
         }
         try {
-            response.data = await DriverRegister.updateDriver(driverID,updateField)
-            response.data.id=driverID
+            response.data = await DriverRegister.updateDriver(driverID, updateField)
+            response.data.id = driverID
             response.error = false
         } catch (error) {
             console.log(error)

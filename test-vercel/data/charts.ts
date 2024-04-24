@@ -147,7 +147,7 @@ export const barChartOptionsDailyTraffic = {
 };
 
 export const pieChartOptions = {
-  labels: ["Sẵn sàng", "Đang nhận đơn"],
+  labels: ["Sẵn sàng(%)", "Đang nhận đơn(%)"],
   colors: ["#4318FF", "#6AD2FF"],
   chart: {
     width: "50px",

@@ -9,11 +9,9 @@ import Image from "next/image";
 import "react-multi-carousel/lib/styles.css";
 import ParticlesBackground from "@/components/Particle";
 import { UsersOperation } from "@/library/account";
+import { RouteOperation } from "@/library/route";
 import NotiPopup from "@/components/notification";
 import { useRouter } from "next/navigation";
-import { VehicleOperation } from "@/library/vehicle";
-import { RouteOperation } from "@/library/route";
-import { DriverOperation } from "@/library/driver";
 type Props = {};
 
 const AuthPage: FC<Props> = () => {
@@ -136,21 +134,29 @@ const AuthPage: FC<Props> = () => {
   }, [form, email, password]);
 
   useEffect(() => {
-    const handleTestApi = async () => {
-     const User2 = new VehicleOperation()
-    //  await User2.deleteAllVehicle()
-     User2.createVehicle({type:"Bus",licenseplate:"ádasdas",maintainanceDay:new Date(2024,4,24)})
-    //  User2.updateVehicleByID("SSHkiNVjP6E0qqknaq9Q",{status:"Maintainance",maintainanceDay:new Date(2024,4,24)})
-     console.log("hello")
-     const response2 = await  User2.viewAllVehicle()
-     console.log("hello")
-     console.log(response2)
+    const fetchData = async () => {
+      const loggedIn2 = await user.checkUserLoggedIn();
+      if (loggedIn2) await user.onClickLogOut();
     };
+    fetchData();
+  }, []);
+  useEffect(() => {
+    const route=new RouteOperation();
+    console.log(route.viewAllRoute());
+  },[])
+  // useEffect(() => {
+  //   const handleTestApi = async () => {
+  //    const User2 = new DriverOperation()
+  //    const response = await  User2.updateDriverByID("teGL4QUCL0QiMEelxGOW",{
+  //     driverName:" DDang tran minh nhat da thay doi o day",
+  //     driverStatus:3
+  //    })
+  //    console.log("hello")
+  //    console.log(response)
+  //   };
 
   //   handleTestApi()
   // }, [ ]);
-    handleTestApi()
-  }, [ ]);
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">
