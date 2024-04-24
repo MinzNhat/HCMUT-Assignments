@@ -106,7 +106,7 @@ class vehicle { // complete this class and delete this comment
                 else if (realStatus == "Maintenance" && checkmaintenanceDay > doc.data().maintenanceDay.toDate()) {
                     // console.log(2)
                     await this.updateVehicle(doc.id, { status: "Inactive" })
-                } 
+                }
                 // else console.log(3)
 
             }
@@ -147,7 +147,7 @@ class Bus extends vehicle {
 class ContainerTruck extends vehicle {
     constructor(vehicleInfo: Vehicle) {
         super(vehicleInfo)
-        this.type = "Container Truck"
+        this.type = "ContainerTruck"
         this.licenseplate = vehicleInfo.licenseplate
         this.enginefuel = vehicleInfo.enginefuel ? vehicleInfo.enginefuel : "Gasoline"
         this.height = vehicleInfo.height ? vehicleInfo.height : "1,9 "
