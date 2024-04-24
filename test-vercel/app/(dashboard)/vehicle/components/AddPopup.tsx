@@ -178,9 +178,8 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
                                 }
                             >
                                 <option value="Bus">Xe khách</option>
-                                <option value="Container Truck">Xe Container</option>
+                                <option value="ContainerTruck">Xe Container</option>
                                 <option value="Truck">Xe tải</option>
-                                <option value="Motorbike">Xe máy</option>
                             </select>
                         </div>
                         <InputWithError
@@ -248,8 +247,11 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
                         />
                     </div>
                     <div className="flex flex-col lg:w-1/2 dark:bg-navy-900 bg-white rounded-xl p-4 mt-6 lg:mt-0">
-                        <span className="w-full text-center font-bold text-base pb-2">
+                        <span className="w-full text-center font-bold text-base lg:-mt-3">
                             Đặt lịch bảo dưỡng định kỳ
+                        </span>
+                        <span className="w-full text-center font-bold text-sm pb-2 lg:pb-1">
+                            (Mặc định sẽ là 2 tháng sau)
                         </span>
                         <MiniCalendar />
                     </div>

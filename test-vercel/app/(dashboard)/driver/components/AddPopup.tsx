@@ -276,7 +276,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
                             error={errors.driverNumber}
                         />
                         <InputWithError
-                            label="Địa chỉ cụ thể"
+                            label="Địa chỉ cư trú"
                             value={address.address}
                             onChange={(e) => setAddress({ ...address, address: e.target.value })}
                             error={errors.address}

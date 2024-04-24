@@ -24,6 +24,7 @@ import { IoAddOutline } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FiSearch } from "react-icons/fi";
+import DetailPopup from "./DetailPopup";
 // import AddPopup from "./AddPopup";
 // import DetailPopup from "./DetailPopup";
 
@@ -118,13 +119,13 @@ const CheckTable = (props: Props) => {
 
   return (
     <Card className={"w-full sm:overflow-auto p-4"}>
-      {/*
+
       {openModal && (
         <DetailPopup
           onClose={handleClodeModal}
-          dataInitial={dataRow}
+        // dataInitial={dataRow}
         />
-      )} */}
+      )}
       <div className="flex justify-between items-center flex-col lg:flex-row">
         <div className="flex flex-col lg:flex-row gap-3 h-full mb-2 lg:mb-0 w-full place-items-center">
           <div

@@ -78,7 +78,7 @@ const SubmitPopup: React.FC<SubmitPopupProps> = ({ onClose, message, ref, submit
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.9 }}
                         transition={{ duration: 0.3 }}
-                        className=" mt-4 px-4 py-2 truncate h-10 rounded-md overflow-clip text-black border border-gray-300 hover:cursor-pointer flex"
+                        className=" mt-4 px-4 py-2 truncate h-10 rounded-md overflow-clip text-black border border-gray-300 dark:text-gray-300 hover:cursor-pointer flex"
                         onClick={(event) => handleClose(event)}
                     >
                         Đóng

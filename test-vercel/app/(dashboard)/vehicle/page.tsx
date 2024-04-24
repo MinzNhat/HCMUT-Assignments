@@ -14,6 +14,7 @@ const DataTablesPage = () => {
 
   const handleFetchVehicle = async () => {
     const response = await vehice.viewAllVehicle();
+    console.log(response)
     setTableData(response.data)
   }
 

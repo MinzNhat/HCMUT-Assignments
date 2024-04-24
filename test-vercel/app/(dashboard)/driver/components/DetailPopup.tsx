@@ -14,6 +14,7 @@ import NotiPopup from "@/components/notification";
 import SubmitPopup from "@/components/submit";
 import { FaSave } from "react-icons/fa";
 import MapPopup from "./MapPopup";
+import { MdHistory } from "react-icons/md";
 
 interface DriverData {
     driverName: string;
@@ -230,14 +231,14 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
                         {!isEditing ?
                             <div className="flex">
                                 <div className="w-1/2 font-bold text-base">
-                                    Địa chỉ cụ thể:
+                                    Địa chỉ cư trú:
                                 </div>
                                 <div className="w-1/2 line-clamp-3">{data.driverAddress.address}</div>
                             </div>
                             :
                             <div className="flex">
                                 <div className="w-1/2 font-bold text-base">
-                                    Địa chỉ cụ thể:
+                                    Địa chỉ cư trú:
                                 </div>
                                 <div className="w-1/2 flex flex-col gap-2">
                                     <div className="w-full line-clamp-3">{data.driverAddress.address}</div>
@@ -256,6 +257,13 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
                             </div>
                             <div>{data.driverStatus == 0 ? "Sẵn sàng" : "Đang nhận đơn"}</div>
                         </div>
+                        <Button
+                            className="h-8 w-full flex gap-1 rounded-md border-2 dark:border-white border-[#000000] bg-white dark:bg-navy-800"
+                        // onClick={() => { setOpenMap(true) }}
+                        >
+                            Lịch sử lái xe
+                            <MdHistory />
+                        </Button>
                     </div>
 
                     <div className="flex flex-col lg:w-1/2 relative dark:bg-navy-900 bg-white rounded-xl p-4 pt-2 mt-6 lg:mt-0 h-full">

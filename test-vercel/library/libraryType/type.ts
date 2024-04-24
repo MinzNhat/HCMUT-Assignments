@@ -79,6 +79,31 @@ export interface updateDriver {
     driverStatus?: number,
     driverLicense?: Blob[]
 }
+export interface Route {
+    id: string
+    begin: Address,
+    end: Address,
+    beginDate: Date,
+    distance: number,
+    endDate?: Date,
+    licenplate?: string,
+    DriverNumber?: string,
+    price: number,
+    owner?: string,
+    car: Vehicle,
+    driver: Driver
+    task: string
+}
+export interface CreateRoute {
+    begin: Address,
+    end: Address,
+    distance: number,
+    beginDate: Date,
+    driver: Driver,
+    task: string,
+    typeCar: string,
+    car?: Vehicle
+}
 export interface Observer {
     update(route: Route): void;
 }
