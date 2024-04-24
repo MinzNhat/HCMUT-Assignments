@@ -98,8 +98,8 @@ export class RouteOperation {
                 price: routeInfo.car.price ? routeInfo.car.price : 1,
                 task: routeInfo.task
             });
-            route.id = docRef.id
-            response.data = route
+            // route.id = docRef.id
+            // response.data = route
         }
         catch (error) {
             response.error = true
@@ -243,12 +243,12 @@ export class RouteOperation {
     }
 
     //_________________For Dang Tran Minh Nhat needs_______________
-     static async getEndDateOfRoute(routeId: string) {
+      async getEndDateOfRoute(routeId: string) {
         try {
             const routeDocSnapshot = await getDoc(doc(RouteRef, routeId));
             if (routeDocSnapshot.exists()) {
                 const routeData = routeDocSnapshot.data();
-                const endDate = new Date(routeData.endDate);
+                const endDate = routeData.endDate.toDate();
                 return endDate;
             } else {
                 console.error("Route does not exist");
@@ -259,5 +259,4 @@ export class RouteOperation {
             return null; // Return null if there's an error
         }
     }
-
 };

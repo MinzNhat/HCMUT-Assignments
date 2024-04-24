@@ -172,7 +172,7 @@ export class DriverOperation {
             data: null
         }
         let result: any[] = []
-        const q = query(DriverRef, where("driverStatus", "==", "available"))
+        const q = query(DriverRef, where("driverStatus", "==", 0))
         try {
 
             const driverArray = await (getDocs(q))

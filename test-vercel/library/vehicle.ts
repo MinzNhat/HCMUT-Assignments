@@ -32,7 +32,7 @@ class vehicle { // complete this class and delete this comment
     status: string
     price: number
     velocity: number
-    maintananceDay: Date | null
+    maintenanceDay?: Date
     constructor(vehicleInfo: Vehicle) {
         this.type = "vehicle"
         this.licenseplate = vehicleInfo.licenseplate
@@ -44,7 +44,7 @@ class vehicle { // complete this class and delete this comment
             this.status = vehicleInfo.status ? vehicleInfo.status : "vehicleInfo.status",
             this.price = vehicleInfo.price ? vehicleInfo.price : 0,
             this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 0,
-            this.maintananceDay = vehicleInfo.maintainanceDay ? vehicleInfo.maintainanceDay : null
+            vehicleInfo.maintenanceDay ? this.maintenanceDay = vehicleInfo.maintenanceDay : null
     }
     async storeToFB() {
         try {
@@ -59,7 +59,7 @@ class vehicle { // complete this class and delete this comment
                 status: this.status,
                 price: this.price,
                 velocity: this.velocity,
-                maintainanceDay: this.maintananceDay ? this.maintananceDay : "null"
+                maintenanceDay: this.maintenanceDay ? this.maintenanceDay : "null"
             })
         }
         catch (error) {
@@ -88,7 +88,30 @@ class vehicle { // complete this class and delete this comment
         )
         return updateData
     }
+    static async ScanForMaintenance() {
 
+        const vehicleArray = await (getDocs(VehicleRef))
+        vehicleArray.docs.forEach(async (doc) => {
+            if (doc.data().maintenanceDay) {
+                let realStatus = doc.data().status;
+                const checkmaintenanceDay = new Date()
+                // console.log(doc.data().maintenanceDay.toDate())
+                // console.log(checkmaintenanceDay)
+                // console.log(realStatus)
+                // console.log(checkmaintenanceDay < doc.data().maintenanceDay.toDate())
+                if (checkmaintenanceDay == doc.data().maintenanceDay.toDate() && realStatus == "Inactive") {
+                    await this.updateVehicle(doc.id, { status: "Maintenance" })
+                    // console.log(1)
+                }
+                else if (realStatus == "Maintenance" && checkmaintenanceDay > doc.data().maintenanceDay.toDate()) {
+                    // console.log(2)
+                    await this.updateVehicle(doc.id, { status: "Inactive" })
+                } 
+                // else console.log(3)
+
+            }
+        })
+    }
 }
 class Truck extends vehicle {                                                                  //inheritance
     constructor(vehicleInfo: Vehicle) {
@@ -102,7 +125,7 @@ class Truck extends vehicle {                                                   
         this.status = vehicleInfo.status ? vehicleInfo.status : "active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 2500
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 60
-        this.maintananceDay = vehicleInfo.maintainanceDay ? vehicleInfo.maintainanceDay : null
+        vehicleInfo.maintenanceDay ? this.maintenanceDay = vehicleInfo.maintenanceDay : null
     }
 }
 class Bus extends vehicle {
@@ -118,7 +141,7 @@ class Bus extends vehicle {
         this.status = vehicleInfo.status ? vehicleInfo.status : "active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 4500
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 47
-        this.maintananceDay = vehicleInfo.maintainanceDay ? vehicleInfo.maintainanceDay : null
+        vehicleInfo.maintenanceDay ? this.maintenanceDay = vehicleInfo.maintenanceDay : null
     }
 }
 class ContainerTruck extends vehicle {
@@ -134,7 +157,7 @@ class ContainerTruck extends vehicle {
         this.status = vehicleInfo.status ? vehicleInfo.status : "active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 3000
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 60
-        this.maintananceDay = vehicleInfo.maintainanceDay ? vehicleInfo.maintainanceDay : null
+        vehicleInfo.maintenanceDay ? this.maintenanceDay = vehicleInfo.maintenanceDay : null
     }
 }
 
@@ -186,21 +209,10 @@ export class VehicleOperation {
         }
         let result: any[] = []
         try {
-
+            vehicle.ScanForMaintenance()
             const vehicleArray = await (getDocs(VehicleRef))
 
             vehicleArray.docs.forEach(async (doc) => {
-                let realStatus = doc.data().status;
-                const checkMaintainanceDay = new Date()
-
-                if (checkMaintainanceDay == new Date(doc.data().maintainanceDay)) {
-                    realStatus = "Maintainance"
-                    await this.updateVehicleByID(doc.id, { status: "Maintainance" })
-                }
-                else if (realStatus == "Maintainance" && checkMaintainanceDay > new Date(doc.data().maintainanceDay)) {
-                    realStatus = "active"
-                    await this.updateVehicleByID(doc.id, { status: "active" })
-                } else;
                 result.push({
                     type: doc.data().type,
                     licenseplate: doc.data().licenseplate,
@@ -212,8 +224,8 @@ export class VehicleOperation {
                     price: doc.data().price,
                     velocity: doc.data().velocity,
                     id: doc.id,
-                    maintainanceDay: doc.data().maintainanceDay,
-                    status: realStatus,
+                    maintenanceDay: doc.data().maintenanceDay,
+                    status: doc.data().status,
                 })
             })
             if (result) {
@@ -236,21 +248,14 @@ export class VehicleOperation {
         }
 
         let result: any[] = []
-
-        const q = query(VehicleRef, where("status", "==", "active"))
+        await vehicle.ScanForMaintenance()
+        const q = query(VehicleRef, where("status", "==", "Inactive"))
         try {
 
             const vehicleArray = await (getDocs(q))
 
             vehicleArray.docs.forEach(async (doc) => {
-                let realStatus = doc.data().status;
-                const checkMaintainanceDay = new Date()
-                if (checkMaintainanceDay == new Date(doc.data().maintainanceDay)) {
-                    realStatus = "Maintainance"
-                    await this.updateVehicleByID(doc.id, { status: "Maintainance" })
-                }
-                 else
-                    result.push({ ...doc.data(), id: doc.id })
+                result.push({ ...doc.data(), id: doc.id })
             })
             if (result) {
                 response.data = result
@@ -315,11 +320,7 @@ export class VehicleOperation {
         } catch (error) {
             console.log(error)
         } finally {
-
             return response;
         }
     }
-
-
 };
-
