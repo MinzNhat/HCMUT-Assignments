@@ -140,25 +140,8 @@ const AuthPage: FC<Props> = () => {
     };
     fetchData();
   }, []);
-  useEffect(() => {
-    const route=new RouteOperation();
-    console.log(route.viewAllRoute());
-  },[])
-  // useEffect(() => {
-  //   const handleTestApi = async () => {
-  //    const User2 = new DriverOperation()
-  //    const response = await  User2.updateDriverByID("teGL4QUCL0QiMEelxGOW",{
-  //     driverName:" DDang tran minh nhat da thay doi o day",
-  //     driverStatus:3
-  //    })
-  //    console.log("hello")
-  //    console.log(response)
-  //   };
-
-  // //   handleTestApi()
-  // // }, [ ]);
-  //   handleTestApi()
-  // }, [ ]);
+  
+  
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">

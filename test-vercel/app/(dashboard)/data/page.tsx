@@ -10,6 +10,7 @@ import TotalSpent from '@/app/components/TotalSpent';
 import WeeklyRevenue from '@/app/components/WeeklyRevenue';
 import { VehicleOperation } from '@/library/vehicle';
 import { DriverOperation } from '@/library/driver';
+import { RouteOperation } from '@/library/route';
 import CustomLoadingElement from '@/app/components/loading';
 import Image from "next/image";
 import Card from "@/components/card";
@@ -36,6 +37,17 @@ const DashboardPage: FC<Props> = () => {
         handleFetchVehicle()
         handleFetchDriver()
     }, []);
+
+    useEffect(() => {
+    const handleTestApi = async () => {
+      const User2 = new RouteOperation();
+      const response = await User2.viewAllRoute();
+      console.log(response);
+    };
+
+    handleTestApi();
+  }, []);
+
     return (
         <div className="min-h-[calc(100vh-118px)]">
             <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3">
