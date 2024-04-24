@@ -92,7 +92,7 @@ export class RouteOperation {
                 beginDate: routeInfo.beginDate,
                 distance: routeInfo.distance,
                 endDate: endDate,
-                status:"active",
+                status: "active",
                 car: routeInfo.car,
                 driver: routeInfo.driver,
                 price: routeInfo.car.price ? routeInfo.car.price : 1,
@@ -172,8 +172,8 @@ export class RouteOperation {
                     // Update Satatus in database
                     await updateDoc(doc.ref, { status: status });
                 }
-                this.CarStatusUpdate(doc.data().car, status ==="active" ? "Active" : "Inactive");
-                this.DriverStatusUpdate(doc.data().driver, status ==="active" ? 0 : 1);
+                this.CarStatusUpdate(doc.data().car, status === "active" ? "Active" : "Inactive");
+                this.DriverStatusUpdate(doc.data().driver, status === "active" ? 0 : 1);
                 // Caculating Route Process
                 const progress = await this.calculateRouteProgress(beginDate, endDate);
                 result.push({
@@ -223,18 +223,18 @@ export class RouteOperation {
             console.error("Error updating car status:", error);
         }
     }
-    
-    async deleteRouteByID(routeID: string){
+
+    async deleteRouteByID(routeID: string) {
         try {
             // Check if the route exists
-            const routeDoc = await getDoc(doc(db, 'routes', routeID));
+            const routeDoc = await getDoc(doc(db, 'Route', routeID));
             if (!routeDoc.exists()) {
                 return { error: true, data: "Route not found" };
             }
-    
+
             // Delete the route
-            await deleteDoc(doc(db, 'routes', routeID));
-    
+            await deleteDoc(doc(db, 'Route', routeID));
+
             return { error: false, data: "Route deleted successfully" };
         } catch (error) {
             console.error("Error deleting route:", error);
@@ -243,7 +243,7 @@ export class RouteOperation {
     }
 
     //_________________For Dang Tran Minh Nhat needs_______________
-      async getEndDateOfRoute(routeId: string) {
+    async getEndDateOfRoute(routeId: string) {
         try {
             const routeDocSnapshot = await getDoc(doc(RouteRef, routeId));
             if (routeDocSnapshot.exists()) {
