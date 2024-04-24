@@ -193,11 +193,11 @@ export class VehicleOperation {
                 let realStatus = doc.data().status;
                 const checkMaintainanceDay = new Date()
 
-                if (checkMaintainanceDay == doc.data().maintainanceDay.toDate()) {
+                if (checkMaintainanceDay == new Date(doc.data().maintainanceDay)) {
                     realStatus = "Maintainance"
                     await this.updateVehicleByID(doc.id, { status: "Maintainance" })
                 }
-                else if (realStatus == "Maintainance" && checkMaintainanceDay > doc.data().maintainanceDay.toDate()) {
+                else if (realStatus == "Maintainance" && checkMaintainanceDay > new Date(doc.data().maintainanceDay)) {
                     realStatus = "active"
                     await this.updateVehicleByID(doc.id, { status: "active" })
                 } else;
@@ -245,7 +245,7 @@ export class VehicleOperation {
             vehicleArray.docs.forEach(async (doc) => {
                 let realStatus = doc.data().status;
                 const checkMaintainanceDay = new Date()
-                if (checkMaintainanceDay == doc.data().maintainanceDay.toDate()) {
+                if (checkMaintainanceDay == new Date(doc.data().maintainanceDay)) {
                     realStatus = "Maintainance"
                     await this.updateVehicleByID(doc.id, { status: "Maintainance" })
                 }
