@@ -85,9 +85,9 @@ export class RouteOperation {
             await this.CarStatusUpdate(routeInfo.car, 'Active');
             await this.CalculatePrice(routeInfo.distance)
             // Create route object
-            const route: Route = {
+            const docRef = await addDoc(RouteRef, {
                 id: '', // Generate or set your ID here
-                begin: routeInfo.begin,
+                begin: JSON.stringify(routeInfo.begin),
                 end: routeInfo.end,
                 beginDate: routeInfo.beginDate,
                 distance: routeInfo.distance,
@@ -97,10 +97,9 @@ export class RouteOperation {
                 driver: routeInfo.driver,
                 price: routeInfo.car.price ? routeInfo.car.price : 1,
                 task: routeInfo.task
-            };
-            const docRef = await addDoc(RouteRef, route);
-            route.id = docRef.id
-            response.data = route
+            });
+            // route.id = docRef.id
+            // response.data = route
         }
         catch (error) {
             response.error = true
@@ -244,12 +243,12 @@ export class RouteOperation {
     }
 
     //_________________For Dang Tran Minh Nhat needs_______________
-    async getEndDateOfRoute(routeId: string) {
+      async getEndDateOfRoute(routeId: string) {
         try {
             const routeDocSnapshot = await getDoc(doc(RouteRef, routeId));
             if (routeDocSnapshot.exists()) {
                 const routeData = routeDocSnapshot.data();
-                const endDate = new Date(routeData.endDate);
+                const endDate = routeData.endDate.toDate();
                 return endDate;
             } else {
                 console.error("Route does not exist");
@@ -260,5 +259,4 @@ export class RouteOperation {
             return null; // Return null if there's an error
         }
     }
-
 };

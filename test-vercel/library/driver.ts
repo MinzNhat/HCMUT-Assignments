@@ -144,7 +144,6 @@ export class DriverOperation {
         let result: any[] = []
         try {
             const driverArray = await (getDocs(DriverRef))
-            console.log(driverArray)
             driverArray.docs.forEach((doc) => {
                 result.push({
                     id: doc.id,
@@ -173,7 +172,7 @@ export class DriverOperation {
             data: null
         }
         let result: any[] = []
-        const q = query(DriverRef, where("driverStatus", "==", "available"))
+        const q = query(DriverRef, where("driverStatus", "==", 0))
         try {
 
             const driverArray = await (getDocs(q))

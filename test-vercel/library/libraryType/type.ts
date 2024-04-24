@@ -20,7 +20,6 @@ export interface Route {
     driver: Driver          // check status if u want , we need to access driveHistory to assign our route(response.data)to that His
 }
 export interface Driver {
-    id?: string
     // type: string,
     //change here when we have updateIMG func
     driveHistory?: Route[],               // we can cal experience by check the length of this
@@ -32,19 +31,19 @@ export interface Driver {
 }
 
 export interface Vehicle {
+    id?:string,
     type: string
     licenseplate: string,
     enginefuel?: string,
-    height: string,
-    length: string,
-    width: string,
-    mass: string,
+    height?: string,
+    length?: string,
+    width?: string,
+    mass?: string,
     status?: string,
     price?: number,
     velocity?: number,
-    id?: string,
-    maintainanceDay?:Date,
-    // maintainanceID:number  //use to cancel when Day being changed by updating ( this field can be seen only when use view function)
+    maintenanceDay?:Date,
+    // maintenanceID:number  //use to cancel when Day being changed by updating ( this field can be seen only when use view function)
 }
 
 export interface Response {
@@ -71,7 +70,7 @@ export interface updateVehicle {
     status?: string,
     price?: number,
     velocity?: number,
-    maintainanceDay?:Date,
+    maintenanceDay?:Date,
 }
 export interface updateDriver {
     // type: string,
