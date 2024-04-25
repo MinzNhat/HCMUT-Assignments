@@ -95,11 +95,11 @@ class vehicle { // complete this class and delete this comment
             if (doc.data().maintenanceDay) {
                 let realStatus = doc.data().status;
                 const checkmaintenanceDay = new Date()
-                // console.log(doc.data().maintenanceDay.toDate())
-                // console.log(checkmaintenanceDay)
+                // console.log(doc.data().maintenanceDay.toDate().getDate())
+                // console.log(checkmaintenanceDay.getDate())
                 // console.log(realStatus)
-                // console.log(checkmaintenanceDay < doc.data().maintenanceDay.toDate())
-                if (checkmaintenanceDay == doc.data().maintenanceDay.toDate() && realStatus == "Inactive") {
+                // console.log(checkmaintenanceDay.getDate() == doc.data().maintenanceDay.toDate().getDate())
+                if (checkmaintenanceDay.getDate() == doc.data().maintenanceDay.toDate().getDate() && realStatus == "Inactive") {
                     await this.updateVehicle(doc.id, { status: "Maintenance" })
                     // console.log(1)
                 }
