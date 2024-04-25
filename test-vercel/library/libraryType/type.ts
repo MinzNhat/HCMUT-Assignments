@@ -98,6 +98,7 @@ export interface Route {
     driver: Driver
     task: string
     income:number;
+    routeProgress:number
 }
 export interface CreateRoute {
     begin: Address,

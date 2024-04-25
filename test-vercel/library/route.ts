@@ -30,17 +30,20 @@ export class RouteOperation {
                 response.data = "Không có xe phù hợp, vui lòng tạo mới."
                 return response;
             }
-            // Update history of the driver
+            
             routeInfo.car = car;
             const endDate = await this.CaculateEndDate(routeInfo.beginDate, routeInfo.distance, routeInfo.car);
             const RouteCost = await this.CalculatePricebyType(routeInfo.distance, routeInfo.typeCar);
             const Income = await this.calculateIncome(RouteCost);
-            if(routeInfo.driver.id && routeInfo.car.id){
-            await DriverRegister.updateDriver(routeInfo.driver.id, {driverStatus:1});
-            await vehicle.updateVehicle(routeInfo.car.id, {status:'Active'});
-            }
-            await this.CalculatePrice(routeInfo.distance)
+            
+            await this.DriverStatusUpdate(routeInfo.driver, 1);
+            await this.CarStatusUpdate(routeInfo.car, "Active");
+            await this.CalculatePrice(routeInfo.distance);
+            const progress = await this.calculateRouteProgress(routeInfo.beginDate, endDate);
+
+            // Change the maintance date of the car if necessary
             await this.delayMaintenanceDate(routeInfo.car, endDate);
+
             // Create route object
             const route: Route = {
                 id: '', // This will be auto-generate by Firebase
@@ -54,9 +57,9 @@ export class RouteOperation {
                 price: RouteCost,
                 task: routeInfo.task,
                 status: 'Active',
-                income: Income
+                income: Income,
+                routeProgress: progress
             };
-            
             const docRef = await addDoc(RouteRef, route);
             route.id = docRef.id
             response.data = route
@@ -71,6 +74,7 @@ export class RouteOperation {
             return response
         }
     }
+
     async GetRoute(routeId: string) {
         try {
             const routeDoc = await getDoc(doc(db, "Route", routeId));
@@ -92,7 +96,6 @@ export class RouteOperation {
                 };
             }
             else {
-                // If ID does not exist
                 console.log("Route not found");
                 return null;
             }
@@ -102,6 +105,7 @@ export class RouteOperation {
             throw error;
         }
     }
+
     async viewAllRoute() {
         let response: Response = {
             error: true,
@@ -109,38 +113,31 @@ export class RouteOperation {
         }
         let result: any[] = []
         try {
-            await DriverRegister.ScanForRouteEnd()
+            await DriverRegister.ScanForRouteEnd();
             const routeArray = await (getDocs(RouteRef));
             const currentTime = new Date();
             routeArray.docs.forEach(async (doc) => {
                 const beginDate = new Date(doc.data().beginDate.seconds * 1000);
                 const endDate = new Date(doc.data().endDate.seconds * 1000);
-                let status = "Active";
-                // if (endDate < currentTime) {
-                //     status = "Expired";
-                //     // Update Satatus in database
-                //     await updateDoc(doc.ref, { status: status });
-                // }
-                // this.CarStatusUpdate(doc.data().car, status === "Active" ? "Active" : "Inactive");
-                // this.DriverStatusUpdate(doc.data().driver, status === "Active" ? 0 : 1);
-                // Caculating Route Process
                 const progress = await this.calculateRouteProgress(beginDate, endDate);
+             
                 result.push({
                     begin: doc.data().begin,
                     end: doc.data().end,
                     beginDate: new Date(doc.data().beginDate.seconds * 1000),
                     endDate: new Date(doc.data().endDate.seconds * 1000),
-                    car: doc.data().car,
-                    driver: doc.data().driver,
+                    carNumber: doc.data().car,
+                    DriverNumber: doc.data().DriverNumber,
                     price: doc.data().price,
                     id: doc.id,
-                    status: status,
-                    routeProgress: progress
+                    status: doc.data().status,
+                    routeProgress: progress,
+                    income:doc.data().income
                 })
             })
             if (result) {
                 response.data = result
-
+                response.error = false
             }
         }
         catch (error) {
@@ -150,9 +147,23 @@ export class RouteOperation {
             return response
         }
     }
+
+    async UpdateRouteStatus(RouteID: string, Status: string){
+        try {
+            const routeDocRef = doc(RouteRef, RouteID);
+                await updateDoc(routeDocRef, {
+                status: Status
+            });
+            console.log("Route status updated successfully");
+        } 
+        catch (error) {
+            console.error("Error updating route status:", error);
+        }
+    }
+    
+
     async deleteRouteByID(routeID: string) {
         try {
-            // Check if the route exists
             const routeDoc = await getDoc(doc(db, 'Route', routeID));
             if (!routeDoc.exists()) {
                 return { error: true, data: "Route not found" };
@@ -163,6 +174,7 @@ export class RouteOperation {
             await updateDoc(routeRef, {
                 status: "Deleted"
             });
+    
             return { error: false, data: "Route deleted successfully" };
         } 
         catch (error) {
@@ -170,25 +182,13 @@ export class RouteOperation {
             return { error: true, data: error };
         }
     }
-    // Method to delay maintenance date
-    async delayMaintenanceDate(Vehicle: Vehicle, endDate: Date){
-        // Check if maintenance day is before the end date
-        if (Vehicle.maintenanceDay && Vehicle.maintenanceDay < endDate) {
-            // Set maintenance day to the day after the end date
-            const nextDay = new Date(endDate);
-            nextDay.setDate(nextDay.getDate() + 1);
-            Vehicle.maintenanceDay = nextDay;
-            if(Vehicle.id)
-            vehicle.updateVehicle(Vehicle.id,{maintenanceDay:nextDay})
-        }
-    }
+
     async RecommendDriver() {
         let response: Response = {
             error: false,
             data: []
         };
         try {
-            await DriverRegister.ScanForRouteEnd()
             const querySnapshot = await getDocs(DriverRef);
             const drivers: Driver[] = [];
             querySnapshot.forEach((doc) => {
@@ -216,7 +216,6 @@ export class RouteOperation {
         }
     }
     async GetCar(typeCar: string) {
-
         try {
             const carsSnapshot = await getDocs(collection(db, 'Vehicle'));
 
@@ -234,6 +233,17 @@ export class RouteOperation {
             throw error; // Propagate the error
         }
     }
+
+    async delayMaintenanceDate(vehicle: Vehicle, endDate: Date){
+        // Check if maintenance day is before the end date
+        if (vehicle.maintenanceDay && vehicle.maintenanceDay < endDate) {
+            // Set maintenance day to the day after the end date
+            const nextDay = new Date(endDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            vehicle.maintenanceDay = nextDay;
+        }
+    }
+
     async CaculateEndDate(beginDate: Date, distance: number, car: Vehicle) {
         const carVelocity = car.velocity ? car.velocity : 1
         const time = distance / carVelocity;
@@ -287,14 +297,13 @@ export class RouteOperation {
             return response;
         }
     }
-    // Add this function
-// Method to calculate income
-async calculateIncome(RoutePrice: number){
-    // Assuming income is 5% of the route price
-    const incomePercentage = 0.05; 
-    const income = RoutePrice * incomePercentage;
-    return income;
-}
+
+    async calculateIncome(RoutePrice: number){
+        // Assuming income is 5% of the route price
+        const incomePercentage = 0.05; 
+        const income = RoutePrice * incomePercentage;
+        return income;
+    }
 
     async calculateRouteProgress(beginDate: Date, endDate: Date) {
         const currentDate = new Date();
@@ -307,7 +316,7 @@ async calculateIncome(RoutePrice: number){
         // console.log(endDate)
 
         const progressPercentage = (elapsedTime / totalTime) * 100;
-        return progressPercentage.toFixed(2);
+        return Math.min(100, Math.max(0, progressPercentage));
     }
 
     async DriverStatusUpdate(driver: Driver, status: number) {
@@ -324,7 +333,6 @@ async calculateIncome(RoutePrice: number){
 
     async CarStatusUpdate(car: Vehicle, status: string) {
         try {
-            console.log(status)
             await updateDoc(doc(CarRef, car.id), {
                 status: status
             });
@@ -334,7 +342,6 @@ async calculateIncome(RoutePrice: number){
             console.error("Error updating car status:", error);
         }
     }
-
 
     async UpdateHistoryDriver(driver: Driver, RouteId: string) {
         try {
@@ -363,17 +370,4 @@ async calculateIncome(RoutePrice: number){
         }
     }
 
-    async UpdateRouteStatus(RouteID: string, Status: string){
-        try {
-            const routeDocRef = doc(RouteRef, RouteID);
-                await updateDoc(routeDocRef, {
-                status: Status
-            });
-            console.log("Route status updated successfully");
-        } 
-        catch (error) {
-            console.error("Error updating route status:", error);
-        }
-    }
-   
 };
