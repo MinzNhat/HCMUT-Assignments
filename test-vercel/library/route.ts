@@ -96,10 +96,8 @@ export class RouteOperation {
                 car: routeInfo.car,
                 driver: routeInfo.driver,
                 price: routeInfo.car.price ? routeInfo.car.price : 1,
-                task: routeInfo.task
+                task: routeInfo.task,
             });
-            // route.id = docRef.id
-            // response.data = route
         }
         catch (error) {
             response.error = true
@@ -149,9 +147,11 @@ export class RouteOperation {
 
         const totalTime = endTime - beginTime;
         const elapsedTime = currentTime - beginTime;
+        console.log(beginDate)
+        console.log(endDate)
 
         const progressPercentage = (elapsedTime / totalTime) * 100;
-        return progressPercentage;
+        return progressPercentage.toFixed(2);
     }
 
     async viewAllRoute() {
@@ -164,29 +164,30 @@ export class RouteOperation {
             const routeArray = await (getDocs(RouteRef));
             const currentTime = new Date();
             routeArray.docs.forEach(async (doc) => {
-                const beginDate = new Date(doc.data().beginDate);
-                const endDate = new Date(doc.data().endDate);
-                let status = "active";
+                const beginDate = new Date(doc.data().beginDate.seconds * 1000);
+                const endDate = new Date(doc.data().endDate.seconds * 1000);
+
+                let status = "Active";
                 if (endDate < currentTime) {
-                    status = "expired";
-                    // Update Satatus in database
+                    status = "Expired";
                     await updateDoc(doc.ref, { status: status });
                 }
-                this.CarStatusUpdate(doc.data().car, status === "active" ? "Active" : "Inactive");
-                this.DriverStatusUpdate(doc.data().driver, status === "active" ? 0 : 1);
+                this.CarStatusUpdate(doc.data().car, status === "Active" ? "Active" : "Inactive");
+                this.DriverStatusUpdate(doc.data().driver, status === "Active" ? 0 : 1);
                 // Caculating Route Process
                 const progress = await this.calculateRouteProgress(beginDate, endDate);
                 result.push({
                     begin: JSON.parse(doc.data().begin),
                     end: JSON.parse(doc.data().begin),
-                    beginDate: new Date(doc.data().beginDate),
-                    endDate: new Date(doc.data().beginDate),
-                    carNumber: doc.data().carNumber,
-                    driverNumber: doc.data().driverNumber,
+                    beginDate: new Date(doc.data().beginDate.seconds * 1000),
+                    endDate: new Date(doc.data().endDate.seconds * 1000),
+                    carNumber: doc.data().car.licenseplate,
+                    driverNumber: doc.data().driver.driverNumber,
                     price: doc.data().price,
                     id: doc.id,
                     status: status,
-                    routeProgress: progress
+                    routeProgress: progress,
+                    distance: doc.data().distance
                 })
             })
         }

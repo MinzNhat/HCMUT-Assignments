@@ -6,8 +6,8 @@ import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import Card from "@/components/card";
 import NotiPopup from "../notification";
 
-const MiniCalendar = () => {
-  const [value, onChange] = useState<any>();
+const MiniCalendar = ({ value, onChange }: any) => {
+
   const [openError, setOpenError] = useState(false);
   const [message, setMessage] = useState("");
   const handleDateChange = (date: any) => {

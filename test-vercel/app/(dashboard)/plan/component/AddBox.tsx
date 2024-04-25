@@ -12,6 +12,7 @@ import { RouteOperation } from '@/library/route';
 import Notification from '@/components/notification'
 import DriverSelect from './DriverSelect';
 import { Address, CreateRoute, Driver } from '@/library/libraryType/type';
+import { useRouter } from 'next/navigation';
 const AddPanel = () => {
     //@ts-ignore
     const { isCollapsed, setIsCollapsed } = useContext(CollapseContext);
@@ -24,9 +25,11 @@ const AddPanel = () => {
     const [selectedType, setSelectedType] = useState(null);
     const [task, setTask] = useState("")
     const route = new RouteOperation()
+    const router = useRouter()
     const [message, setMessage] = useState("")
     const [openError, setOpenError] = useState(false)
     const [openModal, setOpenModal] = useState(false)
+    const [openModal2, setOpenModal2] = useState(false)
     const [selectedDriver, setSelectedDriver] = useState<Driver>()
     const handleToggleCollapse = () => {
         setIsCollapsed(!isCollapsed);
@@ -81,7 +84,19 @@ const AddPanel = () => {
                 typeCar: selectedType
             }
             const response = await route.CreateRoute(routeInfo)
-            console.log(response)
+            setOpenModal(false)
+            if (response.error) {
+                setMessage("Đã có lỗi xảy ra khi tạo mới.")
+                setOpenError(true);
+            }
+            else if (typeof response.data == "string") {
+                setMessage(response.data)
+                setOpenError(true)
+            }
+            else {
+                setMessage("Tạo mới lộ trình thành công")
+                setOpenModal2(true)
+            }
         }
 
     };
@@ -98,6 +113,8 @@ const AddPanel = () => {
     return (
         <div className={`relative ${isCollapsed ? 'w-full h-8 sm:w-8 sm:h-full' : ' w-full h-[calc(100dvh-208px)] md:h-[calc(100dvh-126px)] sm:w-2/3 md:w-[550px]'} sticky z-[45] transition-all duration-500 ease-in-out`}>
             {openError && <Notification onClose={() => setOpenError(false)} message={message} />}
+            {openModal2 && <Notification onClose={() => { setOpenModal2(false); router.push("/route") }} message={message} />}
+
             {openModal && <DriverSelect onClose={() => setOpenModal(false)} submit={handleCreateRoute} selectedDriver={selectedDriver} setSelectedDriver={setSelectedDriver} />}
             <div className={`border-8 border-white dark:border-navy-900 shadow-xl shadow-shadow-500 dark:shadow-none rounded-xl sm:rounded-tr-none sm:rounded-l-xl transition-all duration-500 ${isCollapsed ? 'opacity-0 h-8' : 'opacity-100 h-[calc(100dvh-208px)] md:h-[calc(100dvh-126px)]'}`} style={{ transitionDelay: isCollapsed ? '0ms' : '200ms' }}>
                 <div className={`bg-white/10 backdrop-blur-sm dark:bg-[#0b14374d] h-full transition-opacity rounded-[4px] sm:rounded-tr-none sm:rounded-l-[4px] duration-200 border-b-2 dark:border-b border-white/10 dark:border-white/30 flex flex-col overflow-y-scroll no-scrollbar ${isCollapsed ? 'opacity-0' : 'opacity-100'}`} style={{ transitionDelay: isCollapsed ? '0ms' : '400ms' }}>

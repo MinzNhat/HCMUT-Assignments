@@ -43,6 +43,7 @@ const CheckTable = (props: Props) => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
   const [openError, setOpenError] = useState(false);
+  const [openError2, setOpenError2] = useState(false);
   const [message, setMessage] = useState("");
   const driver = new DriverOperation()
   const [address, setAddress] = useState<Address>({
@@ -67,22 +68,28 @@ const CheckTable = (props: Props) => {
 
   const toggleRowSelection = (rowIndex: number) => {
     const newSelectedRows = new Set(selectedRows);
-    if (selectedRows.has(rowIndex)) {
-      newSelectedRows.delete(rowIndex);
+    const rowData = tableData[rowIndex];
+    if (rowData.driverStatus !== 1) {
+      if (selectedRows.has(rowIndex)) {
+        newSelectedRows.delete(rowIndex);
+      } else {
+        newSelectedRows.add(rowIndex);
+      }
+      setSelectedRows(newSelectedRows);
     } else {
-      newSelectedRows.add(rowIndex);
+      setMessage("Tài xế này đang thực hiện đơn hàng, vui lòng xoá đơn hàng trước khi xoá tài xế.")
+      setOpenError2(true)
     }
-    setSelectedRows(newSelectedRows);
   };
 
   const selectAllRows = () => {
-    if (selectedRows.size === tableData.length) {
-      setSelectedRows(new Set<number>());
-    } else {
-      const newSelectedRows = new Set<number>();
-      tableData.forEach((_, index) => newSelectedRows.add(index));
-      setSelectedRows(newSelectedRows);
-    }
+    const newSelectedRows = new Set<number>();
+    tableData.forEach((rowData, index) => {
+      if (rowData.driverStatus !== 1) {
+        newSelectedRows.add(index);
+      }
+    });
+    setSelectedRows(newSelectedRows);
   };
 
   const columns = useMemo(() => columnsData, [columnsData]);
@@ -156,6 +163,7 @@ const CheckTable = (props: Props) => {
         />
       )}
       {openError && <NotiPopup message={message} onClose={() => { setOpenError(false); reloadData() }} />}
+      {openError2 && <NotiPopup message={message} onClose={() => { setOpenError2(false) }} />}
       {openModal2 && <SubmitPopup message={message} onClose={() => { setOpenModal2(false); }} submit={handleDelete} />}
       <div className="flex justify-between items-center flex-col lg:flex-row">
         <div className="flex flex-col lg:flex-row gap-3 h-full mb-2 lg:mb-0 w-full place-items-center">

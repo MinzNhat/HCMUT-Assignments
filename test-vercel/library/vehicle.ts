@@ -211,7 +211,6 @@ export class VehicleOperation {
         try {
             vehicle.ScanForMaintenance()
             const vehicleArray = await (getDocs(VehicleRef))
-
             vehicleArray.docs.forEach(async (doc) => {
                 result.push({
                     type: doc.data().type,
@@ -224,7 +223,7 @@ export class VehicleOperation {
                     price: doc.data().price,
                     velocity: doc.data().velocity,
                     id: doc.id,
-                    maintenanceDay: doc.data().maintenanceDay,
+                    maintenanceDay: new Date(doc.data().maintenanceDay.seconds * 1000),
                     status: doc.data().status,
                 })
             })

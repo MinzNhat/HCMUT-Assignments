@@ -92,7 +92,7 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
                 data.width !== dataInitial.width ||
                 data.mass !== dataInitial.mass ||
                 data.enginefuel !== dataInitial.enginefuel ||
-                data.type !== dataInitial.type
+                data.type !== dataInitial.type || data.maintenanceDay !== dataInitial.maintenanceDay
             if (hasChanges) {
                 setMessage("Bạn có xác nhận muốn thay đổi thông tin phương tiện?");
                 setOpenModal(true);
@@ -142,6 +142,7 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
             dataInitial.mass = data.mass;
             dataInitial.type = data.type;
             dataInitial.enginefuel = data.enginefuel;
+            dataInitial.maintenanceDay = data.maintenanceDay
             setMessage("Cập nhật phương tiện thành công.");
             setOpenError(true);
         }
@@ -196,11 +197,11 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
                                     }
                                 >
                                     <option value="Bus">Xe khách</option>
-                                    <option value="Container Truck">Xe Container</option>
+                                    <option value="ContainerTruck">Xe container</option>
                                     <option value="Truck">Xe tải</option>
                                 </select>
                             ) : (
-                                <div>{data.type === "Bus" ? "Xe khách" : (data.type === "Container Truck" ? "Xe Container" : "Xe tải")}</div>
+                                <div>{data.type === "Bus" ? "Xe khách" : (data.type === "ContainerTruck" ? "Xe container" : "Xe tải")}</div>
                             )}
                         </div>
                         {isEditing ?
@@ -325,7 +326,7 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
                         <span className="w-full text-center font-bold text-base pb-2">
                             Đặt lịch bảo dưỡng định kỳ
                         </span>
-                        <MiniCalendar />
+                        <MiniCalendar value={data.maintenanceDay} onChange={(e: any) => setData({ ...data, maintenanceDay: e.target.value })} />
                     </div>
                 </div>
 

@@ -12,18 +12,18 @@ const DriverManager = () => {
   const [tableData, setTableData] = useState<any>(null)
   const driver = new DriverOperation();
 
-  const handlerFetchDriver = async () => {
+  const handleFetchDriver = async () => {
     const response = await driver.viewAllDriver();
     console.log(response)
     setTableData(response.data)
   }
 
   useEffect(() => {
-    handlerFetchDriver()
+    handleFetchDriver()
   }, []);
 
   const reloadData = useCallback(() => {
-    handlerFetchDriver();
+    handleFetchDriver();
   }, []);
   return (
     <div className="mt-5 grid min-h-[calc(100vh-126px)] grid-cols-1 gap-5">
