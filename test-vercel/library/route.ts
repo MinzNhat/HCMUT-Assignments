@@ -105,8 +105,8 @@ export class RouteOperation {
             const routeArray = await (getDocs(RouteRef));
             const currentTime = new Date();
             routeArray.docs.forEach(async (doc) => {
-                const beginDate = new Date(doc.data().beginDate);
-                const endDate = new Date(doc.data().endDate);
+                const beginDate = new Date(doc.data().beginDate.seconds * 1000);
+                const endDate = new Date(doc.data().endDate.seconds * 1000);
                 let status = "Active";
                 if (endDate < currentTime) {
                     status = "Expired";
@@ -120,8 +120,8 @@ export class RouteOperation {
                 result.push({
                     begin: JSON.parse(doc.data().begin),
                     end: JSON.parse(doc.data().begin),
-                    beginDate: new Date(doc.data().beginDate),
-                    endDate: new Date(doc.data().beginDate),
+                    beginDate: new Date(doc.data().beginDate.seconds * 1000),
+                    endDate: new Date(doc.data().beginDate.seconds * 1000),
                     carNumber: doc.data().carNumber,
                     driverNumber: doc.data().driverNumber,
                     price: doc.data().price,

@@ -9,11 +9,6 @@ import {
 } from 'firebase/firestore';
 import { Vehicle, Response, updateVehicle } from './libraryType/type';
 import { app, db } from './account'
-import { constants } from 'buffer';
-import { data } from 'autoprefixer';
-import { Result } from 'postcss';
-import { error } from 'console';
-import { BsTruck } from 'react-icons/bs';
 
 
 // Initialize Firebase
@@ -122,7 +117,7 @@ class Truck extends vehicle {                                                   
         this.height = vehicleInfo.height ? vehicleInfo.height : "1,5"
         this.length = vehicleInfo.length ? vehicleInfo.length : "4,6"
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "500 "
-        this.status = vehicleInfo.status ? vehicleInfo.status : "active"
+        this.status = vehicleInfo.status ? vehicleInfo.status : "Active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 2500
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 60
         vehicleInfo.maintenanceDay ? this.maintenanceDay = vehicleInfo.maintenanceDay : null
@@ -138,7 +133,7 @@ class Bus extends vehicle {
         this.length = vehicleInfo.length ? vehicleInfo.length : "12 "
         this.width = vehicleInfo.width ? vehicleInfo.width : "3"
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "700 "
-        this.status = vehicleInfo.status ? vehicleInfo.status : "active"
+        this.status = vehicleInfo.status ? vehicleInfo.status : "Active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 4500
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 47
         vehicleInfo.maintenanceDay ? this.maintenanceDay = vehicleInfo.maintenanceDay : null
@@ -154,7 +149,7 @@ class ContainerTruck extends vehicle {
         this.width = vehicleInfo.width ? vehicleInfo.width : "3"
         this.length = vehicleInfo.length ? vehicleInfo.length : "3,1 "
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "500 "
-        this.status = vehicleInfo.status ? vehicleInfo.status : "active"
+        this.status = vehicleInfo.status ? vehicleInfo.status : "Active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 3000
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 60
         vehicleInfo.maintenanceDay ? this.maintenanceDay = vehicleInfo.maintenanceDay : null
