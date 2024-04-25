@@ -12,7 +12,7 @@ import { UsersOperation } from "@/library/account";
 import { RouteOperation } from "@/library/route";
 import NotiPopup from "@/components/notification";
 import { useRouter } from "next/navigation";
-import { DriverOperation } from "@/library/driver";
+import { DriverOperation, DriverRegister } from "@/library/driver";
 import { VehicleOperation } from "@/library/vehicle";
 type Props = {};
 
@@ -148,9 +148,8 @@ const AuthPage: FC<Props> = () => {
   // },[])
   useEffect(() => {
     const handleTestApi = async () => {
-     const User2 = new VehicleOperation()
-     await User2.updateVehicleByID("00nkSsCvDSj2G9gt7B5b",{maintenanceDay:new Date (2024,3,24)})
-     const response = await  User2.viewAllVehicle()
+     const User2 = new DriverOperation()
+     const response =await User2.viewAllDriver();
      console.log("hello")
      console.log(response)
     };

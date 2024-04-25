@@ -21,7 +21,7 @@ const VehicleRef = collection(db, 'Vehicle');
 const DriverRef = collection(db, 'Driver');
 const RouteRef = collection(db, 'Route');
 
-class vehicle { // complete this class and delete this comment
+export class vehicle { // complete this class and delete this comment
     type: string
     licenseplate: string
     enginefuel: string

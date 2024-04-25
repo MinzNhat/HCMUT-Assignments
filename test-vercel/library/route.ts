@@ -17,6 +17,149 @@ const RouteRef = collection(db, 'Route');
 
 export class RouteOperation {
     constructor() { }
+    async CreateRoute(routeInfo: CreateRoute) {
+        let response: Response = {
+            error: false,
+            data: null
+        };
+        try {
+            const car = await this.GetCar(routeInfo.typeCar);
+            if (!car) {
+                response.data = "Không có xe phù hợp, vui lòng tạo mới."
+                return response;
+            }
+            // Update history of the driver
+            routeInfo.car = car;
+            const endDate = await this.CaculateEndDate(routeInfo.beginDate, routeInfo.distance, routeInfo.car);
+            const RouteCost = await this.CalculatePricebyType(routeInfo.distance, routeInfo.typeCar);
+
+            await this.DriverStatusUpdate(routeInfo.driver, 1);
+            await this.CarStatusUpdate(routeInfo.car, 'Active');
+            await this.CalculatePrice(routeInfo.distance)
+            // Create route object
+            const route: Route = {
+                id: '', // This will be auto-generate by Firebase
+                begin: routeInfo.begin,
+                end: routeInfo.end,
+                beginDate: routeInfo.beginDate,
+                distance: routeInfo.distance,
+                endDate: endDate,
+                car: routeInfo.car,
+                driver: routeInfo.driver,
+                price: RouteCost,
+                task: routeInfo.task,
+                status: 'Active'
+            };
+            const docRef = await addDoc(RouteRef, route);
+            route.id = docRef.id
+            response.data = route
+
+            //Get id of created route from firebase and update driver history
+            await this.UpdateHistoryDriver(routeInfo.driver, route.id);
+        }
+        catch (error) {
+            response.error = true
+        }
+        finally{
+        return response
+        }
+    }
+    async GetRoute(routeId: string) {
+        try {
+            const routeDoc = await getDoc(doc(db, "Route", routeId));
+
+            if (routeDoc.exists()) {
+                const routeData = routeDoc.data();
+                return {
+                    id: routeId,
+                    begin: routeData.begin,
+                    end: routeData.end,
+                    beginDate: routeData.beginDate,
+                    distance: routeData.distance,
+                    endDate: routeData.endDate,
+                    car: routeData.car,
+                    driver: routeData.driver,
+                    price: routeData.price,
+                    task: routeData.task,
+                    status: routeData.status
+                };
+            }
+            else {
+                // If ID does not exist
+                console.log("Route not found");
+                return null;
+            }
+        }
+        catch (error) {
+            console.error("Error retrieving route:", error);
+            throw error;
+        }
+    }
+    async viewAllRoute() {
+        let response: Response = {
+            error: true,
+            data: null
+        }
+        let result: any[] = []
+        try {
+            const routeArray = await (getDocs(RouteRef));
+            const currentTime = new Date();
+            routeArray.docs.forEach(async (doc) => {
+                const beginDate = new Date(doc.data().beginDate);
+                const endDate = new Date(doc.data().endDate);
+                let status = "Active";
+                if (endDate < currentTime) {
+                    status = "Expired";
+                    // Update Satatus in database
+                    await updateDoc(doc.ref, { status: status });
+                }
+                this.CarStatusUpdate(doc.data().car, status === "active" ? "Active" : "Inactive");
+                this.DriverStatusUpdate(doc.data().driver, status === "active" ? 0 : 1);
+                // Caculating Route Process
+                const progress = await this.calculateRouteProgress(beginDate, endDate);
+                result.push({
+                    begin: JSON.parse(doc.data().begin),
+                    end: JSON.parse(doc.data().begin),
+                    beginDate: new Date(doc.data().beginDate),
+                    endDate: new Date(doc.data().beginDate),
+                    carNumber: doc.data().carNumber,
+                    driverNumber: doc.data().driverNumber,
+                    price: doc.data().price,
+                    id: doc.id,
+                    status: status,
+                    routeProgress: progress
+                })
+            })
+            if (result) {
+                response.data = result
+               
+            }
+        }
+        catch(error) {
+            throw error;
+        }
+        finally{
+         return response
+        }
+    }
+    async deleteRouteByID(routeID: string) {
+        // UPdate status for Driver
+        try {
+            // Check if the route exists
+            const routeDoc = await getDoc(doc(db, 'Route', routeID));
+            if (!routeDoc.exists()) {
+                return { error: true, data: "Route not found" };
+            }
+
+            //    the route
+            await deleteDoc(doc(db, 'Route', routeID));
+
+            return { error: false, data: "Route deleted successfully" };
+        } catch (error) {
+            console.error("Error deleting route:", error);
+            return { error: true, data: error };
+        }
+    }
     async RecommendDriver() {
         let response: Response = {
             error: false,
@@ -45,7 +188,9 @@ export class RouteOperation {
         } catch (error) {
             response.error = true;
         }
+        finally{
         return response;
+        }
     }
     async GetCar(typeCar: string) {
 
@@ -66,53 +211,31 @@ export class RouteOperation {
             throw error; // Propagate the error
         }
     }
-
-    async CreateRoute(routeInfo: CreateRoute) {
-        let response: Response = {
-            error: false,
-            data: null
-        };
-        try {
-            const car = await this.GetCar(routeInfo.typeCar);
-            if (!car) {
-                response.data = "Không có xe phù hợp, vui lòng tạo mới."
-                return response;
-            }
-            routeInfo.car = car;
-            const endDate = await this.CaculateEndDate(routeInfo.beginDate, routeInfo.distance, routeInfo.car);
-
-            await this.DriverStatusUpdate(routeInfo.driver, 1);
-            await this.CarStatusUpdate(routeInfo.car, 'Active');
-            await this.CalculatePrice(routeInfo.distance)
-            // Create route object
-            const docRef = await addDoc(RouteRef, {
-                id: '', // Generate or set your ID here
-                begin: JSON.stringify(routeInfo.begin),
-                end: routeInfo.end,
-                beginDate: routeInfo.beginDate,
-                distance: routeInfo.distance,
-                endDate: endDate,
-                status:"active",
-                car: routeInfo.car,
-                driver: routeInfo.driver,
-                price: routeInfo.car.price ? routeInfo.car.price : 1,
-                task: routeInfo.task
-            });
-            // route.id = docRef.id
-            // response.data = route
-        }
-        catch (error) {
-            response.error = true
-        }
-        return response
-    }
-
-
     async CaculateEndDate(beginDate: Date, distance: number, car: Vehicle) {
         const carVelocity = car.velocity ? car.velocity : 1
         const time = distance / carVelocity;
         const endDate = new Date(beginDate.getTime() + (time * 3600000)); // Convert hours to milliseconds
         return endDate;
+    }
+
+    async CalculatePricebyType(distance: number, type: string): Promise<number> {
+        const prices: { [key: string]: number } = {
+            Truck: 2500,
+            Bus: 4500,
+            ContainerTruck: 3000
+        };
+
+        try {
+            if (prices[type]) {
+                const totalPrice = distance * prices[type];
+                return totalPrice;
+            } else {
+                throw new Error(`Invalid vehicle type: ${type}`);
+            }
+        } catch (error) {
+            console.error("Error calculating price by type:", error);
+            throw error;
+        }
     }
 
     async CalculatePrice(distance: number) {
@@ -137,68 +260,23 @@ export class RouteOperation {
             console.error("Error calculating fees:", error);
             response.error = true;
         }
-        return response;
+        finally{        
+            return response;
+        }
     }
 
     async calculateRouteProgress(beginDate: Date, endDate: Date) {
         const currentDate = new Date();
-
         const beginTime = beginDate.getTime();
         const endTime = endDate.getTime();
         const currentTime = currentDate.getTime();
-
         const totalTime = endTime - beginTime;
         const elapsedTime = currentTime - beginTime;
-
         const progressPercentage = (elapsedTime / totalTime) * 100;
         return progressPercentage;
     }
 
-    async viewAllRoute() {
-        let response: Response = {
-            error: true,
-            data: null
-        }
-        let result: any[] = []
-        try {
-            const routeArray = await (getDocs(RouteRef));
-            const currentTime = new Date();
-            routeArray.docs.forEach(async (doc) => {
-                const beginDate = new Date(doc.data().beginDate);
-                const endDate = new Date(doc.data().endDate);
-                let status = "active";
-                if (endDate < currentTime) {
-                    status = "expired";
-                    // Update Satatus in database
-                    await updateDoc(doc.ref, { status: status });
-                }
-                this.CarStatusUpdate(doc.data().car, status ==="active" ? "Active" : "Inactive");
-                this.DriverStatusUpdate(doc.data().driver, status ==="active" ? 0 : 1);
-                // Caculating Route Process
-                const progress = await this.calculateRouteProgress(beginDate, endDate);
-                result.push({
-                    begin: JSON.parse(doc.data().begin),
-                    end: JSON.parse(doc.data().begin),
-                    beginDate: new Date(doc.data().beginDate),
-                    endDate: new Date(doc.data().beginDate),
-                    carNumber: doc.data().carNumber,
-                    driverNumber: doc.data().driverNumber,
-                    price: doc.data().price,
-                    id: doc.id,
-                    status: status,
-                    routeProgress: progress
-                })
-            })
-        }
-        catch {
-            return response
-        }
-        if (result) {
-            response.data = result
-            return response
-        }
-        else return response
-    }
+    
 
     async DriverStatusUpdate(driver: Driver, status: number) {
         try {
@@ -223,40 +301,37 @@ export class RouteOperation {
             console.error("Error updating car status:", error);
         }
     }
+
     
-    async deleteRouteByID(routeID: string){
+    async UpdateHistoryDriver(driver: Driver, RouteId: string) {
         try {
-            // Check if the route exists
-            const routeDoc = await getDoc(doc(db, 'routes', routeID));
-            if (!routeDoc.exists()) {
-                return { error: true, data: "Route not found" };
+            // Get the document reference of the driver
+            const driverDocRef = doc(DriverRef, driver.id);
+            // Get the current driver data
+            const driverDoc = await getDoc(driverDocRef);
+            if (!driverDoc.exists()) {
+                throw new Error("Driver not found");
             }
-    
-            // Delete the route
-            await deleteDoc(doc(db, 'routes', routeID));
-    
-            return { error: false, data: "Route deleted successfully" };
-        } catch (error) {
-            console.error("Error deleting route:", error);
-            return { error: true, data: error };
+
+            // Update the driveHistory with the new RouteId
+            const currentDriveHistory = driverDoc.data().driveHistory || [];
+            const updatedDriveHistory = [...currentDriveHistory, RouteId];
+
+            // Update the driver document with the updated driveHistory
+            await updateDoc(driverDocRef, {
+                driveHistory: updatedDriveHistory
+            });
+
+            console.log("Driver history updated successfully");
+        }
+        catch (error) {
+            console.error("Error updating driver history:", error);
+            throw error;
         }
     }
 
+
     //_________________For Dang Tran Minh Nhat needs_______________
-      async getEndDateOfRoute(routeId: string) {
-        try {
-            const routeDocSnapshot = await getDoc(doc(RouteRef, routeId));
-            if (routeDocSnapshot.exists()) {
-                const routeData = routeDocSnapshot.data();
-                const endDate = routeData.endDate.toDate();
-                return endDate;
-            } else {
-                console.error("Route does not exist");
-                return null; // Return null if route does not exist
-            }
-        } catch (error) {
-            console.error("Error fetching end date of route:", error);
-            return null; // Return null if there's an error
-        }
-    }
+   
+
 };

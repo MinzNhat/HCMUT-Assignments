@@ -1,5 +1,4 @@
 // Import the functions you need from the SDKs you need
-import { response } from 'express';
 import { QuerySnapshot } from 'firebase-admin/firestore';
 import { initializeApp } from 'firebase/app';
 import {
@@ -12,10 +11,8 @@ import {
 import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 import { Driver, Response, Address, Route, updateDriver } from './libraryType/type';
 import { app, storage } from './account'
-import { constants } from 'buffer';
-import { data } from 'autoprefixer';
-import { Result } from 'postcss';
-import { stringify } from 'querystring';
+import { RouteOperation } from './route';
+import { vehicle } from './vehicle'
 
 
 // Initialize Firebase
@@ -24,7 +21,7 @@ const db = getFirestore();
 const DriverRef = collection(db, 'Driver');
 const RouteRef = collection(db, 'Route');
 
-class DriverRegister {
+export class DriverRegister {
 
     id?: string
     // type: string
@@ -114,6 +111,59 @@ class DriverRegister {
         await setDoc(docRef, updateData, { merge: true });
         return updateData;
     }
+    static async ScanForRouteEnd() { // this func check the last element of his arr and then update status of vehicle and driver depened on reoute's endDate
+        /* call when :
+                + create route ( must call to refresh avaible driver and vehicle) 
+                + viewAllDriver
+                + viewAvailableDriver
+                + viewAllVehicle
+                + viewAvailableVehicle
+        */
+        const driverArray = await (getDocs(DriverRef))
+        driverArray.docs.forEach(async (doc) => {
+            let tempUser1 = new DriverOperation()
+            const driver = await tempUser1.GetDriver(doc.id)
+            if (driver && driver.driveHistory) {
+                const lastRouteID = driver.driveHistory[driver.driveHistory.length - 1]
+                // console.log(driver)
+                // console.log(`this is the last element of his, index is ${driver.driveHistory.length -1}} \n 
+                //                  and this is the id of that route (it should be string ) :${lastRouteID} ` )
+                let tempUser2 = new RouteOperation()
+                const routeObj = await tempUser2.GetRoute(lastRouteID)
+                const today = new Date()
+                // console.log(doc.data().maintenanceDay.toDate().getDate())
+                // console.log(checkmaintenanceDay.getDate())
+                // console.log(realStatus)
+                // console.log(checkmaintenanceDay.getDate() == doc.data().maintenanceDay.toDate().getDate())
+                if (routeObj) {
+                    const endDate = routeObj.endDate.toDate()
+                    // console.log(endDate < today)
+                    // console.log(driver.driverStatus == 1)
+                    // console.log(routeObj.status != "Deleted")
+                    if (endDate < today && driver.driverStatus == 1 && routeObj.status != "Deleted") {
+                        const vehicleID = routeObj.car.id
+                        const driverID = routeObj.driver.id
+                        vehicle.updateVehicle(vehicleID, { status: "Inactive" })
+                        DriverRegister.updateDriver(driverID, { driverStatus: 0 })
+                        // call some function to update status for route is expired
+                        //    console.log("test success")  
+                    }
+                    else if (routeObj.status == "Deleted") {
+                        const vehicleID = routeObj.car.id
+                        const driverID = routeObj.driver.id
+                        vehicle.updateVehicle(vehicleID, { status: "Inactive" })
+                        DriverRegister.updateDriver(driverID, { driverStatus: 0 })
+                    }
+                    // console.log(today)
+                    // console.log(endDate)
+                }
+                else
+                    throw `  route ${lastRouteID} is null when scan to update status, click Valorant.exe to open debuger tools `
+
+            }
+        })
+
+    }
 }
 export class DriverOperation {
     constructor() { }
@@ -137,6 +187,7 @@ export class DriverOperation {
         }
     }
     async viewAllDriver() {
+        await DriverRegister.ScanForRouteEnd()
         let response: Response = {
             error: true,
             data: null
@@ -245,6 +296,34 @@ export class DriverOperation {
             return response;
         }
     }
+    async GetDriver(driverId: string) {
+        try {
+            const driverDoc = await getDoc(doc(db, "Driver", driverId));
+
+            if (driverDoc.exists()) {
+                const driverData = driverDoc.data();
+                return {
+                    driverAddress: JSON.parse(driverData.driverAddress),
+                    driverLicense: driverData.driverLicense,
+                    driverName: driverData.driverName,
+                    driverNumber: driverData.driverNumber,
+                    driverStatus: driverData.driverStatus,
+                    driveHistory: driverData.driveHistory,
+                    id: driverId
+                };
+            }
+            else {
+                // If ID does not exist
+                console.log("Driver not found");
+                return null;
+            }
+        }
+        catch (error) {
+            console.error("Error retrieving driver:", error);
+            throw error;
+        }
+    }
+
 };
 
 
