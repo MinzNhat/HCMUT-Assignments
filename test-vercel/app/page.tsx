@@ -13,7 +13,7 @@ import { RouteOperation } from "@/library/route";
 import NotiPopup from "@/components/notification";
 import { useRouter } from "next/navigation";
 import { DriverOperation, DriverRegister } from "@/library/driver";
-import { VehicleOperation } from "@/library/vehicle";
+import { vehicle, VehicleOperation } from "@/library/vehicle";
 type Props = {};
 
 const AuthPage: FC<Props> = () => {
@@ -148,10 +148,11 @@ const AuthPage: FC<Props> = () => {
   // },[])
   useEffect(() => {
     const handleTestApi = async () => {
-     const User2 = new DriverOperation()
-     const response =await User2.viewAvailableDriver();
+     const User2 = new RouteOperation()
+    //  const response =await User2.deleteRouteByID("UO6EM0o9EQIE6be61gMT");
+    const response =await User2.viewAllRoute()
      console.log("hello")
-     console.log(response)
+      console.log(response)
     };
 
     handleTestApi()

@@ -97,6 +97,7 @@ export interface Route {
     car: Vehicle,
     driver: Driver
     task: string
+    income:number;
 }
 export interface CreateRoute {
     begin: Address,

@@ -9,11 +9,6 @@ import {
 } from 'firebase/firestore';
 import { Vehicle, Response, updateVehicle } from './libraryType/type';
 import { app, db } from './account'
-import { constants } from 'buffer';
-import { data } from 'autoprefixer';
-import { Result } from 'postcss';
-import { error } from 'console';
-import { BsTruck } from 'react-icons/bs';
 import { DriverRegister } from './driver';
 
 
@@ -72,6 +67,9 @@ export class vehicle { // complete this class and delete this comment
         const docRef = doc(db, 'Vehicle', id)
         const data = await getDoc(docRef)
         if (!data.exists) throw "id not exist when call delete vehicle by ID"
+        // if(data.data().status == "Active"){
+
+        // }
         const result = { ...data.data(), id: data.id }
         await deleteDoc(docRef)
         return result
@@ -123,7 +121,7 @@ class Truck extends vehicle {                                                   
         this.height = vehicleInfo.height ? vehicleInfo.height : "1,5"
         this.length = vehicleInfo.length ? vehicleInfo.length : "4,6"
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "500 "
-        this.status = vehicleInfo.status ? vehicleInfo.status : "active"
+        this.status = vehicleInfo.status ? vehicleInfo.status : "Active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 2500
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 60
         vehicleInfo.maintenanceDay ? this.maintenanceDay = vehicleInfo.maintenanceDay : null
@@ -139,7 +137,7 @@ class Bus extends vehicle {
         this.length = vehicleInfo.length ? vehicleInfo.length : "12 "
         this.width = vehicleInfo.width ? vehicleInfo.width : "3"
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "700 "
-        this.status = vehicleInfo.status ? vehicleInfo.status : "active"
+        this.status = vehicleInfo.status ? vehicleInfo.status : "Active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 4500
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 47
         vehicleInfo.maintenanceDay ? this.maintenanceDay = vehicleInfo.maintenanceDay : null
@@ -155,7 +153,7 @@ class ContainerTruck extends vehicle {
         this.width = vehicleInfo.width ? vehicleInfo.width : "3"
         this.length = vehicleInfo.length ? vehicleInfo.length : "3,1 "
         this.mass = vehicleInfo.mass ? vehicleInfo.mass : "500 "
-        this.status = vehicleInfo.status ? vehicleInfo.status : "active"
+        this.status = vehicleInfo.status ? vehicleInfo.status : "Active"
         this.price = vehicleInfo.price ? vehicleInfo.price : 3000
         this.velocity = vehicleInfo.velocity ? vehicleInfo.velocity : 60
         vehicleInfo.maintenanceDay ? this.maintenanceDay = vehicleInfo.maintenanceDay : null
@@ -249,7 +247,7 @@ export class VehicleOperation {
         }
 
         let result: any[] = []
-        await DriverRegister.ScanForRouteEnd()
+        // await DriverRegister.ScanForRouteEnd()
         await vehicle.ScanForMaintenance()
         const q = query(VehicleRef, where("status", "==", "Inactive"))
         try {
