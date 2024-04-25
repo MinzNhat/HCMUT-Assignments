@@ -60,8 +60,8 @@ export class RouteOperation {
         catch (error) {
             response.error = true
         }
-        finally{
-        return response
+        finally {
+            return response
         }
     }
     async GetRoute(routeId: string) {
@@ -113,8 +113,8 @@ export class RouteOperation {
                     // Update Satatus in database
                     await updateDoc(doc.ref, { status: status });
                 }
-                this.CarStatusUpdate(doc.data().car, status === "active" ? "Active" : "Inactive");
-                this.DriverStatusUpdate(doc.data().driver, status === "active" ? 0 : 1);
+                this.CarStatusUpdate(doc.data().car, status === "Active" ? "Active" : "Inactive");
+                this.DriverStatusUpdate(doc.data().driver, status === "Active" ? 0 : 1);
                 // Caculating Route Process
                 const progress = await this.calculateRouteProgress(beginDate, endDate);
                 result.push({
@@ -132,14 +132,14 @@ export class RouteOperation {
             })
             if (result) {
                 response.data = result
-               
+
             }
         }
-        catch(error) {
+        catch (error) {
             throw error;
         }
-        finally{
-         return response
+        finally {
+            return response
         }
     }
     async deleteRouteByID(routeID: string) {
@@ -188,8 +188,8 @@ export class RouteOperation {
         } catch (error) {
             response.error = true;
         }
-        finally{
-        return response;
+        finally {
+            return response;
         }
     }
     async GetCar(typeCar: string) {
@@ -260,7 +260,7 @@ export class RouteOperation {
             console.error("Error calculating fees:", error);
             response.error = true;
         }
-        finally{        
+        finally {
             return response;
         }
     }
@@ -275,8 +275,6 @@ export class RouteOperation {
         const progressPercentage = (elapsedTime / totalTime) * 100;
         return progressPercentage;
     }
-
-    
 
     async DriverStatusUpdate(driver: Driver, status: number) {
         try {
@@ -302,7 +300,7 @@ export class RouteOperation {
         }
     }
 
-    
+
     async UpdateHistoryDriver(driver: Driver, RouteId: string) {
         try {
             // Get the document reference of the driver
@@ -332,6 +330,6 @@ export class RouteOperation {
 
 
     //_________________For Dang Tran Minh Nhat needs_______________
-   
+
 
 };
