@@ -106,7 +106,7 @@ export class vehicle { // complete this class and delete this comment
                 else if (realStatus == "Maintenance" && checkmaintenanceDay > doc.data().maintenanceDay.toDate()) {
                     // console.log(2)
                     await this.updateVehicle(doc.id, { status: "Inactive" })
-                } 
+                }
                 // else console.log(3)
 
             }
@@ -147,7 +147,7 @@ class Bus extends vehicle {
 class ContainerTruck extends vehicle {
     constructor(vehicleInfo: Vehicle) {
         super(vehicleInfo)
-        this.type = "Container Truck"
+        this.type = "ContainerTruck"
         this.licenseplate = vehicleInfo.licenseplate
         this.enginefuel = vehicleInfo.enginefuel ? vehicleInfo.enginefuel : "Gasoline"
         this.height = vehicleInfo.height ? vehicleInfo.height : "1,9 "
@@ -211,7 +211,6 @@ export class VehicleOperation {
         try {
             vehicle.ScanForMaintenance()
             const vehicleArray = await (getDocs(VehicleRef))
-
             vehicleArray.docs.forEach(async (doc) => {
                 result.push({
                     type: doc.data().type,
@@ -224,7 +223,7 @@ export class VehicleOperation {
                     price: doc.data().price,
                     velocity: doc.data().velocity,
                     id: doc.id,
-                    maintenanceDay: doc.data().maintenanceDay,
+                    maintenanceDay: new Date(doc.data().maintenanceDay.seconds * 1000),
                     status: doc.data().status,
                 })
             })

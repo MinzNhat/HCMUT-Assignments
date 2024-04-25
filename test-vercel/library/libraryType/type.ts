@@ -28,11 +28,11 @@ export interface Driver {
     driverAddress: Address,
     driverStatus?: number,
     driverLicense: Blob[]
-    id?:string
+    id?: string,
 }
 
 export interface Vehicle {
-    id?:string,
+    id?: string,
     type: string
     licenseplate: string,
     enginefuel?: string,
@@ -43,7 +43,7 @@ export interface Vehicle {
     status?: string,
     price?: number,
     velocity?: number,
-    maintenanceDay?:Date,
+    maintenanceDay?: Date,
     // maintenanceID:number  //use to cancel when Day being changed by updating ( this field can be seen only when use view function)
 }
 
@@ -71,7 +71,7 @@ export interface updateVehicle {
     status?: string,
     price?: number,
     velocity?: number,
-    maintenanceDay?:Date,
+    maintenanceDay?: Date,
 }
 export interface updateDriver {
     // type: string,

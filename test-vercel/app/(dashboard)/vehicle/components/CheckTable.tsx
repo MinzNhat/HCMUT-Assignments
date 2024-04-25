@@ -43,6 +43,7 @@ const CheckTable = (props: Props) => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
   const [openError, setOpenError] = useState(false);
+  const [openError2, setOpenError2] = useState(false);
   const [message, setMessage] = useState("");
   const vehice = new VehicleOperation()
   const handleClodeModal = () => {
@@ -55,22 +56,28 @@ const CheckTable = (props: Props) => {
 
   const toggleRowSelection = (rowIndex: number) => {
     const newSelectedRows = new Set(selectedRows);
-    if (selectedRows.has(rowIndex)) {
-      newSelectedRows.delete(rowIndex);
+    const rowData = tableData[rowIndex];
+    if (rowData.status !== "Active") {
+      if (selectedRows.has(rowIndex)) {
+        newSelectedRows.delete(rowIndex);
+      } else {
+        newSelectedRows.add(rowIndex);
+      }
+      setSelectedRows(newSelectedRows);
     } else {
-      newSelectedRows.add(rowIndex);
+      setMessage("Phương tiện này đang thực hiện đơn hàng, vui lòng xoá đơn hàng trước khi xoá phương tiện.")
+      setOpenError2(true)
     }
-    setSelectedRows(newSelectedRows);
   };
 
   const selectAllRows = () => {
-    if (selectedRows.size === tableData.length) {
-      setSelectedRows(new Set<number>());
-    } else {
-      const newSelectedRows = new Set<number>();
-      tableData.forEach((_, index) => newSelectedRows.add(index));
-      setSelectedRows(newSelectedRows);
-    }
+    const newSelectedRows = new Set<number>();
+    tableData.forEach((rowData, index) => {
+      if (rowData.status !== "Active") {
+        newSelectedRows.add(index);
+      }
+    });
+    setSelectedRows(newSelectedRows);
   };
 
   const columns = useMemo(() => columnsData, [columnsData]);
@@ -153,6 +160,7 @@ const CheckTable = (props: Props) => {
           reloadData={reloadData}
         />
       )}
+      {openError2 && <NotiPopup message={message} onClose={() => { setOpenError2(false) }} />}
       {openError && <NotiPopup message={message} onClose={() => { setOpenError(false); reloadData() }} />}
       {openModal2 && <SubmitPopup message={message} onClose={() => { setOpenModal2(false); }} submit={handleDelete} />}
       <div className="flex justify-between items-center flex-col lg:flex-row">
@@ -259,8 +267,8 @@ const CheckTable = (props: Props) => {
                           <p className="mt-1 text-sm font-bold text-navy-700 dark:text-white pr-4 whitespace-nowrap">
                             {cell.value === "Bus"
                               ? "Xe khách"
-                              : cell.value === "Container Truck"
-                                ? "Xe Container"
+                              : cell.value === "ContainerTruck"
+                                ? "Xe container"
                                 : "Xe tải"}
                           </p>
                         );

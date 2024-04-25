@@ -272,8 +272,11 @@ export class RouteOperation {
         const currentTime = currentDate.getTime();
         const totalTime = endTime - beginTime;
         const elapsedTime = currentTime - beginTime;
+        // console.log(beginDate)
+        // console.log(endDate)
+
         const progressPercentage = (elapsedTime / totalTime) * 100;
-        return progressPercentage;
+        return progressPercentage.toFixed(2);
     }
 
     async DriverStatusUpdate(driver: Driver, status: number) {
@@ -330,6 +333,20 @@ export class RouteOperation {
 
 
     //_________________For Dang Tran Minh Nhat needs_______________
-
-
+    async getEndDateOfRoute(routeId: string) {
+        try {
+            const routeDocSnapshot = await getDoc(doc(RouteRef, routeId));
+            if (routeDocSnapshot.exists()) {
+                const routeData = routeDocSnapshot.data();
+                const endDate = routeData.endDate.toDate();
+                return endDate;
+            } else {
+                console.error("Route does not exist");
+                return null; // Return null if route does not exist
+            }
+        } catch (error) {
+            console.error("Error fetching end date of route:", error);
+            return null; // Return null if there's an error
+        }
+    }
 };

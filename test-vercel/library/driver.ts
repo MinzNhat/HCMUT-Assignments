@@ -92,7 +92,6 @@ export class DriverRegister {
                         const fileName = `Driver_license_${Date.now()}`;
                         const imageRef = ref(storage, `Driver/${id}/${fileName}`);
                         //@ts-ignore
-
                         await uploadBytes(imageRef, image, "data_url");
                         return getDownloadURL(imageRef);
                     })

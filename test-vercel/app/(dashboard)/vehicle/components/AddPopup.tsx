@@ -23,6 +23,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
     const [openError, setOpenError] = useState(false);
     const [message, setMessage] = useState("");
     const vehice = new VehicleOperation()
+    const [value, onChange] = useState<any>();
     const [data, setData] = useState<Vehicle>({
         type: "Bus",
         licenseplate: "",
@@ -94,7 +95,18 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
     };
 
     const handleAddVehicle = async () => {
-        const response = await vehice.createVehicle(data);
+        let dataInfo: Vehicle = {
+            type: data.type,
+            licenseplate: data.licenseplate,
+            enginefuel: data.enginefuel,
+            height: data.height,
+            length: data.length,
+            width: data.width,
+            mass: data.mass,
+            status: data.status,
+            maintenanceDay: value ? new Date(value) : new Date(Date.now() + 2 * 30 * 24 * 60 * 60 * 1000)
+        }
+        const response = await vehice.createVehicle(dataInfo);
         setOpenModal(false)
         if (response.error) {
             setMessage("Đã có lỗi khi tạo mới phương tiện.");
@@ -178,7 +190,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
                                 }
                             >
                                 <option value="Bus">Xe khách</option>
-                                <option value="ContainerTruck">Xe Container</option>
+                                <option value="ContainerTruck">Xe container</option>
                                 <option value="Truck">Xe tải</option>
                             </select>
                         </div>
@@ -253,7 +265,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, reloadData }) => {
                         <span className="w-full text-center font-bold text-sm pb-2 lg:pb-1">
                             (Mặc định sẽ là 2 tháng sau)
                         </span>
-                        <MiniCalendar />
+                        <MiniCalendar value={value} onChange={onChange} />
                     </div>
                 </div>
 
