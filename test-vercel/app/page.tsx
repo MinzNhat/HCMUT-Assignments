@@ -149,7 +149,7 @@ const AuthPage: FC<Props> = () => {
   useEffect(() => {
     const handleTestApi = async () => {
      const User2 = new DriverOperation()
-     const response =await User2.viewAllDriver();
+     const response =await User2.viewAvailableDriver();
      console.log("hello")
      console.log(response)
     };

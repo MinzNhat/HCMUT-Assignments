@@ -217,6 +217,7 @@ export class DriverOperation {
         }
     }
     async viewAvailableDriver() {
+        await DriverRegister.ScanForRouteEnd()
         let response: Response = {
             error: true,
             data: null
@@ -297,6 +298,7 @@ export class DriverOperation {
     }
     async GetDriver(driverId: string) {
         try {
+            await DriverRegister.ScanForRouteEnd()
             const driverDoc = await getDoc(doc(db, "Driver", driverId));
 
             if (driverDoc.exists()) {
