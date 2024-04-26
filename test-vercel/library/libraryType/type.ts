@@ -1,23 +1,8 @@
 
-
 export interface Address {
     latitude: number,
     longitude: number,
     address: string
-}
-export interface Route {
-    id: string
-    begin: Address,
-    end: Address,
-    beginDate: Date,
-    endDate?: Date,         //no need to pass bc it will be calculated in trip's constructor
-    licenplate?: string,     //no need to pass bc we'll get it from car
-    DriverNumber?: string, //no need to pass bc we'll get it from driver
-    price: number
-    owner?: string, //email address of the owner
-    status: string,
-    car: Vehicle,                // get velocity and price from this
-    driver: Driver          // check status if u want , we need to access driveHistory to assign our route(response.data)to that His
 }
 export interface Driver {
     // type: string,
@@ -44,7 +29,6 @@ export interface Vehicle {
     price?: number,
     velocity?: number,
     maintenanceDay?: Date,
-    // maintenanceID:number  //use to cancel when Day being changed by updating ( this field can be seen only when use view function)
 }
 
 export interface Response {
@@ -94,11 +78,16 @@ export interface Route {
     DriverNumber?: string,
     price: number,
     owner?: string,
-    car: Vehicle,
-    driver: Driver
+    carID?: string,
+    carType: string,
+    carLicensePlate: string,
+    driverID?: string,
+    driverName: string,
+    driver?: string,
     task: string
-    income:number;
-    routeProgress:number
+    income: number;
+    routeProgress: number,
+    status: string,
 }
 export interface CreateRoute {
     begin: Address,
