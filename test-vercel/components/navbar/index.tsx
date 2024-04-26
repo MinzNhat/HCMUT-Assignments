@@ -11,10 +11,8 @@ import routes from "@/data/routes";
 import { useSidebarContext } from "@/providers/SidebarProvider";
 import { useThemeContext } from "@/providers/ThemeProvider";
 import { UsersOperation } from "@/library/account";
-import { useUserContext } from "@/providers/UserInfoProvider";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { EmailAuthCredential } from "firebase/auth";
 
 type Props = {};
 

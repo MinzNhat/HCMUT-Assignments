@@ -125,7 +125,7 @@ export class DriverRegister {
             if (driver && driver.driveHistory) {
                 // console.log(driver)
                 // console.log(driver.driveHistory.length-1)
-                if(!driver.driveHistory[driver.driveHistory.length - 1]) throw `invalid ref in history of Driver ${driver}, may be u try to delete route invalidly `
+                if (!driver.driveHistory[driver.driveHistory.length - 1]) throw `invalid ref in history of Driver ${driver}, may be u try to delete route invalidly `
                 const lastRouteID = driver.driveHistory[driver.driveHistory.length - 1]
                 // console.log(driver)
                 // console.log(`this is the last element of his, index is ${driver.driveHistory.length -1}} \n 
@@ -138,22 +138,22 @@ export class DriverRegister {
                 // console.log(realStatus)
                 // console.log(checkmaintenanceDay.getDate() == doc.data().maintenanceDay.toDate().getDate())
                 if (routeObj) {
-                    const endDate = routeObj.endDate.toDate()
+                    const endDate = routeObj.endDate
                     // console.log(endDate < today)
                     // console.log(driver.driverStatus == 1)
                     // console.log(routeObj.status != "Deleted")
                     if (endDate < today && driver.driverStatus == 1 && routeObj.status == "Active") {
-                        const vehicleID = routeObj.car.id
-                        const driverID = routeObj.driver.id
+                        const vehicleID = routeObj.carID
+                        const driverID = routeObj.driverID
                         await vehicle.updateVehicle(vehicleID, { status: "Inactive" })
                         await DriverRegister.updateDriver(driverID, { driverStatus: 0 })
                         // call some function to update status for route is expired
-                        await tempUser2.UpdateRouteStatus(lastRouteID,"Expired")  
+                        await tempUser2.UpdateRouteStatus(lastRouteID, "Expired")
                         //    console.log("test success")  
                     }
                     else if (routeObj.status == "Deleted" && driver.driverStatus == 1) {
-                        const vehicleID = routeObj.car.id
-                        const driverID = routeObj.driver.id
+                        const vehicleID = routeObj.carID
+                        const driverID = routeObj.driverID
                         await vehicle.updateVehicle(vehicleID, { status: "Inactive" })
                         await DriverRegister.updateDriver(driverID, { driverStatus: 0 })
                     }

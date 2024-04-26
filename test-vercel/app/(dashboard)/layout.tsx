@@ -11,9 +11,8 @@ import { CollapseContext } from "./plan/context/CollapseContext";
 import { DestinationContext } from "./plan/context/DestinationContext";
 import { DistanceContext } from "./plan/context/DistanceContext";
 import { SourceContext } from "./plan/context/SourceContext";
-import CustomLoadingElement from "../components/loading";
-import CustomLoadingElement2 from "../loading";
 import { UsersOperation } from "@/library/account";
+import PassDataProvider from "@/providers/PassedData";
 const RootStructure = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -41,41 +40,43 @@ const RootStructure = ({ children }: { children: React.ReactNode }) => {
             <SourceContext.Provider value={{ source, setSource }}>
               {/* @ts-ignore */}
               <DestinationContext.Provider value={{ destination, setDestination }} >
-                <SidebarProvider>
-                  <section className="flex h-full w-full">
-                    <Sidebar />
+                <PassDataProvider>
+                  <SidebarProvider>
+                    <section className="flex h-full w-full">
+                      <Sidebar />
 
-                    {/* Navbar & Main Content */}
-                    <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
-                      {/* Main Content */}
-                      {pathname != "/plan" ? (
-                        <main className="mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]">
-                          {/* Routes */}
-                          <div className="h-full">
-                            <Navbar />
-                            <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
-                              {children}
+                      {/* Navbar & Main Content */}
+                      <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
+                        {/* Main Content */}
+                        {pathname != "/plan" ? (
+                          <main className="mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]">
+                            {/* Routes */}
+                            <div className="h-full">
+                              <Navbar />
+                              <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
+                                {children}
+                              </div>
                             </div>
-                          </div>
-                        </main>
-                      ) : (
-                        <main className="relative mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]">
-                          {/* Routes */}
-                          <div className="h-full">
-                            <Navbar />
+                          </main>
+                        ) : (
+                          <main className="relative mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]">
+                            {/* Routes */}
+                            <div className="h-full">
+                              <Navbar />
 
-                            <div className="pt-5s mx-auto mb-auto pt-2 md:pr-2">
-                              {children}
+                              <div className="pt-5s mx-auto mb-auto pt-2 md:pr-2">
+                                {children}
+                              </div>
                             </div>
-                          </div>
-                          <div className="absolute h-[calc(100dvh)] w-screen xl:w-[calc(100vw-250px)] top-0 -left-[12px] xl:-left-[63px]">
-                            <MapExport />
-                          </div>
-                        </main>
-                      )}
-                    </div>
-                  </section>
-                </SidebarProvider>
+                            <div className="absolute h-[calc(100dvh)] w-screen xl:w-[calc(100vw-250px)] top-0 -left-[12px] xl:-left-[63px]">
+                              <MapExport />
+                            </div>
+                          </main>
+                        )}
+                      </div>
+                    </section>
+                  </SidebarProvider>
+                </PassDataProvider >
               </DestinationContext.Provider>
             </SourceContext.Provider>
           </CollapseContext.Provider>

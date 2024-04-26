@@ -341,7 +341,7 @@ export class VehicleOperation {
                     status: vehicleData.status,
                     price: vehicleData.price,
                     velocity: vehicleData.price,
-                    maintenanceDay: vehicleData.maintenanceDay,
+                    maintenanceDay: new Date(vehicleData.maintenanceDay.seconds * 1000),
                     id: vehicleId
                 };
             }

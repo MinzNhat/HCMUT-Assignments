@@ -4,11 +4,11 @@ export const columnsData = [
   },
   {
     Header: "Tên tài xế",
-    accessor: "driver_name",
+    accessor: "driverName",
   },
   {
     Header: "Biển số xe",
-    accessor: "licenseplate",
+    accessor: "carLicensePlate",
   },
   {
     Header: "Khoảng cách (km)",
@@ -16,6 +16,10 @@ export const columnsData = [
   },
   {
     Header: "Tiến độ",
+    accessor: "routeProgress",
+  },
+  {
+    Header: "Trạng thái",
     accessor: "status",
   },
   {

@@ -7,12 +7,15 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { DriverOperation } from "@/library/driver";
 import CustomLoadingElement from "../../components/loading";
+import { RouteOperation } from "@/library/route";
 
 const DriverManager = () => {
   const [tableData, setTableData] = useState<any>(null)
   const driver = new DriverOperation();
+  const route = new RouteOperation()
 
   const handleFetchDriver = async () => {
+    await route.viewAllRoute();
     const response = await driver.viewAllDriver();
     console.log(response)
     setTableData(response.data)

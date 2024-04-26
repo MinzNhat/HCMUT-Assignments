@@ -6,44 +6,27 @@ import { Button } from "@nextui-org/react";
 import { FaPen } from "react-icons/fa6";
 import MapExport from "./MapExport";
 import { Address } from "@/library/libraryType/type";
-// import MapPopup from "./MapPopup";
-
-// interface DriverData {
-//     driverName: string;
-//     driverNumber: string;
-//     driverAddress: Address;
-//     driverStatus: number;
-//     driverLicense: string[];
-// }
+import { RouteData } from "./CheckTable";
+import Progress from "@/components/progress";
+import { useRouter } from "next/navigation";
+import { usePassDataContext } from "@/providers/PassedData";
 
 interface AddPopupProps {
     onClose: () => void;
-    // dataInitial: DriverData;
-    // reloadData: () => void;
+    dataInitial: RouteData;
+    reloadData: () => void;
 }
 
-const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
+const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData }) => {
     const notificationRef = useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(true);
-    // const [data, setData] = useState<DriverData>(dataInitial);
-    const [openModal, setOpenModal] = useState(false);
-    const [openError, setOpenError] = useState(false);
-    const [openMap, setOpenMap] = useState(false);
-    const [message, setMessage] = useState("");
-    const source: Address = {
-        address: "123 William St",
-        latitude: 40.7094756,
-        longitude: -74.0072955
-    }
-    const destination: Address = {
-        address: "FDR Park",
-        latitude: 39.90213749999999,
-        longitude: -75.1838075
-    }
+    const [data, setData] = useState<RouteData>(dataInitial);
+    const route = useRouter();
+    const { passData, setPassData } = usePassDataContext();
     const handleAnimationComplete = () => {
         if (!isVisible) {
             onClose();
-            // reloadData();
+            reloadData();
         }
     };
 
@@ -63,9 +46,6 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
             }}
             onAnimationComplete={handleAnimationComplete}
         >
-            {/* {openError && <NotiPopup message={message} onClose={() => { setOpenError(false); setIsEditing(false); }} />}
-            {openModal && <SubmitPopup message={message} onClose={() => { setOpenModal(false); }} submit={handleChangeData} />}
-            {openMap && <MapPopup onClose={() => { setOpenMap(false) }} dataInitial={data.driverAddress} setData={setData} data={data} />} */}
             <motion.div
                 ref={notificationRef}
                 className={`relative w-[98%] sm:w-9/12 dark:bg-navy-900 bg-white rounded-xl p-4 overflow-y-auto`}
@@ -88,43 +68,64 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                 <div className="h-96 mt-4 relative flex flex-col lg:flex-row bg-gray-200 bg-clip-border 
                  dark:!bg-navy-800 dark:text-white w-full overflow-y-scroll p-4 rounded-sm">
                     <div className="flex flex-col gap-5 lg:w-1/2 lg:pt-2 lg:pr-5">
-                        {/*                         
-                            <div className="flex">
-                                <div className="w-1/2 font-bold text-base">
-                                    Tên tài xế:
-                                </div>
-                                <div>{data.driverName}</div>
-                            </div>
-                    
-                        
-                            <div className="flex">
-                                <div className="w-1/2 font-bold text-base">
-                                    Số điện thoại:
-                                </div>
-                                <div>{data.driverNumber}</div>
-                            </div>
-            
-                        
-                            <div className="flex">
-                                <div className="w-1/2 font-bold text-base">
-                                    Địa chỉ cư trú:
-                                </div>
-                                <div className="w-1/2 line-clamp-3">{data.driverAddress.address}</div>
-                            </div>
-                            
-                        <div className="flex lg:pb-4">
+                        <Button
+                            onClick={() => { setPassData(data.driverID); route.push("/driver") }}
+                            className="h-8 w-full flex gap-1 rounded-md border-2 bg-white dark:bg-navy-800"
+                        >
+                            Xem thông tin tài xế
+                        </Button>
+                        <Button
+                            onClick={() => { setPassData(data.carID); route.push("/vehicle") }}
+                            className="h-8 w-full flex gap-1 rounded-md border-2 bg-white dark:bg-navy-800"
+                        >
+                            Xem thông tin phương tiện
+                        </Button>
+                        <div className="relative flex w-full justify-self-center place-items-center gap-2">
+                            <p className="absolute right-1/2 translate-x-1/2">{data.routeProgress.toFixed(2)}%</p>
+                            <Progress value={data.routeProgress} bg_color="bg-white dark:bg-navy-700" />
+                        </div>
+                        <div className="flex">
                             <div className="w-1/2 font-bold text-base">
-                                Trạng thái:
+                                Tên tài xế:
                             </div>
-                            <div>{data.driverStatus == 0 ? "Sẵn sàng" : "Đang nhận đơn"}</div>
-                        </div> */}
+                            <div>{data.driverName}</div>
+                        </div>
+
+                        <div className="flex">
+                            <div className="w-1/2 font-bold text-base">
+                                Biển số xe:
+                            </div>
+                            <div className="w-1/2 line-clamp-3">{data.carLicensePlate}</div>
+                        </div>
+
+                        <div className="flex">
+                            <div className="w-1/2 font-bold text-base">
+                                Loại phương tiện:
+                            </div>
+                            <div>{data.carType == "Bus" ? "Xe buýt" : (data.carType == "Truck" ? "Xe tải" : "Xe container")}</div>
+                        </div>
+
+                        <div className="flex">
+                            <div className="w-1/2 font-bold text-base">
+                                Ngày tạo:
+                            </div>
+                            <div className="w-1/2">{new Date(data.beginDate).toLocaleString()}</div>
+                        </div>
+
+                        <div className="flex">
+                            <div className="w-1/2 font-bold text-base">
+                                Ngày dự kiến hoàn thành:
+                            </div>
+                            <div className="w-1/2">{new Date(data.endDate).toLocaleString()}</div>
+                        </div>
+
                     </div>
 
-                    <div className="flex flex-col lg:w-1/2 relative dark:bg-navy-900 bg-white rounded-xl p-4 pt-2 mt-6 lg:mt-0 h-full">
+                    <div className="flex flex-col lg:w-1/2 min-h-full relative dark:bg-navy-900 bg-white rounded-xl p-4 pt-2 mt-6 lg:mt-0 h-full">
                         <span className="w-full text-center font-bold text-lg pb-2">
                             Vị trí hiện tại
                         </span>
-                        <MapExport source={source} destination={destination} progress={45} />
+                        <MapExport source={data.begin} destination={data.end} progress={parseFloat(data.routeProgress.toFixed(2))} />
                     </div>
                 </div>
 
@@ -133,7 +134,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose }) => {
                         className="w-full rounded-lg mt-5 mb-1 py-3 text-[#545e7b] border-[#545e7b] hover:border-green-600 dark:hover:bg-green-700 
                             bg-transparent  hover:text-white border-2 hover:bg-green-600 dark:text-white dark:hover:border-green-700 
                             hover:shadow-md"
-                    // onClick={handleEditClick}
+                        onClick={handleClose}
                     >
                         <span>
                             Xác nhận

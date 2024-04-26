@@ -7,6 +7,7 @@ import routeData from "./variables/routeData.json";
 import CheckTable from "./components/CheckTable";
 import { useCallback, useEffect, useState } from "react";
 import { RouteOperation } from "@/library/route";
+import CustomLoadingElement from "@/app/components/loading";
 
 const DriverManager = () => {
   const [tableData, setTableData] = useState<any>(null)
@@ -14,9 +15,10 @@ const DriverManager = () => {
 
   const handleFetchRoute = async () => {
     const response = await route.viewAllRoute();
-    console.log(response)
-    setTableData(response.data)
+    const filteredData = response.data.filter((item: any) => item.status !== "Deleted");
+    setTableData(filteredData);
   }
+
 
   useEffect(() => {
     handleFetchRoute()
@@ -27,16 +29,18 @@ const DriverManager = () => {
   }, []);
   return (
     <div className="mt-5 grid min-h-[calc(100vh-126px)] grid-cols-1 gap-5">
-      <motion.div
+      {tableData ? <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
       >
         <CheckTable
           columnsData={columnsData}
-          tableData={routeData}
+          tableData={tableData}
+          reloadData={reloadData}
         />
       </motion.div>
+        : <CustomLoadingElement />}
     </div>
   );
 };

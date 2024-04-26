@@ -1,5 +1,5 @@
 "use client"
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Card from "@/components/card";
 import Checkbox from "@/components/checkbox";
 import {
@@ -29,6 +29,7 @@ import { Address, Driver } from "@/library/libraryType/type";
 import { DriverOperation } from "@/library/driver";
 import NotiPopup from "@/components/notification";
 import SubmitPopup from "@/components/submit";
+import { usePassDataContext } from "@/providers/PassedData";
 
 type Props = {
   columnsData: any[];
@@ -46,6 +47,7 @@ const CheckTable = (props: Props) => {
   const [openError2, setOpenError2] = useState(false);
   const [message, setMessage] = useState("");
   const driver = new DriverOperation()
+  const { passData, setPassData } = usePassDataContext();
   const [address, setAddress] = useState<Address>({
     latitude: 0,
     longitude: 0,
@@ -145,6 +147,20 @@ const CheckTable = (props: Props) => {
     state: { pageIndex },
     setGlobalFilter,
   } = tableInstance;
+
+  useEffect(() => {
+    const handleFetchData = async () => {
+      if (passData && passData != "") {
+        const response = await driver.GetDriver(passData);
+        if (response) {
+          setDataRow(response);
+          setOpenModal(true)
+          setPassData("")
+        }
+      }
+    }
+    handleFetchData();
+  }, [passData]);
 
   return (
     <Card className={"w-full sm:overflow-auto p-4"}>

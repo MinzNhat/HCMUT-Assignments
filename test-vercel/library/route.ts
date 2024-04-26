@@ -30,12 +30,12 @@ export class RouteOperation {
                 response.data = "Không có xe phù hợp, vui lòng tạo mới."
                 return response;
             }
-            
+
             routeInfo.car = car;
             const endDate = await this.CaculateEndDate(routeInfo.beginDate, routeInfo.distance, routeInfo.car);
             const RouteCost = await this.CalculatePricebyType(routeInfo.distance, routeInfo.typeCar);
             const Income = await this.calculateIncome(RouteCost);
-            
+
             await this.DriverStatusUpdate(routeInfo.driver, 1);
             await this.CarStatusUpdate(routeInfo.car, "Active");
             await this.CalculatePrice(routeInfo.distance);
@@ -52,8 +52,11 @@ export class RouteOperation {
                 beginDate: routeInfo.beginDate,
                 distance: routeInfo.distance,
                 endDate: endDate,
-                car: routeInfo.car,
-                driver: routeInfo.driver,
+                carID: routeInfo.car.id,
+                carType: routeInfo.car.type,
+                carLicensePlate: routeInfo.car.licenseplate,
+                driverID: routeInfo.driver.id,
+                driverName: routeInfo.driver.driverName,
                 price: RouteCost,
                 task: routeInfo.task,
                 status: 'Active',
@@ -81,18 +84,29 @@ export class RouteOperation {
 
             if (routeDoc.exists()) {
                 const routeData = routeDoc.data();
+                const beginDate = new Date(routeData.beginDate.seconds * 1000);
+                const endDate = new Date(routeData.endDate.seconds * 1000);
+                const progress = await this.calculateRouteProgress(beginDate, endDate);
+
                 return {
                     id: routeId,
-                    begin: routeData.begin,
-                    end: routeData.end,
-                    beginDate: routeData.beginDate,
                     distance: routeData.distance,
-                    endDate: routeData.endDate,
                     car: routeData.car,
                     driver: routeData.driver,
                     price: routeData.price,
                     task: routeData.task,
-                    status: routeData.status
+                    status: routeData.status,
+                    begin: routeData.begin,
+                    end: routeData.end,
+                    beginDate: beginDate,
+                    endDate: endDate,
+                    carID: routeData.carID,
+                    carLicensePlate: routeData.carLicensePlate,
+                    carType: routeData.carType,
+                    driverID: routeData.driverID,
+                    driverName: routeData.driverName,
+                    income: routeData.income,
+                    routeProgress: progress
                 };
             }
             else {
@@ -120,19 +134,23 @@ export class RouteOperation {
                 const beginDate = new Date(doc.data().beginDate.seconds * 1000);
                 const endDate = new Date(doc.data().endDate.seconds * 1000);
                 const progress = await this.calculateRouteProgress(beginDate, endDate);
-             
+
                 result.push({
                     begin: doc.data().begin,
                     end: doc.data().end,
                     beginDate: new Date(doc.data().beginDate.seconds * 1000),
                     endDate: new Date(doc.data().endDate.seconds * 1000),
-                    carNumber: doc.data().car,
-                    DriverNumber: doc.data().DriverNumber,
+                    carID: doc.data().carID,
+                    carLicensePlate: doc.data().carLicensePlate,
+                    carType: doc.data().carType,
+                    driverID: doc.data().driverID,
+                    driverName: doc.data().driverName,
                     price: doc.data().price,
                     id: doc.id,
                     status: doc.data().status,
                     routeProgress: progress,
-                    income:doc.data().income
+                    income: doc.data().income,
+                    distance: doc.data().distance
                 })
             })
             if (result) {
@@ -148,19 +166,19 @@ export class RouteOperation {
         }
     }
 
-    async UpdateRouteStatus(RouteID: string, Status: string){
+    async UpdateRouteStatus(RouteID: string, Status: string) {
         try {
             const routeDocRef = doc(RouteRef, RouteID);
-                await updateDoc(routeDocRef, {
+            await updateDoc(routeDocRef, {
                 status: Status
             });
             console.log("Route status updated successfully");
-        } 
+        }
         catch (error) {
             console.error("Error updating route status:", error);
         }
     }
-    
+
 
     async deleteRouteByID(routeID: string) {
         try {
@@ -174,9 +192,9 @@ export class RouteOperation {
             await updateDoc(routeRef, {
                 status: "Deleted"
             });
-    
+
             return { error: false, data: "Route deleted successfully" };
-        } 
+        }
         catch (error) {
             console.error("Error deleting route:", error);
             return { error: true, data: error };
@@ -234,7 +252,7 @@ export class RouteOperation {
         }
     }
 
-    async delayMaintenanceDate(vehicle: Vehicle, endDate: Date){
+    async delayMaintenanceDate(vehicle: Vehicle, endDate: Date) {
         // Check if maintenance day is before the end date
         if (vehicle.maintenanceDay && vehicle.maintenanceDay < endDate) {
             // Set maintenance day to the day after the end date
@@ -251,7 +269,7 @@ export class RouteOperation {
         return endDate;
     }
 
-    async CalculatePricebyType(distance: number, type: string){
+    async CalculatePricebyType(distance: number, type: string) {
         const prices: { [key: string]: number } = {
             Truck: 2500,
             Bus: 4500,
@@ -298,9 +316,9 @@ export class RouteOperation {
         }
     }
 
-    async calculateIncome(RoutePrice: number){
+    async calculateIncome(RoutePrice: number) {
         // Assuming income is 5% of the route price
-        const incomePercentage = 0.05; 
+        const incomePercentage = 0.05;
         const income = RoutePrice * incomePercentage;
         return income;
     }
