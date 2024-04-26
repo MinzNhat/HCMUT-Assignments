@@ -8,11 +8,9 @@ import {
 } from 'firebase/firestore';
 import { Route, Response, Address, Vehicle, Driver, Observer, CreateRoute } from './libraryType/type';
 import { db } from './account';
-import { vehicle } from './vehicle';
 import { DriverRegister } from './driver';
 
 // Initialize Firebase
-const colRef = collection(db, 'books');
 const CarRef = collection(db, 'Vehicle');
 const DriverRef = collection(db, 'Driver');
 const RouteRef = collection(db, 'Route');
@@ -35,7 +33,6 @@ export class RouteOperation {
             const endDate = await this.CaculateEndDate(routeInfo.beginDate, routeInfo.distance, routeInfo.car);
             const RouteCost = await this.CalculatePricebyType(routeInfo.distance, routeInfo.typeCar);
             const Income = await this.calculateIncome(RouteCost);
-
             await this.DriverStatusUpdate(routeInfo.driver, 1);
             await this.CarStatusUpdate(routeInfo.car, "Active");
             await this.CalculatePrice(routeInfo.distance);
@@ -79,7 +76,12 @@ export class RouteOperation {
     }
 
     async GetRoute(routeId: string) {
+        let response: Response = {
+            error: true,
+            data: null
+        }
         try {
+            
             const routeDoc = await getDoc(doc(db, "Route", routeId));
 
             if (routeDoc.exists()) {
@@ -88,7 +90,7 @@ export class RouteOperation {
                 const endDate = new Date(routeData.endDate.seconds * 1000);
                 const progress = await this.calculateRouteProgress(beginDate, endDate);
 
-                return {
+                response.data = {
                     id: routeId,
                     distance: routeData.distance,
                     car: routeData.car,
@@ -108,15 +110,18 @@ export class RouteOperation {
                     income: routeData.income,
                     routeProgress: progress
                 };
+                response.error =false
             }
             else {
-                console.log("Route not found");
-                return null;
+                throw "Route not found";
             }
         }
         catch (error) {
             console.error("Error retrieving route:", error);
-            throw error;
+            
+        }
+        finally{
+            return response
         }
     }
 
@@ -167,15 +172,23 @@ export class RouteOperation {
     }
 
     async UpdateRouteStatus(RouteID: string, Status: string) {
+        let response: Response = {
+            error: true,
+            data: null
+        }
         try {
             const routeDocRef = doc(RouteRef, RouteID);
             await updateDoc(routeDocRef, {
                 status: Status
             });
-            console.log("Route status updated successfully");
+            response.error =false
+            response.data =("Route status updated successfully");
         }
         catch (error) {
             console.error("Error updating route status:", error);
+        }
+        finally{
+            return response
         }
     }
 
@@ -253,12 +266,16 @@ export class RouteOperation {
     }
 
     async delayMaintenanceDate(vehicle: Vehicle, endDate: Date) {
-        // Check if maintenance day is before the end date
+       
+       try{ // Check if maintenance day is before the end date
         if (vehicle.maintenanceDay && vehicle.maintenanceDay < endDate) {
             // Set maintenance day to the day after the end date
             const nextDay = new Date(endDate);
             nextDay.setDate(nextDay.getDate() + 1);
             vehicle.maintenanceDay = nextDay;
+        }}
+        catch(error){
+            throw error
         }
     }
 
@@ -332,7 +349,7 @@ export class RouteOperation {
         const elapsedTime = currentTime - beginTime;
         // console.log(beginDate)
         // console.log(endDate)
-
+        
         const progressPercentage = (elapsedTime / totalTime) * 100;
         return Math.min(100, Math.max(0, progressPercentage));
     }
