@@ -33,7 +33,7 @@ const categories = past7DaysData.map(day => {
 const data = past7DaysData.map(day => day.tripsCount);
 export const barChartDataDailyTraffic = [
   {
-    name: "Daily Traffic",
+    name: "Số lượng chuyến xe",
     data: data,
   },
 ];

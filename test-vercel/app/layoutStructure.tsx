@@ -5,7 +5,7 @@ import "@/components/calendar/MiniCalendar.css";
 import Image from "next/image";
 import { LoadScript } from "@react-google-maps/api";
 import { Suspense } from "react";
-import UserProvider from "@/providers/UserInfoProvider";
+import UserProvider from "@/providers/PassedData";
 export const CustomLoadingElement = () => {
   return (
     <div className="w-full h-screen flex flex-col gap-4 justify-center place-items-center dark:text-white bg-white dark:bg-navy-800">

@@ -120,6 +120,10 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
         }
     }, [data]);
 
+    useEffect(() => {
+        console.log(data.maintenanceDay)
+    }, []);
+
     const handleNumericInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         if (/^\d*\.?\d*$/.test(value)) {
@@ -326,7 +330,7 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
                         <span className="w-full text-center font-bold text-base pb-2">
                             Đặt lịch bảo dưỡng định kỳ
                         </span>
-                        <MiniCalendar value={data.maintenanceDay} onChange={(e: any) => setData({ ...data, maintenanceDay: e.target.value })} />
+                        <MiniCalendar value={data.maintenanceDay} onChange={(e: any) => setData({ ...data, maintenanceDay: e })} />
                     </div>
                 </div>
 

@@ -324,13 +324,17 @@ export class VehicleOperation {
         }
     }
     async GetVehicle(vehicleId: string) {
+        let response: Response = {
+            error: true,
+            data: null
+        }
         try {
             await DriverRegister.ScanForRouteEnd()
             const vehicleDoc = await getDoc(doc(db, "Vehicle", vehicleId));
 
             if (vehicleDoc.exists()) {
                 const vehicleData = vehicleDoc.data();
-                return {
+                response.data ={
                     type: vehicleData.type,
                     licenseplate: vehicleData.licenseplate,
                     enginefuel: vehicleData.enginefuel,
@@ -341,19 +345,23 @@ export class VehicleOperation {
                     status: vehicleData.status,
                     price: vehicleData.price,
                     velocity: vehicleData.price,
-                    maintenanceDay: vehicleData.maintenanceDay,
+                    maintenanceDay: new Date(vehicleData.maintenanceDay.seconds * 1000),
                     id: vehicleId
                 };
+                response.error=false
             }
             else {
                 // If ID does not exist
-                console.log("Driver not found");
-                return null;
+                throw "Driver not found"
+                
             }
         }
         catch (error) {
             console.error("Error retrieving driver:", error);
-            throw error;
+            
+        }
+        finally{
+            return response
         }
     }
 };

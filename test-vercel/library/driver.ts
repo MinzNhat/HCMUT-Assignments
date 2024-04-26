@@ -70,8 +70,12 @@ export class DriverRegister {
     static async deleteDriver(id: string) {
         const docRef = doc(db, 'Driver', id)
         const data = await getDoc(docRef)
-        if (!data.exists) throw "id not exist when call delete driver by ID"
+        if (!data.exists()) throw "id not exist when call delete driver by ID"
         const result = { ...data.data(), id: data.id }
+        if (data.exists() && data.data().driverStatus == 1) {
+            console.log(`Driver id ${data.id} is Inactive, please wait for route end or delete route to delete this driver`)
+            return result
+        }
         await deleteDoc(docRef)
         return result
     }
@@ -120,49 +124,40 @@ export class DriverRegister {
         */
         const driverArray = await (getDocs(DriverRef))
         driverArray.docs.forEach(async (doc) => {
-            let tempUser1 = new DriverOperation()
-            const driver = await tempUser1.GetDriver(doc.id)
-            if (driver && driver.driveHistory) {
-                // console.log(driver)
-                // console.log(driver.driveHistory.length-1)
-                if (!driver.driveHistory[driver.driveHistory.length - 1]) throw `invalid ref in history of Driver ${driver}, may be u try to delete route invalidly `
-                const lastRouteID = driver.driveHistory[driver.driveHistory.length - 1]
-                // console.log(driver)
-                // console.log(`this is the last element of his, index is ${driver.driveHistory.length -1}} \n 
-                //                  and this is the id of that route (it should be string ) :${lastRouteID} ` )
-                let tempUser2 = new RouteOperation()
-                const routeObj = await tempUser2.GetRoute(lastRouteID)
-                const today = new Date()
-                // console.log(doc.data().maintenanceDay.toDate().getDate())
-                // console.log(checkmaintenanceDay.getDate())
-                // console.log(realStatus)
-                // console.log(checkmaintenanceDay.getDate() == doc.data().maintenanceDay.toDate().getDate())
-                if (routeObj) {
-                    const endDate = routeObj.endDate.toDate()
-                    // console.log(endDate < today)
-                    // console.log(driver.driverStatus == 1)
-                    // console.log(routeObj.status != "Deleted")
-                    if (endDate < today && driver.driverStatus == 1 && routeObj.status == "Active") {
-                        const vehicleID = routeObj.car.id
-                        const driverID = routeObj.driver.id
-                        await vehicle.updateVehicle(vehicleID, { status: "Inactive" })
-                        await DriverRegister.updateDriver(driverID, { driverStatus: 0 })
-                        // call some function to update status for route is expired
-                        await tempUser2.UpdateRouteStatus(lastRouteID, "Expired")
-                        //    console.log("test success")  
-                    }
-                    else if (routeObj.status == "Deleted" && driver.driverStatus == 1) {
-                        const vehicleID = routeObj.car.id
-                        const driverID = routeObj.driver.id
-                        await vehicle.updateVehicle(vehicleID, { status: "Inactive" })
-                        await DriverRegister.updateDriver(driverID, { driverStatus: 0 })
-                    }
-                    // console.log(today)
-                    // console.log(endDate)
-                }
-                else
-                    throw `  route ${lastRouteID} is null when scan to update status `
+            try {
+                let tempUser1 = new DriverOperation()
+                const driver = await tempUser1.GetDriver(doc.id)
+                if (driver && driver.data.driveHistory) {
+                    if (!driver.data.driveHistory[driver.data.driveHistory.length - 1]) throw `invalid ref in history of Driver ${driver}, may be u try to delete route invalidly `
+                    const lastRouteID = driver.data.driveHistory[driver.data.driveHistory.length - 1]
+                    let tempUser2 = new RouteOperation()
+                    const routeObj : Response = (await tempUser2.GetRoute(lastRouteID))
+                    const today = new Date()
+                    if (routeObj.data) {
+                        const endDate = routeObj.data.endDate
 
+                        if (endDate < today && driver.data.driverStatus == 1 && routeObj.data.status == 1) {
+                            const vehicleID = routeObj.data.carID
+                            const driverID = routeObj.data.driverID
+                            await vehicle.updateVehicle(vehicleID, { status: "Inactive" })
+                            await DriverRegister.updateDriver(driverID, { driverStatus: 0 })
+
+                            await tempUser2.UpdateRouteStatus(lastRouteID, "Expired")
+
+                        }
+                        else if (routeObj.data.status == "Deleted" && driver.data.driverStatus == 1) {
+                            const vehicleID = routeObj.data.car.id
+                            const driverID = routeObj.data.driver.id
+                            await vehicle.updateVehicle(vehicleID, { status: "Inactive" })
+                            await DriverRegister.updateDriver(driverID, { driverStatus: 0 })
+                        }
+                    }
+                    else
+                        throw `  route ${lastRouteID} is null when scan to update status `
+
+                }
+            } catch (error) {
+                console.log(error)
             }
         })
 
@@ -206,6 +201,7 @@ export class DriverOperation {
                     driverAddress: JSON.parse(doc.data().driverAddress),
                     driverStatus: doc.data().driverStatus,
                     driverLicense: doc.data().driverLicense,
+                    driveHistory: doc.data().driveHistory ? doc.data().driveHistory : null,
                 })
             })
             if (result) {
@@ -253,11 +249,15 @@ export class DriverOperation {
             data: null
         }
         try {
+            DriverRegister.ScanForRouteEnd()
             const batch = writeBatch(db);
             const querySnapshot = await getDocs(query(DriverRef));
 
             querySnapshot.forEach((doc) => {
-                deleteDoc(doc.ref);
+                if (doc.data().driverStatus != "Active")
+                    deleteDoc(doc.ref);
+                else
+                    console.log(`Driver id ${doc.id} is Inactive, please wait for route end or delete route to delete this driver`)
             });
             response.error = false
         }
@@ -301,12 +301,16 @@ export class DriverOperation {
         }
     }
     async GetDriver(driverId: string) { // if driver dont have his the driveHistory will be undefined
+        let response: Response = {
+            error: true,
+            data: null
+        }
         try {
             const driverDoc = await getDoc(doc(db, "Driver", driverId));
 
             if (driverDoc.exists()) {
                 const driverData = driverDoc.data();
-                return {
+                response.data = {
                     driverAddress: JSON.parse(driverData.driverAddress),
                     driverLicense: driverData.driverLicense,
                     driverName: driverData.driverName,
@@ -319,12 +323,13 @@ export class DriverOperation {
             else {
                 // If ID does not exist
                 console.log("Driver not found");
-                return null;
             }
         }
         catch (error) {
             console.error("Error retrieving driver:", error);
-            throw error;
+            
+        }finally{
+            return response
         }
     }
 

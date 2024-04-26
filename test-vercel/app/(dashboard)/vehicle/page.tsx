@@ -7,12 +7,15 @@ import {
 import { VehicleOperation } from "@/library/vehicle";
 import { useCallback, useEffect, useState } from "react";
 import CustomLoadingElement from "../../components/loading";
+import { RouteOperation } from "@/library/route";
 
 const DataTablesPage = () => {
   const [tableData, setTableData] = useState<any>(null)
   const vehice = new VehicleOperation();
+  const route = new RouteOperation()
 
   const handleFetchVehicle = async () => {
+    await route.viewAllRoute();
     const response = await vehice.viewAllVehicle();
     console.log(response)
     setTableData(response.data)

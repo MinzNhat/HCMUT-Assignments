@@ -1,5 +1,5 @@
 "use client"
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Card from "@/components/card";
 import Checkbox from "@/components/checkbox";
 import {
@@ -29,6 +29,7 @@ import { Vehicle } from "@/library/libraryType/type";
 import { VehicleOperation } from "@/library/vehicle";
 import NotiPopup from "@/components/notification";
 import SubmitPopup from "@/components/submit";
+import { usePassDataContext } from "@/providers/PassedData";
 
 type Props = {
   columnsData: any[];
@@ -46,6 +47,7 @@ const CheckTable = (props: Props) => {
   const [openError2, setOpenError2] = useState(false);
   const [message, setMessage] = useState("");
   const vehice = new VehicleOperation()
+  const { passData, setPassData } = usePassDataContext();
   const handleClodeModal = () => {
     setOpenModal(false);
   };
@@ -123,7 +125,8 @@ const CheckTable = (props: Props) => {
     width: "",
     mass: "",
     status: "",
-    id: ""
+    id: "",
+    maintenanceDay: new Date()
   })
 
   const handleDelete = async () => {
@@ -145,6 +148,20 @@ const CheckTable = (props: Props) => {
       setSelectedRows(new Set())
     }
   };
+
+  useEffect(() => {
+    const handleFetchData = async () => {
+      if (passData && passData != "") {
+        const response = await vehice.GetVehicle(passData);
+        if (response) {
+          setDataRow(response);
+          setOpenModal(true)
+          setPassData("")
+        }
+      }
+    }
+    handleFetchData();
+  }, [passData]);
   return (
     <Card className={"w-full sm:overflow-auto p-4"}>
       {openAdd && (

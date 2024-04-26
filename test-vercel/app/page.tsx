@@ -150,7 +150,7 @@ const AuthPage: FC<Props> = () => {
     const handleTestApi = async () => {
      const User2 = new RouteOperation()
     //  const response =await User2.deleteRouteByID("UO6EM0o9EQIE6be61gMT");
-    const response =await User2.viewAllRoute()
+    const response =await User2.GetRoute("etXL8Wascy4S79LifWHu")
      console.log("hello")
       console.log(response)
     };

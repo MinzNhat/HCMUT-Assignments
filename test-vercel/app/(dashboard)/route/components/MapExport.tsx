@@ -136,13 +136,30 @@ function MapExport({ source, destination, progress }: MapProps) {
         onLoad={onLoad}
         onUnmount={onUnmount}
     >
+        {currentLocation && (
+            <MarkerF position={currentLocation} icon={{
+                url: theme == "dark" ? "/img/placeholder/placeHolder3.png" : "/img/placeholder/placeHolder2.png",
+                // @ts-ignore
+                scaledSize: { equals: null, width: 50, height: 50 },
+            }} className="relative shadow" >
+                <OverlayViewF
+                    position={currentLocation}
+                    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                >
+                    <div className="absolute top-2 z-50 right-0 translate-x-1/2 p-2 text-[#1488D8] dark:bg-navy-900 dark:text-gray-300 bg-white border-[#1488D8] border-2 dark:border-gray-300
+                    transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 shadow-xl rounded-xl font-semibold text-xs truncate max-w-10">
+                        <p>Vị trí hiện tại</p>
+                    </div>
+                </OverlayViewF>
+            </MarkerF>
+        )}
         {source && (
 
             <OverlayViewF
                 position={{ lat: source.latitude, lng: source.longitude }}
                 mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
             >
-                <div className="absolute -top-2 right-0 translate-x-1/2 p-2 text-[#1488D8] dark:bg-navy-900 dark:text-gray-300 bg-white border-[#1488D8] border-2 dark:border-gray-300
+                <div className="absolute z-20 -top-2 right-0 translate-x-1/2 p-2 text-[#1488D8] dark:bg-navy-900 dark:text-gray-300 bg-white border-[#1488D8] border-2 dark:border-gray-300
                     transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 shadow-xl rounded-xl font-semibold text-xs truncate max-w-10">
                     <p>Điểm xuất phát</p>
                     <p>{source.address}</p>
@@ -157,7 +174,7 @@ function MapExport({ source, destination, progress }: MapProps) {
                     // @ts-ignore
                     scaledSize: { equals: null, width: 45, height: 45 },
                 }}
-                className="relative shadow"
+                className="relative shadow z-[25]"
             >
                 <OverlayViewF
                     position={{ lat: destination.latitude, lng: destination.longitude }}
@@ -165,28 +182,13 @@ function MapExport({ source, destination, progress }: MapProps) {
                 >
                     <div className="absolute top-2 right-0 translate-x-1/2 p-2 text-[#1488D8] dark:bg-navy-900 dark:text-gray-300 bg-white border-[#1488D8] border-2 dark:border-gray-300
                     transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 shadow-xl rounded-xl font-semibold text-xs truncate max-w-10">
+                        <p>Điểm đến</p>
                         <p>{destination.address}</p>
                     </div>
                 </OverlayViewF>
             </MarkerF>
         )}
-        {currentLocation && (
-            <MarkerF position={currentLocation} icon={{
-                url: theme == "dark" ? "/img/placeholder/placeHolder3.png" : "/img/placeholder/placeHolder2.png",
-                // @ts-ignore
-                scaledSize: { equals: null, width: 50, height: 50 },
-            }} className="relative shadow" >
-                <OverlayViewF
-                    position={currentLocation}
-                    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                >
-                    <div className="absolute top-2 right-0 translate-x-1/2 p-2 text-[#1488D8] dark:bg-navy-900 dark:text-gray-300 bg-white border-[#1488D8] border-2 dark:border-gray-300
-                    transition duration-200 hover:cursor-pointer hover:bg-gray-100 active:bg-gray-200 shadow-xl rounded-xl font-semibold text-xs truncate max-w-10">
-                        <p>Vị trí hiện tại</p>
-                    </div>
-                </OverlayViewF>
-            </MarkerF>
-        )}
+
         {source && destination &&
             <DirectionsRenderer
                 directions={directionRoutePoints}
