@@ -9,6 +9,7 @@ import {
 } from 'firebase/firestore';
 import { Vehicle, Response, updateVehicle } from './libraryType/type';
 import { app, db } from './account'
+import { DriverRegister } from './driver';
 
 
 // Initialize Firebase
@@ -66,6 +67,9 @@ export class vehicle { // complete this class and delete this comment
         const docRef = doc(db, 'Vehicle', id)
         const data = await getDoc(docRef)
         if (!data.exists) throw "id not exist when call delete vehicle by ID"
+        // if(data.data().status == "Active"){
+
+        // }
         const result = { ...data.data(), id: data.id }
         await deleteDoc(docRef)
         return result
@@ -204,7 +208,8 @@ export class VehicleOperation {
         }
         let result: any[] = []
         try {
-            vehicle.ScanForMaintenance()
+            await DriverRegister.ScanForRouteEnd()
+            await vehicle.ScanForMaintenance()
             const vehicleArray = await (getDocs(VehicleRef))
             vehicleArray.docs.forEach(async (doc) => {
                 result.push({
@@ -242,6 +247,7 @@ export class VehicleOperation {
         }
 
         let result: any[] = []
+        // await DriverRegister.ScanForRouteEnd()
         await vehicle.ScanForMaintenance()
         const q = query(VehicleRef, where("status", "==", "Inactive"))
         try {
@@ -315,6 +321,39 @@ export class VehicleOperation {
             console.log(error)
         } finally {
             return response;
+        }
+    }
+    async GetVehicle(vehicleId: string) {
+        try {
+            await DriverRegister.ScanForRouteEnd()
+            const vehicleDoc = await getDoc(doc(db, "Vehicle", vehicleId));
+
+            if (vehicleDoc.exists()) {
+                const vehicleData = vehicleDoc.data();
+                return {
+                    type: vehicleData.type,
+                    licenseplate: vehicleData.licenseplate,
+                    enginefuel: vehicleData.enginefuel,
+                    height: vehicleData.height,
+                    length: vehicleData.length,
+                    width: vehicleData.width,
+                    mass: vehicleData.mass,
+                    status: vehicleData.status,
+                    price: vehicleData.price,
+                    velocity: vehicleData.price,
+                    maintenanceDay: vehicleData.maintenanceDay,
+                    id: vehicleId
+                };
+            }
+            else {
+                // If ID does not exist
+                console.log("Driver not found");
+                return null;
+            }
+        }
+        catch (error) {
+            console.error("Error retrieving driver:", error);
+            throw error;
         }
     }
 };

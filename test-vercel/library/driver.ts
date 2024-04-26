@@ -123,6 +123,9 @@ export class DriverRegister {
             let tempUser1 = new DriverOperation()
             const driver = await tempUser1.GetDriver(doc.id)
             if (driver && driver.driveHistory) {
+                // console.log(driver)
+                // console.log(driver.driveHistory.length-1)
+                if(!driver.driveHistory[driver.driveHistory.length - 1]) throw `invalid ref in history of Driver ${driver}, may be u try to delete route invalidly `
                 const lastRouteID = driver.driveHistory[driver.driveHistory.length - 1]
                 // console.log(driver)
                 // console.log(`this is the last element of his, index is ${driver.driveHistory.length -1}} \n 
@@ -139,25 +142,26 @@ export class DriverRegister {
                     // console.log(endDate < today)
                     // console.log(driver.driverStatus == 1)
                     // console.log(routeObj.status != "Deleted")
-                    if (endDate < today && driver.driverStatus == 1 && routeObj.status != "Deleted") {
+                    if (endDate < today && driver.driverStatus == 1 && routeObj.status == "Active") {
                         const vehicleID = routeObj.car.id
                         const driverID = routeObj.driver.id
-                        vehicle.updateVehicle(vehicleID, { status: "Inactive" })
-                        DriverRegister.updateDriver(driverID, { driverStatus: 0 })
+                        await vehicle.updateVehicle(vehicleID, { status: "Inactive" })
+                        await DriverRegister.updateDriver(driverID, { driverStatus: 0 })
                         // call some function to update status for route is expired
+                        await tempUser2.UpdateRouteStatus(lastRouteID,"Expired")  
                         //    console.log("test success")  
                     }
-                    else if (routeObj.status == "Deleted") {
+                    else if (routeObj.status == "Deleted" && driver.driverStatus == 1) {
                         const vehicleID = routeObj.car.id
                         const driverID = routeObj.driver.id
-                        vehicle.updateVehicle(vehicleID, { status: "Inactive" })
-                        DriverRegister.updateDriver(driverID, { driverStatus: 0 })
+                        await vehicle.updateVehicle(vehicleID, { status: "Inactive" })
+                        await DriverRegister.updateDriver(driverID, { driverStatus: 0 })
                     }
                     // console.log(today)
                     // console.log(endDate)
                 }
                 else
-                    throw `  route ${lastRouteID} is null when scan to update status, click Valorant.exe to open debuger tools `
+                    throw `  route ${lastRouteID} is null when scan to update status `
 
             }
         })
@@ -217,6 +221,7 @@ export class DriverOperation {
         }
     }
     async viewAvailableDriver() {
+        await DriverRegister.ScanForRouteEnd()
         let response: Response = {
             error: true,
             data: null
@@ -295,7 +300,7 @@ export class DriverOperation {
             return response;
         }
     }
-    async GetDriver(driverId: string) {
+    async GetDriver(driverId: string) { // if driver dont have his the driveHistory will be undefined
         try {
             const driverDoc = await getDoc(doc(db, "Driver", driverId));
 
