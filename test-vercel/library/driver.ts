@@ -10,7 +10,7 @@ import {
 import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 import { Driver, Response, Address, Route, updateDriver } from './libraryType/type';
 import { app, storage } from './account'
-import { RouteOperation } from './route';
+import { RouteOperation, trip } from './route';
 import { vehicle } from './vehicle'
 
 
@@ -73,7 +73,7 @@ export class DriverRegister {
         if (!data.exists()) throw "id not exist when call delete driver by ID"
         const result = { ...data.data(), id: data.id }
         if (data.exists() && data.data().driverStatus == 1) {
-            console.log(`Driver id ${data.id} is Inactive, please wait for route end or delete route to delete this driver`)
+            console.log(`Driver id ${data.id} is Active, please wait for route end or delete route to delete this driver`)
             return result
         }
         await deleteDoc(docRef)
@@ -131,23 +131,22 @@ export class DriverRegister {
                     if (!driver.data.driveHistory[driver.data.driveHistory.length - 1]) throw `invalid ref in history of Driver ${driver}, may be u try to delete route invalidly `
                     const lastRouteID = driver.data.driveHistory[driver.data.driveHistory.length - 1]
                     let tempUser2 = new RouteOperation()
-                    const routeObj : Response = (await tempUser2.GetRoute(lastRouteID))
+                    const routeObj: Response = (await tempUser2.GetRoute(lastRouteID))
                     const today = new Date()
                     if (routeObj.data) {
                         const endDate = routeObj.data.endDate
-
-                        if (endDate < today && driver.data.driverStatus == 1 && routeObj.data.status == 1) {
+                        if (endDate < today && driver.data.driverStatus == 1 && routeObj.data.status == "Expired") {
+                            console.log(` alraeady check driver ${routeObj.data.driverID}`)
                             const vehicleID = routeObj.data.carID
                             const driverID = routeObj.data.driverID
                             await vehicle.updateVehicle(vehicleID, { status: "Inactive" })
                             await DriverRegister.updateDriver(driverID, { driverStatus: 0 })
-
-                            await tempUser2.UpdateRouteStatus(lastRouteID, "Expired")
+                            await trip.UpdateRouteStatus(lastRouteID, "Expired")
 
                         }
                         else if (routeObj.data.status == "Deleted" && driver.data.driverStatus == 1) {
-                            const vehicleID = routeObj.data.car.id
-                            const driverID = routeObj.data.driver.id
+                            const vehicleID = routeObj.data.carID
+                            const driverID = routeObj.data.driverID
                             await vehicle.updateVehicle(vehicleID, { status: "Inactive" })
                             await DriverRegister.updateDriver(driverID, { driverStatus: 0 })
                         }
@@ -185,13 +184,13 @@ export class DriverOperation {
         }
     }
     async viewAllDriver() {
-        await DriverRegister.ScanForRouteEnd()
         let response: Response = {
             error: true,
             data: null
         }
         let result: any[] = []
         try {
+            await DriverRegister.ScanForRouteEnd()
             const driverArray = await (getDocs(DriverRef))
             driverArray.docs.forEach((doc) => {
                 result.push({
@@ -257,7 +256,7 @@ export class DriverOperation {
                 if (doc.data().driverStatus != "Active")
                     deleteDoc(doc.ref);
                 else
-                    console.log(`Driver id ${doc.id} is Inactive, please wait for route end or delete route to delete this driver`)
+                    console.log(`Driver id ${doc.id} is Active, please wait for route end or delete route to delete this driver`)
             });
             response.error = false
         }
@@ -327,8 +326,8 @@ export class DriverOperation {
         }
         catch (error) {
             console.error("Error retrieving driver:", error);
-            
-        }finally{
+
+        } finally {
             return response
         }
     }

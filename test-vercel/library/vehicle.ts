@@ -67,17 +67,18 @@ export class vehicle { // complete this class and delete this comment
         const docRef = doc(db, 'Vehicle', id)
         const data = await getDoc(docRef)
         if (!data.exists) throw "id not exist when call delete vehicle by ID"
-        // if(data.data().status == "Active"){
-
-        // }
         const result = { ...data.data(), id: data.id }
+        if (data.exists() && data.data().status == "Active") {
+            console.log(`Vehicle id ${data.id} is Active, please wait for route end or delete route to delete this vehicle`)
+            return result
+        }
         await deleteDoc(docRef)
         return result
     }
     static async updateVehicle(id: string, updateField: updateVehicle) {
         const docRef = doc(db, 'Vehicle', id)
         const data = await getDoc(docRef)
-        if (!data.exists) throw "id not exist when call update vehicle by ID"
+        if (!data.exists) throw "ID not exist when call update vehicle by ID"
         const updateData = { ...data.data() };
         for (const [fieldName, fieldValue] of Object.entries(updateField)) {
             updateData[fieldName] = fieldValue; // Update only provided fields
@@ -281,7 +282,10 @@ export class VehicleOperation {
             const querySnapshot = await getDocs(query(VehicleRef));
 
             querySnapshot.forEach((doc) => {
-                deleteDoc(doc.ref);
+                if (doc.data().status != 1)
+                    deleteDoc(doc.ref);
+                else
+                    console.log(`Vehicle id ${doc.id} is Active, please wait for route end or delete route to delete this vehicle`)
             });
             response.error = false
         }
@@ -334,7 +338,7 @@ export class VehicleOperation {
 
             if (vehicleDoc.exists()) {
                 const vehicleData = vehicleDoc.data();
-                response.data ={
+                response.data = {
                     type: vehicleData.type,
                     licenseplate: vehicleData.licenseplate,
                     enginefuel: vehicleData.enginefuel,
@@ -348,19 +352,19 @@ export class VehicleOperation {
                     maintenanceDay: new Date(vehicleData.maintenanceDay.seconds * 1000),
                     id: vehicleId
                 };
-                response.error=false
+                response.error = false
             }
             else {
                 // If ID does not exist
                 throw "Driver not found"
-                
+
             }
         }
         catch (error) {
             console.error("Error retrieving driver:", error);
-            
+
         }
-        finally{
+        finally {
             return response
         }
     }

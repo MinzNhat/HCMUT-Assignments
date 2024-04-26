@@ -146,17 +146,17 @@ const AuthPage: FC<Props> = () => {
   //   const route=new RouteOperation();
   //   console.log(route.viewAllRoute());
   // },[])
-  useEffect(() => {
-    const handleTestApi = async () => {
-     const User2 = new RouteOperation()
-    //  const response =await User2.deleteRouteByID("UO6EM0o9EQIE6be61gMT");
-    const response =await User2.GetRoute("etXL8Wascy4S79LifWHu")
-     console.log("hello")
-      console.log(response)
-    };
+  // useEffect(() => {
+  //   const handleTestApi = async () => {
+  //    const User2 = new DriverOperation()
+  //   //  const response =await User2.deleteRouteByID("UO6EM0o9EQIE6be61gMT");
+  //   const response =await User2.deleteDriverByID("h6zeohDMAbzn8qg7gM13")
+  //    console.log("hello")
+  //     console.log(response)
+  //   };
 
-    handleTestApi()
-  }, [ ]);
+  //   handleTestApi()
+  // }, [ ]);
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">
