@@ -1,6 +1,5 @@
 // Import the functions you need from the SDKs you need
-import { QuerySnapshot } from 'firebase-admin/firestore';
-import { initializeApp } from 'firebase/app';
+
 import {
     getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc,
     query, where, getDocs, GeoPoint, updateDoc, getDoc, writeBatch,
@@ -26,12 +25,13 @@ export class DriverRegister {
     id?: string
     // type: string
     //change here when we have updateIMG func
-    driveHistory?: Route[]               // we can cal experience by check the length of this
+    driveHistory?: string[]               // we can cal experience by check the length of this , this is arr of route id
     driverName: string
     driverNumber: string
     driverAddress: Address
     driverStatus: number
     driverLicense: Blob[]
+
     constructor(driverInfo: Driver) {
 
         this.driverNumber = driverInfo.driverNumber
@@ -125,7 +125,7 @@ export class DriverRegister {
             if (driver && driver.driveHistory) {
                 // console.log(driver)
                 // console.log(driver.driveHistory.length-1)
-                if(!driver.driveHistory[driver.driveHistory.length - 1]) throw `invalid ref in history of Driver ${driver}, may be u try to delete route invalidly `
+                if (!driver.driveHistory[driver.driveHistory.length - 1]) throw `invalid ref in history of Driver ${driver}, may be u try to delete route invalidly `
                 const lastRouteID = driver.driveHistory[driver.driveHistory.length - 1]
                 // console.log(driver)
                 // console.log(`this is the last element of his, index is ${driver.driveHistory.length -1}} \n 
@@ -148,7 +148,7 @@ export class DriverRegister {
                         await vehicle.updateVehicle(vehicleID, { status: "Inactive" })
                         await DriverRegister.updateDriver(driverID, { driverStatus: 0 })
                         // call some function to update status for route is expired
-                        await tempUser2.UpdateRouteStatus(lastRouteID,"Expired")  
+                        await tempUser2.UpdateRouteStatus(lastRouteID, "Expired")
                         //    console.log("test success")  
                     }
                     else if (routeObj.status == "Deleted" && driver.driverStatus == 1) {

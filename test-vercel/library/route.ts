@@ -8,11 +8,9 @@ import {
 } from 'firebase/firestore';
 import { Route, Response, Address, Vehicle, Driver, Observer, CreateRoute } from './libraryType/type';
 import { db } from './account';
-import { vehicle } from './vehicle';
 import { DriverRegister } from './driver';
 
 // Initialize Firebase
-const colRef = collection(db, 'books');
 const CarRef = collection(db, 'Vehicle');
 const DriverRef = collection(db, 'Driver');
 const RouteRef = collection(db, 'Route');
@@ -314,7 +312,7 @@ export class RouteOperation {
         const elapsedTime = currentTime - beginTime;
         // console.log(beginDate)
         // console.log(endDate)
-
+        
         const progressPercentage = (elapsedTime / totalTime) * 100;
         return Math.min(100, Math.max(0, progressPercentage));
     }
