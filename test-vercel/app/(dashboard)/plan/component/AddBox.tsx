@@ -111,6 +111,7 @@ const AddPanel = () => {
             setIsCollapsed(true);
             setDestination(null);
             setSource(null)
+            setDistance(null)
         };
     }, []);
 

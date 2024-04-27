@@ -152,11 +152,13 @@ const CheckTable = (props: Props) => {
     const handleFetchData = async () => {
       if (passData && passData != "") {
         const response = await driver.GetDriver(passData);
-        if (response) {
-          setDataRow(response);
+        if (!response.error) {
+          setDataRow(response.data);
           setOpenModal(true)
           setPassData("")
         }
+        console.log(response)
+
       }
     }
     handleFetchData();

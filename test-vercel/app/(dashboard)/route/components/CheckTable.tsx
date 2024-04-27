@@ -134,8 +134,8 @@ const CheckTable = (props: Props) => {
     const handleFetchData = async () => {
       if (passData && passData != "") {
         const response = await routeOp.GetRoute(passData);
-        if (response) {
-          setDataRow(response);
+        if (!response.error) {
+          setDataRow(response.data);
           setOpenModal(true)
           setPassData("")
         }

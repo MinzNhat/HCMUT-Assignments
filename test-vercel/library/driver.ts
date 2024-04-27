@@ -318,9 +318,9 @@ export class DriverOperation {
                     driveHistory: driverData.driveHistory,
                     id: driverId
                 };
+                response.error = false;
             }
             else {
-                // If ID does not exist
                 console.log("Driver not found");
             }
         }

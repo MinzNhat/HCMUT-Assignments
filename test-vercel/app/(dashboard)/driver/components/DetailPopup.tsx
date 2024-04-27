@@ -15,6 +15,8 @@ import SubmitPopup from "@/components/submit";
 import { FaSave } from "react-icons/fa";
 import MapPopup from "./MapPopup";
 import { MdHistory } from "react-icons/md";
+import { RouteOperation } from "@/library/route";
+import CustomTimeline from "@/components/timeline";
 
 interface DriverData {
     driverName: string;
@@ -22,6 +24,7 @@ interface DriverData {
     driverAddress: Address;
     driverStatus: number;
     driverLicense: string[];
+    driveHistory?: string[]
 }
 
 interface AddPopupProps {
@@ -39,8 +42,10 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
     const [openModal, setOpenModal] = useState(false);
     const [openError, setOpenError] = useState(false);
     const [openMap, setOpenMap] = useState(false);
+    const [openNoti, setOpenNoti] = useState(false);
     const [message, setMessage] = useState("");
     const driver = new DriverOperation()
+    const route = new RouteOperation()
     const [errors, setErrors] = useState({
         driverName: "",
         driverNumber: "",
@@ -48,6 +53,22 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
         driverStatus: "",
         driverLicense: "",
     });
+    const [routes, setRoutes] = useState<any>([]);
+    useEffect(() => {
+        const fetchRoutes = async () => {
+            try {
+                const driveHistory = dataInitial.driveHistory || [];
+                const routeData = await Promise.all(driveHistory.map(routeID => route.GetRoute(routeID)));
+                const routesData = routeData.map(response => response.data);
+
+                setRoutes(routesData);
+            } catch (error) {
+                console.error("Error fetching routes:", error);
+            }
+        };
+
+        fetchRoutes();
+    }, [dataInitial]);
 
     const handleEditClick = async () => {
         console.log(data)
@@ -174,6 +195,14 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
             onAnimationComplete={handleAnimationComplete}
         >
             {openError && <NotiPopup message={message} onClose={() => { setOpenError(false); setIsEditing(false); }} />}
+            {openNoti && <NotiPopup message={
+                <div className="mt-6">
+                    {routes.length > 0 ? (
+                        <CustomTimeline data={routes} />
+                    ) : (
+                        <p>Người này không có lịch sử lái xe.</p>
+                    )}
+                </div>} onClose={() => { setOpenNoti(false) }} name="Lịch sử lái xe" />}
             {openModal && <SubmitPopup message={message} onClose={() => { setOpenModal(false); }} submit={handleChangeData} />}
             {openMap && <MapPopup onClose={() => { setOpenMap(false) }} dataInitial={data.driverAddress} setData={setData} data={data} />}
             <motion.div
@@ -259,7 +288,7 @@ const AddPopup: React.FC<AddPopupProps> = ({ onClose, dataInitial, reloadData })
                         </div>
                         <Button
                             className="h-8 w-full flex gap-1 rounded-md border-2 dark:border-white border-[#000000] bg-white dark:bg-navy-800"
-                        // onClick={() => { setOpenMap(true) }}
+                            onClick={() => { setOpenNoti(true) }}
                         >
                             Lịch sử lái xe
                             <MdHistory />

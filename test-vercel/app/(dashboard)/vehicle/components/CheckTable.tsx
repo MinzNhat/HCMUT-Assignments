@@ -153,8 +153,8 @@ const CheckTable = (props: Props) => {
     const handleFetchData = async () => {
       if (passData && passData != "") {
         const response = await vehice.GetVehicle(passData);
-        if (response) {
-          setDataRow(response);
+        if (!response.error) {
+          setDataRow(response.data);
           setOpenModal(true)
           setPassData("")
         }

@@ -10,6 +10,8 @@ import { VehicleOperation } from "@/library/vehicle";
 import NotiPopup from "@/components/notification";
 import SubmitPopup from "@/components/submit";
 import InputWithError from "./Input";
+import { RouteOperation } from "@/library/route";
+import CustomTimeline from "@/components/timeline";
 
 interface DetailPopupProps {
     onClose: () => void;
@@ -26,6 +28,7 @@ const DetailPopup: React.FC<DetailPopupProps> = ({ onClose, dataInitial, reloadD
     const [openError, setOpenError] = useState(false);
     const [message, setMessage] = useState("");
     const vehice = new VehicleOperation()
+    const route = new RouteOperation()
     const [errors, setErrors] = useState({
         licenseplate: "",
         height: "",

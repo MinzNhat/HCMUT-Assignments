@@ -193,7 +193,7 @@ export class trip {
         return Math.min(100, Math.max(0, progressPercentage));
     }
 
-     async DriverStatusUpdate(driverId:string, status: number) {
+    async DriverStatusUpdate(driverId: string, status: number) {
         try {
             await updateDoc(doc(DriverRef, driverId), {
                 driverStatus: status
@@ -205,7 +205,7 @@ export class trip {
         }
     }
 
-     async CarStatusUpdate(carId: string, status: string) {
+    async CarStatusUpdate(carId: string, status: string) {
         try {
             await updateDoc(doc(CarRef, carId), {
                 status: status
@@ -269,7 +269,7 @@ export class RouteOperation {
             // Create route object
             if (newRoute) {
                 await newRoute.storeToFB()
-                await newRoute.delayMaintenanceDate(car,newRoute.endDate)
+                await newRoute.delayMaintenanceDate(car, newRoute.endDate)
                 response.data = newRoute
                 response.error = false
             }

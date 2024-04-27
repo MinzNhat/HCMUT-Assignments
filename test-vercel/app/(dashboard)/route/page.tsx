@@ -16,6 +16,7 @@ const DriverManager = () => {
   const handleFetchRoute = async () => {
     const response = await route.viewAllRoute();
     const filteredData = response.data.filter((item: any) => item.status !== "Deleted");
+    console.log(filteredData)
     setTableData(filteredData);
   }
 

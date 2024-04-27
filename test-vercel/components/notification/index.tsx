@@ -5,9 +5,10 @@ interface NotiPopupProps {
     onClose: () => void;
     message: string | JSX.Element;
     ref?: any;
+    name?: string
 }
 
-const NotiPopup: React.FC<NotiPopupProps> = ({ onClose, message, ref }) => {
+const NotiPopup: React.FC<NotiPopupProps> = ({ onClose, message, ref, name }) => {
     const notificationRef = useRef<HTMLDivElement>(null);
     const [isVisible, setIsVisible] = useState(true);
 
@@ -64,7 +65,7 @@ const NotiPopup: React.FC<NotiPopupProps> = ({ onClose, message, ref }) => {
                 exit={{ scale: 0 }}
                 transition={{ duration: 0.5 }}
             >
-                <h2 className="text-[#000000] dark:text-gray-500 text-xl font-bold mb-2 text-center">Thông báo</h2>
+                <h2 className="text-[#000000] dark:text-gray-500 text-xl font-bold mb-2 text-center">{name ? name : "Thông báo"}</h2>
                 <div className="overflow-scroll max-h-full w-full no-scrollbar"><p className="text-[#000000] dark:text-gray-500 w-full text-center">{message}</p></div>
 
                 <div className="flex w-full justify-end gap-2">
