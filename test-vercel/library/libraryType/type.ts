@@ -60,7 +60,7 @@ export interface updateVehicle {
 export interface updateDriver {
     // type: string,
     //change here when we have updateIMG func
-    driveHistory?: Route[],               // we can cal experience by check the length of this
+    driveHistory?: string[],               // we can cal experience by check the length of this
     driverName?: string,
     driverNumber?: string,
     driverAddress?: Address,
