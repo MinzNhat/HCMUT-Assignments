@@ -21,7 +21,7 @@ type Props = {};
 const DashboardPage: FC<Props> = () => {
     const [vehicleData, setVehicleData] = useState<any>(null)
     const [driverData, setDriverData] = useState<any>(null)
-    const [routeData, setRouteData] = useState<Route[]>([])
+    const [routeData, setRouteData] = useState<any>(null)
     const vehice = new VehicleOperation();
     const driver = new DriverOperation();
     const route = new RouteOperation();
