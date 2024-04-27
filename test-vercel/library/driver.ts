@@ -135,7 +135,7 @@ export class DriverRegister {
                     const today = new Date()
                     if (routeObj.data) {
                         const endDate = routeObj.data.endDate
-                        if (endDate < today && driver.data.driverStatus == 1 && routeObj.data.status == "Expired") {
+                        if (endDate < today && driver.data.driverStatus == 1 && routeObj.data.status == "Active") {
                             console.log(` alraeady check driver ${routeObj.data.driverID}`)
                             const vehicleID = routeObj.data.carID
                             const driverID = routeObj.data.driverID
