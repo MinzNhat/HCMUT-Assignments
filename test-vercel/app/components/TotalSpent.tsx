@@ -163,9 +163,7 @@ const TotalSpent = ({ data }: { data: Route[] }) => {
       <div className="flex h-full w-full flex-col sm:flex-row gap-2 justify-between 2xl:overflow-hidden">
         <div className="flex gap-2 justify-between sm:justify-start sm:flex-col">
           <p className="mt-[10px] sm:mt-[20px] text-3xl font-bold text-navy-700 dark:text-white flex">
-            {(calculateTotalProfit7Days() - calculateTotalTrips7Days()).toLocaleString('vi-VN')}
-            {' '}
-            <p className="mt-1">₫</p>
+            {(calculateTotalProfit7Days() - calculateTotalTrips7Days()).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
           </p>
           <div className="flex flex-col items-end sm:items-start">
             <p className="mt-2 text-sm text-gray-600 whitespace-nowrap">Tổng lợi nhuận</p>
