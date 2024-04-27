@@ -90,10 +90,13 @@ const TotalSpent = ({ data }: { data: Route[] }) => {
           fontFamily: undefined,
           backgroundColor: "#000000"
         },
-        theme: 'dark',
-        x: {
-          format: "dd/MM/yy HH:mm",
+        onDatasetHover: {
+          style: {
+            fontSize: "12px",
+            fontFamily: undefined,
+          },
         },
+        theme: "dark",
       },
       grid: {
         show: false,
